@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PickRuleMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_PICKRULE(
+			CUSTOMER_ID,	
+			PICK_RULE_CODE,	
+			PICK_RULE_CN,	
+			MEMO,	
+			PROD_COMB_USE,	
+			OUT_PROD_DAY,	
+			OUT_PROD_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PICKRULE_ID
+		) values (
+			#{CUSTOMER_ID},	
+			#{PICK_RULE_CODE},	
+			#{PICK_RULE_CN},	
+			#{MEMO},	
+			#{PROD_COMB_USE},	
+			#{OUT_PROD_DAY},	
+			#{OUT_PROD_USE},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{PICKRULE_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_PICKRULE
+		where PICKRULE_ID = #{PICKRULE_ID}
+		 AND  PICKRULE_ID NOT IN (SELECT RULE_PICK  FROM  TB_PRODUCT )
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_PICKRULE
+			set 
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				PICK_RULE_CODE = #{PICK_RULE_CODE},
+				PICK_RULE_CN = #{PICK_RULE_CN},
+				MEMO = #{MEMO},
+				PROD_COMB_USE = #{PROD_COMB_USE},
+				OUT_PROD_DAY = #{OUT_PROD_DAY},
+				OUT_PROD_USE = #{OUT_PROD_USE},
+			PICKRULE_ID = PICKRULE_ID
+			where 
+				PICKRULE_ID = #{PICKRULE_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			CUSTOMER_ID,	
+			PICK_RULE_CODE,	
+			PICK_RULE_CN,	
+			MEMO,	
+			PROD_COMB_USE,	
+			OUT_PROD_DAY,	
+			OUT_PROD_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PICKRULE_ID
+		from 
+			TB_PICKRULE
+		where 
+			PICKRULE_ID = #{PICKRULE_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.PICK_RULE_CODE,	
+				a.PICK_RULE_CN,	
+				a.MEMO,	
+				a.PROD_COMB_USE,	
+				a.OUT_PROD_DAY,	
+				a.OUT_PROD_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PICKRULE_ID
+		from 
+				TB_PICKRULE a
+				WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.PICK_RULE_CODE != null and pd.PICK_RULE_CODE != ''">
+			AND PICK_RULE_CODE LIKE CONCAT(CONCAT('%', #{pd.PICK_RULE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.PICK_RULE_CN != null and pd.PICK_RULE_CN != ''">
+			AND PICK_RULE_CN LIKE CONCAT(CONCAT('%', #{pd.PICK_RULE_CN}),'%')
+		</if>
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.PICK_RULE_CODE,	
+				a.PICK_RULE_CN,	
+				a.MEMO,	
+				a.PROD_COMB_USE,	
+				a.OUT_PROD_DAY,	
+				a.OUT_PROD_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PICKRULE_ID
+		from 
+				TB_PICKRULE a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_PICKRULE
+		where 
+			PICKRULE_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND  PICKRULE_ID NOT IN (SELECT RULE_PICK  FROM  TB_PRODUCT )
+	</delete>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		PICK_RULE_CODE,
+		PICK_RULE_CN,
+		MEMO,
+		PROD_COMB_USE,
+		OUT_PROD_DAY,
+		OUT_PROD_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		PICKRULE_ID
+		from
+		TB_PICKRULE
+		where DEL_FLG = '0'
+		and PICK_RULE_CODE = #{PICK_RULE_CODE}
+		<if test="PICKRULE_ID != null and PICKRULE_ID != ''">
+			and PICKRULE_ID != #{PICKRULE_ID}
+		</if>
+		<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{CUSTOMER_ID}
+		</if>
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		PICK_RULE_CODE,
+		PICK_RULE_CN,
+		MEMO,
+		PROD_COMB_USE,
+		OUT_PROD_DAY,
+		OUT_PROD_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		PICKRULE_ID
+		from
+		TB_PICKRULE
+		where DEL_FLG = '0'
+		and PICK_RULE_CN = #{PICK_RULE_CN}
+		<if test="PICKRULE_ID != null and PICKRULE_ID != ''">
+			and PICKRULE_ID != #{PICKRULE_ID}
+		</if>
+		<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{CUSTOMER_ID}
+		</if>
+	</select>
+	
+</mapper>

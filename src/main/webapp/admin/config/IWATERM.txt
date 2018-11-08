@@ -1,0 +1,1 @@
+yes,hw,watermark.png,hw,1,hw,1

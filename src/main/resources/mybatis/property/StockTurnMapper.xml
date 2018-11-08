@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockTurnMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_STOCKTURN(
+			STOCKTURN_CODE,	
+			STOCKTURN_CN,	
+			TIME_DISTANCE,	
+			CUSTOMER_ID,	
+			PRIORITY_LEVEL,	
+			BATCH_PROPERTY,	
+			SORT_BY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STOCKTURN_ID
+		) values (
+			#{STOCKTURN_CODE},	
+			#{STOCKTURN_CN},	
+			#{TIME_DISTANCE},	
+			#{CUSTOMER_ID},	
+			#{PRIORITY_LEVEL},	
+			#{BATCH_PROPERTY},	
+			#{SORT_BY},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{STOCKTURN_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		DELETE FROM TB_STOCKTURN
+		where STOCKTURN_ID = #{STOCKTURN_ID}
+		  AND STOCKTURN_ID NOT IN (SELECT STOCKTURN_ID FROM TB_PRODUCT)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_STOCKTURN
+			set 
+				STOCKTURN_CODE = #{STOCKTURN_CODE},
+				STOCKTURN_CN = #{STOCKTURN_CN},
+				TIME_DISTANCE = #{TIME_DISTANCE},
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				PRIORITY_LEVEL = #{PRIORITY_LEVEL},
+				BATCH_PROPERTY = #{BATCH_PROPERTY},
+				SORT_BY = #{SORT_BY},
+			STOCKTURN_ID = STOCKTURN_ID
+			where 
+				STOCKTURN_ID = #{STOCKTURN_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			STOCKTURN_CODE,	
+			STOCKTURN_CN,	
+			TIME_DISTANCE,	
+			CUSTOMER_ID,	
+			PRIORITY_LEVEL,	
+			BATCH_PROPERTY,	
+			SORT_BY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STOCKTURN_ID
+		from 
+			TB_STOCKTURN
+		where 
+			STOCKTURN_ID = #{STOCKTURN_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.STOCKTURN_CODE,	
+				a.STOCKTURN_CN,	
+				a.TIME_DISTANCE,	
+				a.CUSTOMER_ID,	
+				a.PRIORITY_LEVEL,	
+				a.BATCH_PROPERTY,	
+				a.SORT_BY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCKTURN_ID
+		from 
+				TB_STOCKTURN a
+		WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.STOCKTURN_CODE != null and pd.STOCKTURN_CODE != ''">
+			AND a.STOCKTURN_CODE LIKE CONCAT(CONCAT('%', #{pd.STOCKTURN_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.STOCKTURN_CN != null and pd.STOCKTURN_CN != ''">
+			AND a.STOCKTURN_CN LIKE CONCAT(CONCAT('%', #{pd.STOCKTURN_CN}),'%')
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.STOCKTURN_CODE,	
+				a.STOCKTURN_CN,	
+				a.TIME_DISTANCE,	
+				a.CUSTOMER_ID,	
+				a.PRIORITY_LEVEL,	
+				a.BATCH_PROPERTY,	
+				a.SORT_BY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCKTURN_ID
+		from 
+				TB_STOCKTURN a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		DELETE FROM TB_STOCKTURN
+		where 
+			STOCKTURN_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND STOCKTURN_ID NOT IN (SELECT STOCKTURN_ID FROM TB_PRODUCT)
+	</delete>
+
+	<!-- 通过code获取数据 -->
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		STOCKTURN_CODE,
+		STOCKTURN_CN,
+		TIME_DISTANCE,
+		CUSTOMER_ID,
+		PRIORITY_LEVEL,
+		BATCH_PROPERTY,
+		SORT_BY,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STOCKTURN_ID
+		from
+		TB_STOCKTURN
+		WHERE DEL_FLG = '0'
+		 AND STOCKTURN_CODE = #{STOCKTURN_CODE}
+		<if test="STOCKTURN_ID != null and STOCKTURN_ID != ''">
+			AND STOCKTURN_ID != #{STOCKTURN_ID}
+		</if>
+	</select>
+
+	<!-- 通过code获取数据 -->
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		STOCKTURN_CODE,
+		STOCKTURN_CN,
+		TIME_DISTANCE,
+		CUSTOMER_ID,
+		PRIORITY_LEVEL,
+		BATCH_PROPERTY,
+		SORT_BY,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STOCKTURN_ID
+		from
+		TB_STOCKTURN
+		WHERE DEL_FLG = '0'
+		  AND STOCKTURN_CN = #{STOCKTURN_CN}
+		<if test="STOCKTURN_ID != null and STOCKTURN_ID != ''">
+			AND STOCKTURN_ID != #{STOCKTURN_ID}
+		</if>
+	</select>
+	
+</mapper>

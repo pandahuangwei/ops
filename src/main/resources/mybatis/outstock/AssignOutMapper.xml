@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AssignOutMapper">
+
+
+	<select id="findDtlAssignOutHeadLook" parameterType="page" resultType="pd">
+      SELECT OUTSTOCK_NO,CUSTOMER_ID,ASSIGNED_STATE ,PICK_STATE,CARGO_STATE,DEPOT_STATE FROM TM_STOCKMGROUT
+      WHERE STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+	</select>
+
+	<select id="findDtlAssignOutDtlLooklist1Page" parameterType="page" resultType="pd">
+	SELECT
+		T1.STOCKDTLMGROUT_ID,
+		T1.STOCKMGROUT_ID,
+		T1.ROW_NO,
+		T1.CUSTOMER_ID,
+		T1.PRODUCT_ID,
+		T1.ASSIGNED_STATE,
+		T1.PICK_STATE,
+		T1.LOADED_STATE,
+		T1.DEPOT_STATE,
+		T1.CARGO_STATE,
+		T1.EA_EA,
+		T1.ASSIGNED_EA,
+		T1.CREATE_TM,
+		T1.ASSIGNED_FLG,
+		C.BIG_BOX_NO,
+		C.BOX_NO,
+		C.PUT_LOCATOR,
+		C.LOT_NO,
+		C.DATE_CODE,
+		C.SEPARATE_QTY,
+		C.COO,
+		C.BIN_CODE,
+		C.REMARK1,
+		C.REMARK2,
+		C.REMARK3
+	FROM (SELECT
+			B.STOCKDTLMGROUT_ID,
+			B.STOCKMGROUT_ID,
+			B.ROW_NO,
+			B.CUSTOMER_ID,
+			B.PRODUCT_ID,
+			B.ASSIGNED_STATE,
+			B.PICK_STATE,
+			B.LOADED_STATE,
+			B.DEPOT_STATE,
+			B.CARGO_STATE,
+			B.EA_EA,
+			B.ASSIGNED_EA,
+			B.CREATE_TM,
+			B.ASSIGNED_FLG
+		FROM TM_STOCKMGROUT_DTL B
+		WHERE B.DEL_FLG = '0'
+		  AND B.STOCKMGROUT_ID = #{pd.STOCKMGROUT_ID}) T1
+	   LEFT JOIN TM_BOX C
+	   ON (T1.STOCKDTLMGROUT_ID = C.BOX_ID)
+	</select>
+	<!--拣货分配-->
+	<!--listPage 分页 需要包含字符串  查看分配明细 先去掉分页-->
+	<select id="findDtlAssignOutlist1Page" parameterType="page" resultType="pd">
+    SELECT  T1.OUTSTOCK_NO,T1.ASSIGNED_STATE_HEAD, T1.STOCKDTLMGROUT_ID, T1.STOCKMGROUT_ID, T1.ROW_NO, T1.CUSTOMER_ID, T1.PRODUCT_ID,
+	        T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,T1.CARGO_STATE,T1.CARGO_STATE_HEAD,
+	        T1.EA_EA,T1.ASSIGNED_EA, T1.BOX_NO, T1.CREATE_TM,T1.OVERLOAD,T1.ASSIGNED_FLG,T2.PUT_LOCATOR
+            ,T2.LOT_NO,T2.DATE_CODE,T2.SEPARATE_QTY,T2.COO,T2.BIN_CODE,T2.REMARK1,T2.REMARK2,T2.REMARK3
+     FROM (
+	  SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID,
+	        B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,B.CARGO_STATE,A.CARGO_STATE CARGO_STATE_HEAD,
+	        B.EA_EA,B.ASSIGNED_EA, B.BOX_NO, B.CREATE_TM,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.ASSIGNED_FLG
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+	   WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		 AND B.DEL_FLG = '0'
+		 AND A.STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+		 ) T1 LEFT JOIN TM_BOX T2 ON (T1.STOCKDTLMGROUT_ID = T2.BOX_ID )
+	</select>
+
+	<!--listPage 分页 需要包含字符串  查看分配明细 AND B.ASSIGNED_STATE IN ('100','101') AND B.ASSIGNED_FLG ='0'-->
+	<select id="findAssignOutAutoHeadlist1Page" parameterType="page" resultType="pd">
+	SELECT T1.OUTSTOCK_NO,T1.ASSIGNED_STATE_HEAD, T1.STOCKDTLMGROUT_ID, T1.STOCKMGROUT_ID, T1.ROW_NO,
+	T1.CUSTOMER_ID, T1.PRODUCT_ID, T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,
+	T1.EA_EA, T1.ASSIGNED_EA, T1.BOX_NO,T1.STORAGE_ID,T1.ASSIGNED_FLG,T1.CREATE_TM,
+	C.EA_NUM,C.PUT_LOCATOR,C.LOT_NO,C.DATE_CODE,C.SEPARATE_QTY,C.COO,C.BIN_CODE,C.RECEIPT_TM
+	FROM (
+	SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+	B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.ASSIGNED_FLG,B.STORAGE_ID,
+	B.CREATE_TM
+	FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+	WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+	AND B.DEL_FLG = '0'
+	AND B.PICK_STATE='139'
+
+	<if test="pd.STOCKMGROUT_IDS != null">
+		AND A.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</if>) T1 LEFT JOIN TM_BOX  C ON(T1.STOCKDTLMGROUT_ID = C.BOX_ID)
+
+</select>
+
+	<select id="findAssignOutAutoDtllist1Page" parameterType="page" resultType="pd">
+		SELECT T1.OUTSTOCK_NO,T1.ASSIGNED_STATE_HEAD, T1.STOCKDTLMGROUT_ID, T1.STOCKMGROUT_ID, T1.ROW_NO,
+		T1.CUSTOMER_ID, T1.PRODUCT_ID, T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,
+		T1.EA_EA, T1.ASSIGNED_EA, T1.BOX_NO,T1.STORAGE_ID,T1.ASSIGNED_FLG,T1.CREATE_TM,
+		C.EA_NUM,C.PUT_LOCATOR,C.LOT_NO,C.DATE_CODE,C.SEPARATE_QTY,C.COO,C.BIN_CODE,C.RECEIPT_TM
+		FROM (
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.ASSIGNED_FLG,B.STORAGE_ID,
+		B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.PICK_STATE='139'
+		AND B.ASSIGNED_FLG ='1'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>) T1 LEFT JOIN TM_BOX  C ON(T1.STOCKDTLMGROUT_ID = C.BOX_ID)
+
+	</select>
+
+	<!--listPage 分页 需要包含字符串  查看分配明细-->
+	<select id="findAutoAssignOutlist2Page" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.ASSIGNED_FLG,
+		B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findDtlOutByPIds" parameterType="String" resultType="pd">
+		SELECT A.OUTSTOCK_NO, B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		B.STOCKMGROUT_ID ,B.PRODUCT_ID,B.EA_EA,B.ASSIGNED_EA ,(B.EA_EA +0 - B.ASSIGNED_EA) EA_ACTUAL
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		 AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG = '0'
+		AND (B.EA_EA +0 - B.ASSIGNED_EA) &gt;0
+		AND B.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findDtlOutByPIdAndProdIds" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO, B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		B.STOCKMGROUT_ID ,B.PRODUCT_ID,B.EA_EA,B.ASSIGNED_EA ,(B.EA_EA +0 - B.ASSIGNED_EA) EA_ACTUAL
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG = '0'
+		AND (B.EA_EA +0 - B.ASSIGNED_EA) &gt;0
+		AND B.STOCKMGROUT_ID = #{pd.STOCKMGROUT_ID}
+		AND B.PRODUCT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findDtlOutByDtlIds" parameterType="String" resultType="pd">
+		SELECT  A.OUTSTOCK_NO,B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		        B.STOCKMGROUT_ID ,B.PRODUCT_ID,B.EA_EA,B.ASSIGNED_EA ,(B.EA_EA +0 - B.ASSIGNED_EA) EA_ACTUAL
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		  AND B.DEL_FLG = '0'
+		  AND B.ASSIGNED_FLG = '0'
+		  AND ( B.EA_EA +0 -  B.ASSIGNED_EA) &gt;0
+		  AND B.STOCKDTLMGROUT_ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--根据客户与产品明细获取还没分配的箱号纪录 未冻结 未分配的-->
+	<select id="findBoxOutByCustomAndProdIds" parameterType="pd" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT,
+		VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, EA_NUM, RECEIPT_STATE, ASSIGNED_STATE,
+		PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE, BOX_STATE, CREATE_TM,
+		LOT_NO,DATE_CODE,SEPARATE_QTY,COO,BIN_CODE
+		FROM TM_BOX
+		WHERE PUT_STATUS ='82'
+		  AND ASSIGNED_STOCK_STATE IN ('100','101')
+		  AND FREEZE_STATE='158'
+		  AND DEL_FLG = '0'
+		  AND CUSTOMER_ID =#{CUSTOMER_ID}
+		<if test="PRODUCT_IDS != null">
+			AND PRODUCT_ID IN
+			<foreach item="item" index="index" collection="PRODUCT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+	</select>
+
+
+	<!-- 修改箱号表的分配状态 -->
+	<update id="editBoxStockAssinedInfo" parameterType="pd">
+		UPDATE TM_BOX
+		SET
+		 OUTSTOCK_NO=#{OUTSTOCK_NO},
+		ASSIGNED_STOCK_STATE =#{ASSIGNED_STOCK_STATE},
+		ASSIGNED_STOCK_TM =#{MODIFY_TM},
+		ASSIGNED_STOCK_NUM =#{ASSIGNED_STOCK_NUM},
+		MODIFY_EMP =#{MODIFY_EMP},
+		MODIFY_TM =#{MODIFY_TM}
+		WHERE
+		BOX_ID =#{BOX_ID}
+	</update>
+
+	<!-- 修改出库单单身的分配状态 -->
+	<update id="editDtlStockAssinedInfo" parameterType="pd">
+		UPDATE TM_STOCKMGROUT_DTL
+		SET ASSIGNED_EA = #{ASSIGNED_EA},
+		    ASSIGNED_STATE = #{ASSIGNED_STATE}
+	  WHERE STOCKDTLMGROUT_ID = #{STOCKDTLMGROUT_ID}
+	    AND STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</update>
+
+	<!-- 修改出库单表头的分配状态 -->
+	<update id="editHeadStockAssinedInfo" parameterType="pd">
+		UPDATE TM_STOCKMGROUT
+		SET
+		ASSIGNED_STATE =#{ASSIGNED_STATE},
+		MODIFY_EMP =#{MODIFY_EMP},
+		MODIFY_TM =#{MODIFY_TM}
+		WHERE
+		STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</update>
+
+
+
+
+   <!--根据出库单ID查找出库标识为不是拣货的纪录，用于判断主表的分配状态-->
+	<select id="findDtlOutList" parameterType="pd" resultType="pd">
+		SELECT EA_EA, ASSIGNED_EA  FROM TM_STOCKMGROUT_DTL WHERE  DEL_FLG = '0' AND ASSIGNED_FLG = '0' AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</select>
+
+	<select id="findDtlOutListByID" parameterType="pd" resultType="pd">
+		SELECT EA_EA, ASSIGNED_EA  FROM TM_STOCKMGROUT_DTL WHERE  DEL_FLG = '0' AND ASSIGNED_FLG = '0' AND STOCKDTLMGROUT_ID = #{STOCKDTLMGROUT_ID}
+	</select>
+
+	<!-- 产品-->
+	<insert id="saveAssignStockDtl" parameterType="pd">
+		INSERT INTO TM_STOCKMGROUT_DTL
+		(STOCKDTLMGROUT_ID, STOCKMGROUT_ID, ROW_NO, CUSTOMER_ID, PRODUCT_ID, PRODUCT_TYPE, PACK_RULE, PACK_UNIT, OT_EA, OT_RATIO,
+		PALLET_EA, PALLET_RATIO, BOX_EA, BOX_RATIO, INPACK_EA, INPACK_RATIO, EA_EA, EA_RATIO, LONG_UT, WIDE_UT,
+		HIGH_UT, UNIT_VOLUME, TOTAL_VOLUME, TOTAL_WEIGHT, TOTAL_SUTTLE, TOTAL_PRICE, UNIT_PRICE, CURRENCY_TYPE, STORAGE_ID, LOCATOR_ID,
+		CAR_TYPE, CAR_PLATE, SEAL_NO, TP_HAULIER, FREEZE_CODE, MGR_SERIAL, MEMO, IMP_FLG, DEPOT_STATE, ASSIGNED_STATE,PICK_STATE,CARGO_STATE,
+		LOADED_STATE, RULE_ASSIGNED, RULE_STOCKTURN, RULE_PICK, SEND_EA, PREPLAN_EA, ASSIGNED_EA, PICK_EA, LOADED_EA,
+		CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG, ASSIGNED_FLG,BOX_NO )
+		VALUES
+		(#{STOCKDTLMGROUT_ID}, #{STOCKMGROUT_ID}, #{ROW_NO}, #{CUSTOMER_ID}, #{PRODUCT_ID}, #{PRODUCT_TYPE}, #{PACK_RULE}, #{PACK_UNIT}, #{OT_EA}, #{OT_RATIO},
+		#{PALLET_EA}, #{PALLET_RATIO}, #{BOX_EA}, #{BOX_RATIO}, #{INPACK_EA}, #{INPACK_RATIO}, #{EA_EA}, #{EA_RATIO}, #{LONG_UT}, #{WIDE_UT},
+		#{HIGH_UT}, #{UNIT_VOLUME}, #{TOTAL_VOLUME}, #{TOTAL_WEIGHT}, #{TOTAL_SUTTLE}, #{TOTAL_PRICE}, #{UNIT_PRICE}, #{CURRENCY_TYPE}, #{STORAGE_ID}, #{LOCATOR_ID},
+		#{CAR_TYPE}, #{CAR_PLATE}, #{SEAL_NO}, #{TP_HAULIER}, #{FREEZE_CODE}, #{MGR_SERIAL}, #{MEMO}, #{IMP_FLG}, #{DEPOT_STATE}, #{ASSIGNED_STATE},#{PICK_STATE},#{CARGO_STATE},
+		#{LOADED_STATE}, #{RULE_ASSIGNED}, #{RULE_STOCKTURN}, #{RULE_PICK}, #{SEND_EA}, #{PREPLAN_EA}, #{ASSIGNED_EA}, #{PICK_EA}, #{LOADED_EA},
+		#{CREATE_EMP}, #{CREATE_TM}, #{MODIFY_EMP}, #{MODIFY_TM}, #{DEL_FLG}, #{ASSIGNED_FLG}, #{BOX_NO}  )
+	</insert>
+
+
+	<!--====================================手工分配==============================================-->
+	<!--listPage 分页 需要包含字符串  查看分配明细-->
+	<select id="findManualAssignOutlist" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findManualHeadlist1Page" parameterType="page" resultType="pd">
+      SELECT A.OUTSTOCK_NO, B.ASSIGNED_STATE, B.PICK_STATE,B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID,
+             B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.EA_EA, B.ASSIGNED_EA,
+             B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		  AND B.DEL_FLG = '0'
+		  AND B.ASSIGNED_FLG ='0'
+		  AND B.PICK_STATE IN('139','140')
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+	<select id="findManualDtllist1Page" parameterType="page" resultType="pd">
+     SELECT  A.PRODUCT_ID,A.PUT_LOCATOR,A.BIG_BOX_NO, A.BOX_NO,A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY,A.COO, A.BIN_CODE,  A.REMARK1, A.REMARK2, A.REMARK3,
+			A.RECEIPT_TM,A.ASSIGNED_STOCK_STATE,A.EA_NUM,
+			B.EA_EA, B.ASSIGNED_EA,B.CREATE_TM
+	FROM TM_BOX A ,TM_STOCKMGROUT_DTL B
+	WHERE A.BOX_ID = B.STOCKDTLMGROUT_ID
+	  AND B.DEL_FLG = '0'
+	  AND B.ASSIGNED_FLG ='1'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND B.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+	<!--listPage 分页 需要包含字符串  查看分配明细 AND B.ASSIGNED_STATE IN ('100','101') AND B.ASSIGNED_FLG ='0'-->
+	<select id="findAssignOutManualHeadlist1Page" parameterType="page" resultType="pd">
+		SELECT T1.OUTSTOCK_NO,T1.ASSIGNED_STATE_HEAD, T1.STOCKDTLMGROUT_ID, T1.STOCKMGROUT_ID, T1.ROW_NO,
+		T1.CUSTOMER_ID, T1.PRODUCT_ID, T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,
+		T1.EA_EA, T1.ASSIGNED_EA, T1.BOX_NO,T1.STORAGE_ID,T1.ASSIGNED_FLG,T1.CREATE_TM,
+		C.EA_NUM,C.PUT_LOCATOR,C.LOT_NO,C.DATE_CODE,C.SEPARATE_QTY,C.COO,C.BIN_CODE,C.RECEIPT_TM
+		,TXT_FOU ,TXT_FIV ,TXT_SIX,C.BIG_BOX_NO
+		FROM (
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO,
+		B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		,C2.TXT_FOU ,C2.TXT_FIV ,C2.TXT_SIX
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		,tm_stockmgrout_property C2
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		  AND B.STOCKMGROUT_ID =  C2.STOCKMGROUT_ID
+		  AND B.STOCKDTLMGROUT_ID= C2.STOCKDTLMGROUT_ID
+		  AND B.DEL_FLG = '0'
+		  AND B.PICK_STATE IN('139','140')
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>) T1 LEFT JOIN TM_BOX  C ON(T1.STOCKDTLMGROUT_ID = C.BOX_ID)
+	</select>
+
+	<select id="findAssignOutManualDtllist1Page" parameterType="page" resultType="pd">
+		SELECT T1.OUTSTOCK_NO,T1.ASSIGNED_STATE_HEAD, T1.STOCKDTLMGROUT_ID, T1.STOCKMGROUT_ID, T1.ROW_NO,
+		T1.CUSTOMER_ID, T1.PRODUCT_ID, T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,
+		T1.EA_EA, T1.ASSIGNED_EA, T1.BOX_NO,T1.STORAGE_ID,T1.ASSIGNED_FLG,T1.CREATE_TM,
+		C.EA_NUM,C.PUT_LOCATOR,C.LOT_NO,C.DATE_CODE,C.SEPARATE_QTY,C.COO,C.BIN_CODE,C.RECEIPT_TM
+		FROM (
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO,
+		B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,(B.ASSIGNED_EA+0-B.EA_EA) OVERLOAD,B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE  B.STOCKMGROUT_ID =A.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.PICK_STATE='139'
+		AND B.ASSIGNED_FLG ='1'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>) T1 LEFT JOIN TM_BOX  C ON(T1.STOCKDTLMGROUT_ID = C.BOX_ID)
+	</select>
+
+	<select id="findCancelHeadlist1Page" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO, A.ASSIGNED_STATE, A.PICK_STATE,B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID,
+		B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.EA_EA, B.ASSIGNED_EA,
+		B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG ='0'
+		AND B.ASSIGNED_STATE IN ('102','101')
+		AND B.PICK_STATE='139'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+	<select id="findCancelDtllist1Page" parameterType="page" resultType="pd">
+		SELECT  A.PRODUCT_ID,A.PUT_LOCATOR,A.BIG_BOX_NO, A.BOX_NO,A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY,A.COO, A.BIN_CODE,  A.REMARK1, A.REMARK2, A.REMARK3,
+		A.RECEIPT_TM,A.ASSIGNED_STOCK_STATE,A.EA_NUM,
+		B.EA_EA, B.ASSIGNED_EA,B.CREATE_TM,B.STOCKDTLMGROUT_ID,B.STOCKMGROUT_ID
+		FROM TM_BOX A ,TM_STOCKMGROUT_DTL B
+		WHERE A.BOX_ID = B.STOCKDTLMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG ='1'
+		AND B.ASSIGNED_STATE IN ('102','101')
+		AND B.PICK_STATE='139'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND B.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<!--listPage 分页 需要包含字符串  查看分配明细-->
+	<select id="findAssignOutCacellist1Page" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO,A.ASSIGNED_STATE ASSIGNED_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, B.BOX_NO,B.STORAGE_ID,B.LOCATOR_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_STATE IN ('102','101')
+		AND B.PICK_STATE='139'
+		<if test="pd.STOCKMGROUT_IDS != null">
+			AND A.STOCKMGROUT_ID IN
+			<foreach item="item" index="index" collection="pd.STOCKMGROUT_IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findAssignDtlHead" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO,B.ASSIGNED_STATE, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO,
+		B.CUSTOMER_ID, B.PRODUCT_ID, B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,
+		B.EA_EA, B.ASSIGNED_EA, (B.EA_EA+0-B.ASSIGNED_EA) CAN_ASSIGN_EA ,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE  B.STOCKMGROUT_ID =A.STOCKMGROUT_ID
+		 AND B.DEL_FLG = '0'
+		 AND B.ASSIGNED_FLG = '0'
+		 AND B.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		AND B.PRODUCT_ID IN
+		<foreach item="item" index="index" collection="pd.PRODS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		ORDER BY B.CREATE_TM
+	</select>
+
+    <!--查找可分配的的箱号纪录-->
+	<select id="findAssignBoxlistlistPage" parameterType="page" resultType="pd">
+		SELECT A.BOX_ID, A.BOX_NO, A.BIG_BOX_NO, A.PRODUCT_ID, A.CUSTOMER_ID, A.EA_NUM,
+		B.ROW_NO,A.ASIGN_STORAGE,A.PUT_LOCATOR,A.DATE_CODE,A.SEPARATE_QTY,A.LOT_NO,
+		A.COO,A.BIN_CODE, A.REMARK1, A.REMARK2, A.REMARK3,
+		B.STOCKDTLMGROUT_ID,A.RECEIPT_TM,
+		(A.EA_NUM+0-A.ASSIGNED_STOCK_NUM) CAN_ASSIGN_EA,A.ASSIGNED_STOCK_NUM
+		FROM TM_BOX A,TM_STOCKMGROUT_DTL B
+		WHERE A.PRODUCT_ID =B.PRODUCT_ID
+		AND A.CUSTOMER_ID = B.CUSTOMER_ID
+		AND A.ASSIGNED_STOCK_STATE IN ('100','101')
+		AND A.FREEZE_STATE='158'
+		AND A.DEL_FLG ='0'
+		AND B.DEL_FLG ='0'
+		AND B.ASSIGNED_FLG = '0'
+		AND B.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		AND B.PRODUCT_ID IN
+		<foreach item="item" index="index" collection="pd.PRODS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND (A.BIG_BOX_NO IN
+			<foreach item="item" index="index" collection="pd.BOXS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+			OR A.BOX_NO IN
+			<foreach item="item" index="index" collection="pd.BOXS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+			)
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND A.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_CODE != null and pd.LOT_CODE != ''">
+			AND A.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.BIN_CODE != null and pd.BIN_CODE != ''">
+			AND A.BIN_CODE LIKE CONCAT(CONCAT('%', #{pd.BIN_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND A.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+
+		<choose>
+			<when test='pd != null and pd.REMARK1_EMP == "1"'>
+				AND (A.REMARK1 is NULL  OR A.REMARK1 ='')
+			</when>
+			<otherwise>
+				<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+					AND A.REMARK1 LIKE CONCAT(CONCAT('%', #{pd.REMARK1}),'%')
+				</if>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test='pd != null and pd.REMARK2_EMP == "1"'>
+				AND (A.REMARK2 is NULL  OR A.REMARK2 ='')
+			</when>
+			<otherwise>
+				<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+					AND A.REMARK2 LIKE CONCAT(CONCAT('%', #{pd.REMARK2}),'%')
+				</if>
+			</otherwise>
+		</choose>
+		<choose>
+			<when test='pd != null and pd.REMARK3_EMP == "1"'>
+				AND (A.REMARK3 is NULL  OR A.REMARK3 ='')
+			</when>
+			<otherwise>
+				<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+					AND A.REMARK3 LIKE CONCAT(CONCAT('%', #{pd.REMARK3}),'%')
+				</if>
+			</otherwise>
+		</choose>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="BOX_NO" '>
+			ORDER BY A.BOX_NO
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="BIG_BOX_NO"'>
+			ORDER BY A.BIG_BOX_NO
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+	</select>
+
+	<select id="findBoxDtlIds" parameterType="list" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT,
+		VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, EA_NUM, RECEIPT_STATE, ASSIGNED_STATE,
+		PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE, BOX_STATE, CREATE_TM,
+		LOT_NO,DATE_CODE,SEPARATE_QTY,COO,BIN_CODE
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		AND BOX_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		ORDER BY CREATE_TM
+	</select>
+
+
+	<select id="findHadAssignList" parameterType="page" resultType="pd">
+		SELECT  B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		B.STOCKMGROUT_ID ,B.PRODUCT_ID,EA_EA,ASSIGNED_EA ,(EA_EA +0 - ASSIGNED_EA) EA_ACTUAL,B.ASSIGNED_FLG
+		FROM TM_STOCKMGROUT_DTL B
+		WHERE B.DEL_FLG = '0'
+		 AND B.STOCKMGROUT_ID = #{pd.STOCKMGROUT_ID}
+		 AND B.PRODUCT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</select>
+
+
+	<!-- 取消明细 -->
+	<delete id="deleteDtlAssign" parameterType="pd">
+		DELETE FROM TM_STOCKMGROUT_DTL
+		where
+		STOCKDTLMGROUT_ID  = #{STOCKDTLMGROUT_ID}
+		AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</delete>
+
+	<delete id="deleteDtlAssignProperty" parameterType="pd">
+		DELETE FROM TM_STOCKMGROUT_PROPERTY
+		WHERE STOCKDTLMGROUT_ID  = #{STOCKDTLMGROUT_ID}
+		  AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</delete>
+
+
+	<select id="findBoxById" parameterType="pd" resultType="pd">
+		SELECT BOX_ID,ASSIGNED_STOCK_STATE,ASSIGNED_STOCK_NUM ,EA_NUM,OLD_BOX_ID FROM TM_BOX WHERE BOX_ID =#{BOX_ID}
+	</select>
+
+	<!-- 取消明细 -->
+	<delete id="deleteDBoxAssign" parameterType="pd">
+		UPDATE TM_BOX
+		SET ASSIGNED_STOCK_STATE = #{ASSIGNED_STOCK_STATE},
+		    ASSIGNED_STOCK_NUM = #{ASSIGNED_STOCK_NUM},
+		    OUTSTOCK_NO =#{OUTSTOCK_NO}
+		where BOX_ID =#{BOX_ID}
+	</delete>
+
+	<update id="updateOldBox" parameterType="pd">
+		UPDATE TM_BOX
+		  SET EA_NUM = #{EA_NUM},
+		    ASSIGNED_STOCK_STATE = #{ASSIGNED_STOCK_STATE},
+		    ASSIGNED_STOCK_NUM = #{ASSIGNED_STOCK_NUM},
+		    OUTSTOCK_NO =#{OUTSTOCK_NO}
+		where BOX_ID =#{BOX_ID}
+	</update>
+
+	<delete id="deleteMixBox"  parameterType="pd">
+		UPDATE TM_BOX SET DEL_FLG ='1' 	WHERE BOX_ID =#{BOX_ID}
+	</delete>
+
+    <!-- start根据分配了的明细取消订单sql-->
+	<select id="findDtlAssignPdById" parameterType="pd" resultType="pd">
+		SELECT  B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		B.STOCKMGROUT_ID ,PRODUCT_ID,EA_EA,ASSIGNED_EA ,(EA_EA +0 - ASSIGNED_EA) EA_ACTUAL
+		FROM TM_STOCKMGROUT_DTL B
+		WHERE B.STOCKDTLMGROUT_ID = #{STOCKDTLMGROUT_ID}
+		  AND B.STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</select>
+
+	<!--根据出库单ID与产品得到明细中的不是分配明细的产品纪录-->
+	<select id="findDtlAssignPdByIdAndProd" parameterType="pd" resultType="pd">
+		SELECT  B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,
+		B.STOCKMGROUT_ID ,PRODUCT_ID,EA_EA,ASSIGNED_EA ,(EA_EA +0 - ASSIGNED_EA) EA_ACTUAL
+		FROM TM_STOCKMGROUT_DTL B
+		WHERE B.STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+		  AND B.PRODUCT_ID = #{PRODUCT_ID}
+		  AND B.DEL_FLG = '0'
+		  AND B.ASSIGNED_FLG = '0'
+	</select>
+
+	<select id="findPickOneForExl" parameterType="pd" resultType="pd">
+		SELECT C.OUTSTOCK_NO,C.PRE_OUT_DATE,B.PUT_LOCATOR,B.PRODUCT_ID,B.BIG_BOX_NO,B.BOX_NO,
+		  A.ASSIGNED_EA ASSIGNED_STOCK_NUM,B.BIN_CODE,B.COO,B.SEPARATE_QTY ,B.DATE_CODE ,B.LOT_NO,B.RECEIPT_TM,B.CREATE_TM
+		 FROM  TM_STOCKMGROUT_DTL A,TM_STOCKMGROUT C,TM_BOX B
+		WHERE A.STOCKMGROUT_ID = C.STOCKMGROUT_ID
+		  AND A.STOCKDTLMGROUT_ID = B.BOX_ID
+		  AND A.ASSIGNED_FLG ='1'
+		  AND A.STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</select>
+
+	<select id="findPickManyForExl" parameterType="list" resultType="pd">
+		SELECT C.OUTSTOCK_NO,A.ROW_NO,C.PRE_OUT_DATE,B.PUT_LOCATOR,B.PRODUCT_ID,B.BIG_BOX_NO,B.BOX_NO,A.ASSIGNED_EA ASSIGNED_STOCK_NUM,
+		       B.BIN_CODE,B.COO,B.SEPARATE_QTY ,B.DATE_CODE ,B.LOT_NO,B.RECEIPT_TM,B.CREATE_TM
+		FROM  TM_STOCKMGROUT_DTL A,TM_STOCKMGROUT C,TM_BOX B
+		WHERE A.STOCKMGROUT_ID = C.STOCKMGROUT_ID
+		AND A.STOCKDTLMGROUT_ID = B.BOX_ID
+		AND A.ASSIGNED_FLG ='1'
+		AND A.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</select>
+
+
+	<select id="findManySiRefNo" parameterType="list" resultType="pd">
+		SELECT a.OUTSTOCK_NO, r.TXT_TEN SI_REFERENCE FROM  TM_STOCKMGROUT_PROPERTY r,TM_STOCKMGROUT a
+		WHERE  a.STOCKMGROUT_ID = r.STOCKMGROUT_ID
+		AND r.ORDERBATCH_TYPE='61'
+		AND a.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</select>
+
+	<select id="findSiRefNo" parameterType="pd" resultType="pd">
+		SELECT  r.TXT_TEN SI_REFERENCE FROM  TM_STOCKMGROUT_PROPERTY r WHERE ORDERBATCH_TYPE='61' AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</select>
+
+	<select id="findPickNo" parameterType="pd" resultType="pd">
+			SELECT PICK_NO FROM TM_PICKNO WHERE STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</select>
+
+	  <insert id="savePickNo" parameterType="pd">
+		  INSERT  INTO TM_PICKNO(STOCKMGROUT_ID,PICK_NO) VALUES ( #{STOCKMGROUT_ID}, #{PICK_NO})
+	  </insert>
+
+</mapper>

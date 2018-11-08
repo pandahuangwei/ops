@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CargoOutMapper">
+
+	<!-- 列表 需要分配或者全部分配-->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select DISTINCT
+		A.STOCKMGROUT_ID,A.OUTSTOCK_NO,A.CUSTOMER_ID,A.OUTSTOCK_TYPE,A.PRE_OUT_DATE,A.OUTSTOCK_WAY,A.DEPOT_STATE,A.PICK_STATE,A.LOADED_TYPE,
+		A.PRIORITY_LEVEL, A.ASSIGNED_STATE, A.CARGO_STATE, A.ORDER_NO,A.TOTAL_WEIGHT,A.TOTAL_SUTTLE,A.TOTAL_VOLUME,A.TOTAL_EA
+		from
+		TM_STOCKMGROUT A
+		<if test="pd != null and ((pd.PRODUCT_ID != null and pd.PRODUCT_ID != '') or
+		 (pd.DTL_CUSTOMER_ID != null and pd.DTL_CUSTOMER_ID != ''))">
+		LEFT JOIN
+		(SELECT * FROM TM_STOCKMGROUT_DTL
+		WHERE DEL_FLG = '0'
+		  AND PICK_STATE in('140','141')
+		<if test="pd != null and pd.DTL_CUSTOMER_ID != null and pd.DTL_CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.DTL_CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		) B
+		ON A.STOCKMGROUT_ID = b.STOCKMGROUT_ID
+		</if>
+		WHERE 1 = 1
+		AND A.DEL_FLG = '0'
+		AND A.PICK_STATE in('140','141')
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.OUTSTOCK_NO != null and pd.OUTSTOCK_NO != ''">
+			AND A.OUTSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.OUTSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.ORDER_NO != null and pd.ORDER_NO != ''">
+			AND A.ORDER_NO LIKE CONCAT(CONCAT('%', #{pd.ORDER_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.PRE_OUTSTOCK_DATE_BEGIN != null and pd.PRE_OUTSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.PRE_OUT_DATE >= #{pd.PRE_OUTSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.PRE_OUTSTOCK_DATE_END != null and pd.PRE_OUTSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.PRE_OUT_DATE <= #{pd.PRE_OUTSTOCK_DATE_END} ]]>
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.ACT_OUTSTOCK_DATE_BEGIN != null and pd.ACT_OUTSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.REAL_OUT_DATE >= #{pd.ACT_OUTSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.ACT_OUTSTOCK_DATE_END != null and pd.ACT_OUTSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.REAL_OUT_DATE <= #{pd.ACT_OUTSTOCK_DATE_END} ]]>
+		</if>
+
+		<!-- 装车状态-->
+		<if test="pd.LOADED_TYPE_S != null">
+			AND A.LOADED_TYPE IN
+			<foreach item="item" index="index" collection="pd.LOADED_TYPE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<!-- 分配状态-->
+		<if test="pd.ASSIGNED_STATE_S != null">
+			AND A.ASSIGNED_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 发货状态-->
+		<if test="pd.DEPOT_STATE_S != null">
+			AND A.DEPOT_STATE IN
+			<foreach item="item" index="index" collection="pd.DEPOT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 拣货状态-->
+		<if test="pd.PICK_STATE_S != null">
+			AND A.PICK_STATE IN
+			<foreach item="item" index="index" collection="pd.PICK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 出货类型-->
+		<if test="pd.OUTSTOCK_TYPE_S != null">
+			AND A.OUTSTOCK_TYPE IN
+			<foreach item="item" index="index" collection="pd.OUTSTOCK_TYPE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 发货方式-->
+		<if test="pd.OUTSTOCK_WAY_S != null">
+			AND A.OUTSTOCK_WAY IN
+			<foreach item="item" index="index" collection="pd.OUTSTOCK_WAY_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		ORDER BY A.OUTSTOCK_NO DESC
+	</select>
+
+	<!--拣货 查看界面-->
+	<!--listPage 分页 需要包含字符串 发货状态为未发货142的才可以进行配载操作 需要拣货的明细 先去掉分页-->
+	<select id="findDtl2CargoOutlistPage" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO,  A.ASSIGNED_STATE ASSIGNED_STATE_HEAD,A.PICK_STATE PICK_STATE_HEAD, B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID,
+		B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,B.CARGO_STATE,B.LOCATOR_ID,
+		B.EA_EA,B.ASSIGNED_EA, B.PICK_EA, B.BOX_NO, B.CREATE_TM,B.ASSIGNED_FLG,B.OT_EA,B.PALLET_EA,B.BOX_EA,B.INPACK_EA
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		  AND B.DEL_FLG = '0'
+		  AND B.ASSIGNED_FLG ='1'
+		  AND B.PICK_STATE IN ('140','141')
+		  AND B.CARGO_STATE IN ('161','162')
+		  AND B.DEPOT_STATE='142'
+		  AND A.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</select>
+
+	<!--配载 查看界面-->
+	<!--listPage 分页 需要包含字符串  需要拣货的明细 先去掉分页-->
+	<select id="findDtl2CargoLookllistPage" parameterType="page" resultType="pd">
+		SELECT  T1.OUTSTOCK_NO, T1.ASSIGNED_STATE_HEAD,T1.PICK_STATE_HEAD,T1.CARGO_STATE_HEAD, T1.STOCKDTLMGROUT_ID,
+		T1.STOCKMGROUT_ID, T1.ROW_NO, T1.CUSTOMER_ID, T1.PRODUCT_ID,
+		T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,T1.CARGO_STATE,T1.LOCATOR_ID,
+		T1.EA_EA,T1.ASSIGNED_EA, T1.PICK_EA,T1.CARGO_EA, T1.BOX_NO,
+		T1.CREATE_TM,T1.ASSIGNED_FLG,T1.OT_EA,T1.PALLET_EA,T1.BOX_EA,T1.INPACK_EA,T1.CARGO_TYPE,T2.CARGO_NO
+		FROM
+		(SELECT A.OUTSTOCK_NO, A.ASSIGNED_STATE ASSIGNED_STATE_HEAD,A.PICK_STATE PICK_STATE_HEAD,A.CARGO_STATE CARGO_STATE_HEAD, B.STOCKDTLMGROUT_ID,
+		B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID,
+		B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,B.CARGO_STATE,B.LOCATOR_ID,
+		B.EA_EA,B.ASSIGNED_EA, B.PICK_EA,B.CARGO_EA, B.BOX_NO,
+		B.CREATE_TM,B.ASSIGNED_FLG,B.OT_EA,B.PALLET_EA,B.BOX_EA,B.INPACK_EA,B.CARGO_TYPE
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND A.STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}) T1 LEFT JOIN
+		(SELECT A.CARGO_NO,B.STOCKDTLMGROUT_ID FROM TM_CARGOOUT A,TM_CARGOOUT_DTL B
+		WHERE A.CARGOOUT_ID = B.CARGOOUT_ID
+		AND B.STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+		) T2
+		ON (T1.STOCKDTLMGROUT_ID = T2.STOCKDTLMGROUT_ID)
+	</select>
+
+	<!--listPage 分页 需要包含字符串  需要拣货的明细 先去掉分页 部分或者全部配载 且未发货的才可以取消-->
+	<select id="findDtl2CargoCancellistPage" parameterType="page" resultType="pd">
+		SELECT  T1.OUTSTOCK_NO, T1.ASSIGNED_STATE_HEAD,T1.PICK_STATE_HEAD, T1.STOCKDTLMGROUT_ID,
+		T1.STOCKMGROUT_ID, T1.ROW_NO, T1.CUSTOMER_ID, T1.PRODUCT_ID,
+		T1.ASSIGNED_STATE, T1.PICK_STATE, T1.LOADED_STATE, T1.DEPOT_STATE,T1.CARGO_STATE,T1.LOCATOR_ID,
+		T1.EA_EA,T1.ASSIGNED_EA, T1.PICK_EA,T1.CARGO_EA, T1.BOX_NO,
+		T1.CREATE_TM,T1.ASSIGNED_FLG,T1.OT_EA,T1.PALLET_EA,T1.BOX_EA,T1.INPACK_EA,T1.CARGO_TYPE,T2.CARGO_NO
+		FROM
+		(SELECT A.OUTSTOCK_NO, A.ASSIGNED_STATE ASSIGNED_STATE_HEAD,A.PICK_STATE PICK_STATE_HEAD, B.STOCKDTLMGROUT_ID,
+		B.STOCKMGROUT_ID, B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID,
+		B.ASSIGNED_STATE, B.PICK_STATE, B.LOADED_STATE, B.DEPOT_STATE,B.CARGO_STATE,B.LOCATOR_ID,
+		B.EA_EA,B.ASSIGNED_EA, B.PICK_EA,B.CARGO_EA, B.BOX_NO,
+		B.CREATE_TM,B.ASSIGNED_FLG,B.OT_EA,B.PALLET_EA,B.BOX_EA,B.INPACK_EA,B.CARGO_TYPE
+		FROM TM_STOCKMGROUT_DTL B, TM_STOCKMGROUT A
+		WHERE a.STOCKMGROUT_ID = B.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG ='1'
+		AND B.CARGO_STATE IN ('162','163')
+		AND B.DEPOT_STATE ='142'
+		AND A.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>) T1 LEFT JOIN
+		(SELECT A.CARGO_NO,B.STOCKDTLMGROUT_ID FROM TM_CARGOOUT A,TM_CARGOOUT_DTL B
+		WHERE A.CARGOOUT_ID = B.CARGOOUT_ID
+		AND B.STOCKMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		) T2
+		ON (T1.STOCKDTLMGROUT_ID = T2.STOCKDTLMGROUT_ID)
+	</select>
+
+	<update id="editDtlStockCargoStateByID" parameterType="pd">
+		UPDATE TM_STOCKMGROUT_DTL
+		SET CARGO_STATE = #{CARGO_STATE},
+		    CARGO_EA = #{CARGO_EA}
+		WHERE STOCKDTLMGROUT_ID = #{STOCKDTLMGROUT_ID}
+		  AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</update>
+
+	<!-- 修改出库单单身的配载状态状态 -->
+	<update id="editDtlStockCargoState" parameterType="page">
+		UPDATE TM_STOCKMGROUT_DTL
+		SET CARGO_STATE = #{pd.CARGO_STATE},
+		    CARGO_EA  =  PICK_EA,
+		    CARGO_TYPE =  #{pd.CARGO_TYPE}
+		WHERE STOCKMGROUT_ID = #{pd.STOCKMGROUT_ID}
+		  AND STOCKDTLMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+	<!-- 修改出库单单身的配载状态状态 -->
+	<update id="editDtlStockCargoStateNone" parameterType="page">
+		UPDATE TM_STOCKMGROUT_DTL
+		SET CARGO_STATE = #{pd.CARGO_STATE},
+		CARGO_EA  =  0,
+		CARGO_TYPE =  #{pd.CARGO_TYPE}
+		WHERE STOCKDTLMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+	<!-- 修改出库单单身的配载状态状态 -->
+	<update id="editDtlBoxCargoState" parameterType="page">
+		UPDATE TM_BOX
+		  SET CARGO_STATE =  #{pd.CARGO_STATE},
+		      CARGO_TM = #{pd.MODIFY_TM},
+		      MODIFY_TM = #{pd.MODIFY_TM}
+		WHERE BOX_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+	<select id="findCargoEaByid" parameterType="list" resultType="pd">
+		SELECT 	STOCKDTLMGROUT_ID BOX_ID,SUM(CARGO_EA) CARGO_EA
+		FROM TM_STOCKMGROUT_DTL
+		WHERE PICK_STATE = '141'
+		AND DEL_FLG ='0'
+		AND STOCKDTLMGROUT_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		GROUP BY STOCKDTLMGROUT_ID
+	</select>
+
+	<select id="findBoxEaByid" parameterType="list" resultType="pd">
+		SELECT 	BOX_ID,EA_NUM CARGO_EA
+		FROM TM_BOX
+		WHERE BOX_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<update id="editDtlBoxCargoStateById" parameterType="pd">
+		UPDATE TM_BOX
+		SET CARGO_STATE =  #{CARGO_STATE},
+		PICK_TM = #{MODIFY_TM},
+		MODIFY_TM = #{MODIFY_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<!--根据出库单ID查找出库标识为不是拣货的纪录，用于判断主表的分配状态-->
+	<select id="findDtlOutList" parameterType="pd" resultType="pd">
+		SELECT EA_EA, CARGO_EA  FROM TM_STOCKMGROUT_DTL WHERE  DEL_FLG = '0' AND ASSIGNED_FLG = '0' AND STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</select>
+
+	<!-- 修改出库单表头的分配状态 -->
+	<update id="editHeadStockCargoInfo" parameterType="pd">
+		UPDATE TM_STOCKMGROUT
+		SET
+		CARGO_STATE =#{CARGO_STATE},
+		MODIFY_EMP =#{MODIFY_EMP},
+		MODIFY_TM =#{MODIFY_TM}
+		WHERE
+		STOCKMGROUT_ID =#{STOCKMGROUT_ID}
+	</update>
+
+	<!-- 新增配载主表-->
+	<insert id="saveCargo" parameterType="pd">
+		INSERT INTO TM_CARGOOUT
+		( CARGOOUT_ID,CARGO_NO, CARGO_STATE, CARGO_TM, CAR_BATCH, DEPOT_TM, CAR_PLATE, CAR_TYPE, SAIL_TM, PRE_ARRIVETM, CONTAINER_NO, SAIL_NAME,
+		SEAL_NO, VOYAGE_NUM, LADING_NO, SRC_PORT, DEST_PORT, MEMO, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG )
+		VALUES (
+		#{CARGOOUT_ID},#{CARGO_NO}, #{CARGO_STATE}, #{CARGO_TM}, #{CAR_BATCH}, #{DEPOT_TM}, #{CAR_PLATE}, #{CAR_TYPE}, #{SAIL_TM}, #{PRE_ARRIVETM}, #{CONTAINER_NO}, #{SAIL_NAME},
+		#{SEAL_NO}, #{VOYAGE_NUM}, #{LADING_NO}, #{SRC_PORT}, #{DEST_PORT}, #{MEMO}, #{CREATE_EMP}, #{CREATE_TM}, #{MODIFY_EMP}, #{MODIFY_TM}, #{DEL_FLG} )
+	</insert>
+
+	<!-- 新增配载明细-->
+	<insert id="saveCargoDtl" parameterType="java.util.List">
+	INSERT INTO TM_CARGOOUT_DTL
+			(STOCKDTLMGROUT_ID, CARGOOUT_ID,STOCKMGROUT_ID)
+	VALUES
+	<foreach collection="list"  item="item" index="index" separator=",">
+		(#{item.STOCKDTLMGROUT_ID},#{item.CARGOOUT_ID},#{item.STOCKMGROUT_ID})
+	</foreach>
+	</insert>
+
+	<!-- 根据出库单ID获取该单号下的所有明细纪录-->
+	<select id="findDtlCargoPdById" parameterType="pd" resultType="pd">
+		SELECT  B.STOCKDTLMGROUT_ID,B.CUSTOMER_ID,B.ROW_NO, B.RULE_ASSIGNED,B.STORAGE_ID,B.PICK_STATE,B.CARGO_STATE,
+		B.STOCKMGROUT_ID ,B.PRODUCT_ID,EA_EA,ASSIGNED_EA ,B.PICK_EA, B.CARGO_EA, B.ASSIGNED_FLG
+		FROM TM_STOCKMGROUT_DTL B
+		WHERE B.DEL_FLG='0'
+		AND B.STOCKMGROUT_ID = #{STOCKMGROUT_ID}
+	</select>
+
+	<!-- 根据出库单ID获取该单号下的所有明细纪录-->
+	<select id="findCargoPidByDtlId" parameterType="page" resultType="pd">
+		SELECT DISTINCT CARGOOUT_ID
+		FROM TM_CARGOOUT_DTL B
+		WHERE  STOCKMGROUT_ID = #{pd.STOCKMGROUT_ID}
+		AND B.STOCKDTLMGROUT_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 根据配载ID统计其明细-->
+	<select id="findCargoCntById" parameterType="list" resultType="pd">
+		SELECT A.CARGOOUT_ID,COUNT(B.CARGOOUT_ID) CNT FROM TM_CARGOOUT A LEFT JOIN TM_CARGOOUT_DTL B ON(A.CARGOOUT_ID = B.CARGOOUT_ID)
+		WHERE 1 = 1
+		  AND A.CARGOOUT_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		GROUP BY A.CARGOOUT_ID
+	</select>
+
+
+	<delete id="deleteCargoDtl" parameterType="list">
+		DELETE FROM TM_CARGOOUT_DTL WHERE STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+		  AND  STOCKDTLMGROUT_ID  IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+	<delete id="deleteCargoById" parameterType="String">
+		DELETE FROM TM_CARGOOUT WHERE CARGOOUT_ID = #{value}
+	</delete>
+
+	<select id="findCargoLookHeadlist1Page" parameterType="page" resultType="pd">
+		SELECT A.OUTSTOCK_NO, A.ASSIGNED_STATE, A.CARGO_STATE,A.DEPOT_STATE,A.PICK_STATE,B.STOCKDTLMGROUT_ID, B.STOCKMGROUT_ID,
+		B.ROW_NO, B.CUSTOMER_ID, B.PRODUCT_ID, B.EA_EA, B.ASSIGNED_EA,B.PICK_EA,B.CARGO_EA,
+		B.STORAGE_ID,B.ASSIGNED_FLG,B.CREATE_TM
+		FROM TM_STOCKMGROUT_DTL B,TM_STOCKMGROUT A
+		WHERE B.STOCKMGROUT_ID = A.STOCKMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG ='0'
+		AND B.STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+	</select>
+
+	<select id="findCargoLookDtllist1Page" parameterType="page" resultType="pd">
+		SELECT  A.PRODUCT_ID,A.PUT_LOCATOR,A.BIG_BOX_NO, A.BOX_NO,A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY,A.COO, A.BIN_CODE,  A.REMARK1, A.REMARK2, A.REMARK3,
+		A.RECEIPT_TM,A.ASSIGNED_STOCK_STATE,A.EA_NUM,
+		B.EA_EA, B.ASSIGNED_EA,B.PICK_EA,B.CARGO_EA,B.CREATE_TM, B.ASSIGNED_STATE,B.PICK_STATE,B.CARGO_STATE,B.DEPOT_STATE,
+		B.ROW_NO,B.CARGO_TYPE
+		FROM TM_BOX A ,TM_STOCKMGROUT_DTL B
+		WHERE A.BOX_ID = B.STOCKDTLMGROUT_ID
+		AND B.DEL_FLG = '0'
+		AND B.ASSIGNED_FLG ='1'
+		AND B.STOCKMGROUT_ID =#{pd.STOCKMGROUT_ID}
+	</select>
+</mapper>

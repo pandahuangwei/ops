@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CountryMapper">
+
+    <resultMap type="Country" id="countryResultMap">
+        <id column="COUNTRY_ID" property="COUNTRY_ID"/>
+        <result column="COUNTRY_CODE" property="COUNTRY_CODE"/>
+        <result column="COUNTRY_CN" property="COUNTRY_CN"/>
+        <result column="COUNTRY_EN" property="COUNTRY_EN"/>
+        <result column="CUSTOM_CODE" property="CUSTOM_CODE"/>
+        <result column="COUNTRY_PRE" property="COUNTRY_PRE"/>
+    </resultMap>
+
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_COUNTRY(
+			COUNTRY_CODE,	
+			COUNTRY_CN,	
+			COUNTRY_EN,	
+			CUSTOM_CODE,	
+			COUNTRY_PRE,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			COUNTRY_ID
+		) values (
+			#{COUNTRY_CODE},	
+			#{COUNTRY_CN},	
+			#{COUNTRY_EN},	
+			#{CUSTOM_CODE},	
+			#{COUNTRY_PRE},	
+			#{MEMO},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{COUNTRY_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_COUNTRY
+		where COUNTRY_ID = #{COUNTRY_ID}
+		 AND COUNTRY_ID NOT IN (SELECT COUNTRY_ID FROM TB_PROVINCE)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_COUNTRY
+			set 
+				COUNTRY_CODE = #{COUNTRY_CODE},
+				COUNTRY_CN = #{COUNTRY_CN},
+				COUNTRY_EN = #{COUNTRY_EN},
+				CUSTOM_CODE = #{CUSTOM_CODE},
+				COUNTRY_PRE = #{COUNTRY_PRE},
+				MEMO = #{MEMO},
+			COUNTRY_ID = COUNTRY_ID
+			where 
+				COUNTRY_ID = #{COUNTRY_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			COUNTRY_CODE,	
+			COUNTRY_CN,	
+			COUNTRY_EN,	
+			CUSTOM_CODE,	
+			COUNTRY_PRE,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			COUNTRY_ID
+		from 
+			TB_COUNTRY
+		where DEL_FLG = 0
+		  AND COUNTRY_ID = #{COUNTRY_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.COUNTRY_CODE,	
+				a.COUNTRY_CN,	
+				a.COUNTRY_EN,	
+				a.CUSTOM_CODE,	
+				a.COUNTRY_PRE,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.COUNTRY_ID
+		from 
+				TB_COUNTRY a
+		WHERE DEL_FLG = 0
+		<if test="pd != null and pd.COUNTRY_CODE != null and pd.COUNTRY_CODE != ''">
+			AND COUNTRY_CODE LIKE CONCAT(CONCAT('%', #{pd.COUNTRY_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.COUNTRY_CN != null and pd.COUNTRY_CN != ''">
+			AND COUNTRY_CN LIKE CONCAT(CONCAT('%', #{pd.COUNTRY_CN}),'%')
+		</if>
+		<if test="pd != null and pd.COUNTRY_EN != null and pd.COUNTRY_EN != ''">
+			AND COUNTRY_EN LIKE CONCAT(CONCAT('%', #{pd.COUNTRY_EN}),'%')
+		</if>
+		<if test="pd != null and pd.CUSTOM_CODE != null and pd.CUSTOM_CODE != ''">
+			AND CUSTOM_CODE LIKE CONCAT(CONCAT('%', #{pd.CUSTOM_CODE}),'%')
+		</if>
+
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.COUNTRY_CODE,	
+				a.COUNTRY_CN,	
+				a.COUNTRY_EN,	
+				a.CUSTOM_CODE,	
+				a.COUNTRY_PRE,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.COUNTRY_ID
+		from 
+				TB_COUNTRY a
+		WHERE DEL_FLG = 0
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_COUNTRY
+		where 
+			COUNTRY_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND COUNTRY_ID NOT IN (SELECT COUNTRY_ID FROM TB_PROVINCE)
+	</delete>
+
+	<!-- 通过国家编号获取数据 -->
+	<select id="findByCtyCode" parameterType="pd" resultType="pd" useCache="false">
+		select
+		a.COUNTRY_CODE,
+		a.COUNTRY_CN,
+		a.COUNTRY_EN,
+		a.CUSTOM_CODE,
+		a.COUNTRY_PRE,
+		a.MEMO,
+		a.CREATE_EMP,
+		a.CREATE_TM,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.COUNTRY_ID
+		from
+		TB_COUNTRY a
+		WHERE DEL_FLG = 0
+        and COUNTRY_CODE = #{COUNTRYCODE}
+		<if test="COUNTRYID != null and COUNTRYID != ''">
+			and COUNTRY_ID != #{COUNTRYID}
+		</if>
+	</select>
+
+	<!-- 通过中文名称获取数据 -->
+	<select id="findByCtyCn" parameterType="pd" resultType="pd" useCache="false">
+		select
+		a.COUNTRY_CODE,
+		a.COUNTRY_CN,
+		a.COUNTRY_EN,
+		a.CUSTOM_CODE,
+		a.COUNTRY_PRE,
+		a.MEMO,
+		a.CREATE_EMP,
+		a.CREATE_TM,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.COUNTRY_ID
+		from
+		TB_COUNTRY a
+		WHERE DEL_FLG = 0
+         and COUNTRY_CN = #{COUNTRYCN}
+		<if test="COUNTRYID != null and COUNTRYID != ''">
+			and COUNTRY_ID != #{COUNTRYID}
+		</if>
+	</select>
+
+    <!-- 列表(全部) -->
+    <select id="findAll" parameterType="pd" resultMap="countryResultMap">
+        select
+        a.COUNTRY_CODE,
+        a.COUNTRY_CN,
+        a.COUNTRY_EN,
+        a.CUSTOM_CODE,
+        a.COUNTRY_PRE,
+        a.MEMO,
+        a.CREATE_EMP,
+        a.CREATE_TM,
+        a.MODIFY_EMP,
+        a.MODIFY_TM,
+        a.DEL_FLG,
+        a.COUNTRY_ID
+        from
+        TB_COUNTRY a
+        WHERE DEL_FLG = 0
+    </select>
+	
+</mapper>

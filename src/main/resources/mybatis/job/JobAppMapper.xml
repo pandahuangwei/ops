@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="JobAppMapper">
+
+    <insert id="saveReceivOptHistory">
+	  INSERT  INTO TM_RECEIVOPT_HISTORY SELECT * FROM TM_RECEIVOPT
+	</insert>
+
+    <delete id="deleteReceivOpt">
+		DELETE FROM TM_RECEIVOPT
+	</delete>
+
+    <delete id="deleteRpBreakBox">
+		DELETE FROM TM_RP_BREAKBOX
+	</delete>
+
+    <delete id="deleteRpStockNow">
+		DELETE FROM TM_RP_STOCKNOW
+	</delete>
+</mapper>

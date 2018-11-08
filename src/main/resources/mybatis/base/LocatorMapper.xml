@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LocatorMapper">
+
+
+    <!-- 新增-->
+    <insert id="save" parameterType="pd">
+		insert into TB_LOCATOR(
+		    LOCATOR_ID,
+			LOCATOR_CODE,	
+			STORAGE_CODE,	
+			ROW_UNIT,
+			FLOOR_UNIT,
+			QUEUE_UNIT,
+			LOCATOR_STATE,	
+			LOCATOR_USE,	
+			LOCATOR_TYPE,	
+			LOCATOR_UNIT,	
+			TURNOVER_CYCLE,	
+			MEMO,	
+			VOLUME_LIMIT,	
+			WEIGHT_LIMIT,	
+			QUANTITY_LIMIT,	
+			PALLET_LIMIT,	
+			LONG_UNIT,
+			WIDE_UNIT,
+			HIGH_UNIT,
+			PLIES_UNIT,
+			PRODUCT_MIX,	
+			BATCH_MIX,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,
+			LOCATOR_PRIORITY_LEVEL
+		) values (
+		    #{LOCATOR_ID},
+			#{LOCATOR_CODE},	
+			#{STORAGE_CODE},	
+			#{ROW_UNIT},
+			#{FLOOR_UNIT},
+			#{QUEUE_UNIT},
+			#{LOCATOR_STATE},	
+			#{LOCATOR_USE},	
+			#{LOCATOR_TYPE},	
+			#{LOCATOR_UNIT},	
+			#{TURNOVER_CYCLE},	
+			#{MEMO},	
+			#{VOLUME_LIMIT},	
+			#{WEIGHT_LIMIT},	
+			#{QUANTITY_LIMIT},	
+			#{PALLET_LIMIT},	
+			#{LONG_UNIT},
+			#{WIDE_UNIT},
+			#{HIGH_UNIT},
+			#{PLIES_UNIT},
+			#{PRODUCT_MIX},	
+			#{BATCH_MIX},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},
+			#{LOCATOR_PRIORITY_LEVEL}
+		)
+	</insert>
+
+    <!-- 新增配载明细-->
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO TB_LOCATOR
+        ( LOCATOR_ID, LOCATOR_CODE, STORAGE_CODE, ROW_UNIT, FLOOR_UNIT, QUEUE_UNIT, LOCATOR_STATE, LOCATOR_USE,
+        LOCATOR_TYPE, LOCATOR_UNIT,
+        TURNOVER_CYCLE, MEMO, VOLUME_LIMIT, WEIGHT_LIMIT, QUANTITY_LIMIT, PALLET_LIMIT, LONG_UNIT, WIDE_UNIT, HIGH_UNIT,
+        PLIES_UNIT,
+        PRODUCT_MIX, BATCH_MIX, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG, LOCATOR_PRIORITY_LEVEL )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.LOCATOR_ID}, #{item.LOCATOR_CODE}, #{item.STORAGE_CODE}, #{item.ROW_UNIT}, #{item.FLOOR_UNIT},
+            #{item.QUEUE_UNIT}, #{item.LOCATOR_STATE}, #{item.LOCATOR_USE}, #{item.LOCATOR_TYPE}, #{item.LOCATOR_UNIT},
+            #{item.TURNOVER_CYCLE}, #{item.MEMO}, #{item.VOLUME_LIMIT}, #{item.WEIGHT_LIMIT}, #{item.QUANTITY_LIMIT},
+            #{item.PALLET_LIMIT}, #{item.LONG_UNIT}, #{item.WIDE_UNIT}, #{item.HIGH_UNIT}, #{item.PLIES_UNIT},
+            #{item.PRODUCT_MIX}, #{item.BATCH_MIX}, #{item.CREATE_EMP}, #{item.CREATE_TM}, #{item.MODIFY_EMP},
+            #{item.MODIFY_TM}, #{item.DEL_FLG}, #{item.LOCATOR_PRIORITY_LEVEL} )
+        </foreach>
+    </insert>
+
+    <!-- 删除-->
+    <delete id="delete" parameterType="pd">
+		delete from TB_LOCATOR
+		where LOCATOR_ID = #{LOCATOR_ID}
+		  AND  LOCATOR_ID NOT IN (SELECT LOCATOR_ID FROM TM_STOCKMGRIN_DTL)
+	</delete>
+
+
+    <!-- 修改 -->
+    <update id="edit" parameterType="pd">
+		update  TB_LOCATOR
+			set 
+				LOCATOR_CODE = #{LOCATOR_CODE},
+				STORAGE_CODE = #{STORAGE_CODE},
+				ROW_UNIT = #{ROW_UNIT},
+				FLOOR_UNIT = #{FLOOR_UNIT},
+				QUEUE_UNIT = #{QUEUE_UNIT},
+				LOCATOR_STATE = #{LOCATOR_STATE},
+				LOCATOR_USE = #{LOCATOR_USE},
+				LOCATOR_TYPE = #{LOCATOR_TYPE},
+				LOCATOR_UNIT = #{LOCATOR_UNIT},
+				TURNOVER_CYCLE = #{TURNOVER_CYCLE},
+				MEMO = #{MEMO},
+				VOLUME_LIMIT = #{VOLUME_LIMIT},
+				WEIGHT_LIMIT = #{WEIGHT_LIMIT},
+				QUANTITY_LIMIT = #{QUANTITY_LIMIT},
+				PALLET_LIMIT = #{PALLET_LIMIT},
+				LONG_UNIT = #{LONG_UNIT},
+				WIDE_UNIT = #{WIDE_UNIT},
+				HIGH_UNIT = #{HIGH_UNIT},
+				PLIES_UNIT = #{PLIES_UNIT},
+				PRODUCT_MIX = #{PRODUCT_MIX},
+				BATCH_MIX = #{BATCH_MIX},
+				MODIFY_EMP = #{MODIFY_EMP},
+			    MODIFY_TM = #{MODIFY_TM},
+			   LOCATOR_PRIORITY_LEVEL = #{LOCATOR_PRIORITY_LEVEL}
+			where 
+				LOCATOR_ID = #{LOCATOR_ID}
+	</update>
+
+
+    <!-- 通过ID获取数据 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+		select 
+			LOCATOR_CODE,	
+			STORAGE_CODE,	
+			ROW_UNIT,
+			FLOOR_UNIT,
+			QUEUE_UNIT,
+			LOCATOR_STATE,	
+			LOCATOR_USE,	
+			LOCATOR_TYPE,	
+			LOCATOR_UNIT,	
+			TURNOVER_CYCLE,	
+			MEMO,	
+			VOLUME_LIMIT,	
+			WEIGHT_LIMIT,	
+			QUANTITY_LIMIT,	
+			PALLET_LIMIT,	
+			LONG_UNIT,
+			WIDE_UNIT,
+			HIGH_UNIT,
+			PLIES_UNIT,
+			PRODUCT_MIX,	
+			BATCH_MIX,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,
+			LOCATOR_ID,
+			LOCATOR_PRIORITY_LEVEL
+		from 
+			TB_LOCATOR
+		where 
+			LOCATOR_ID = #{LOCATOR_ID}
+	</select>
+
+
+    <!-- 列表 -->
+    <select id="datalistPage" parameterType="page" resultType="pd">
+        select
+        a.LOCATOR_CODE,
+        a.STORAGE_CODE,
+        a.ROW_UNIT,
+        a.FLOOR_UNIT,
+        a.QUEUE_UNIT,
+        a.LOCATOR_STATE,
+        a.LOCATOR_USE,
+        a.LOCATOR_TYPE,
+        a.LOCATOR_UNIT,
+        a.TURNOVER_CYCLE,
+        a.MEMO,
+        a.VOLUME_LIMIT,
+        a.WEIGHT_LIMIT,
+        a.QUANTITY_LIMIT,
+        a.PALLET_LIMIT,
+        a.LONG_UNIT,
+        a.WIDE_UNIT,
+        a.HIGH_UNIT,
+        a.PLIES_UNIT,
+        a.PRODUCT_MIX,
+        a.BATCH_MIX,
+        a.CREATE_EMP,
+        a.CREATE_TM,
+        a.MODIFY_EMP,
+        a.MODIFY_TM,
+        a.LOCATOR_ID,
+        a.LOCATOR_PRIORITY_LEVEL
+        from
+        TB_LOCATOR a
+        WHERE a.DEL_FLG = 0
+        <if test="pd != null and pd.LOCATOR_CODE != null and pd.LOCATOR_CODE != ''">
+            AND a.LOCATOR_CODE LIKE CONCAT(CONCAT('%', #{pd.LOCATOR_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.STORAGE_CODE != null and pd.STORAGE_CODE != ''">
+            AND a.STORAGE_CODE = #{pd.STORAGE_CODE}
+        </if>
+        <if test="pd != null and pd.LOCATOR_STATE != null and pd.LOCATOR_STATE != ''">
+            AND a.LOCATOR_STATE = #{pd.LOCATOR_STATE}
+        </if>
+        <if test="pd != null and pd.LOCATOR_PRIORITY_LEVEL != null and pd.LOCATOR_PRIORITY_LEVEL != ''">
+            AND a.LOCATOR_PRIORITY_LEVEL = #{pd.LOCATOR_PRIORITY_LEVEL}
+        </if>
+    </select>
+
+    <!-- 列表(全部) -->
+    <select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.LOCATOR_CODE,	
+				a.STORAGE_CODE,	
+				a.ROW_UNIT,
+				a.FLOOR_UNIT,
+				a.QUEUE_UNIT,
+				a.LOCATOR_STATE,	
+				a.LOCATOR_USE,	
+				a.LOCATOR_TYPE,	
+				a.LOCATOR_UNIT,	
+				a.TURNOVER_CYCLE,	
+				a.MEMO,	
+				a.VOLUME_LIMIT,	
+				a.WEIGHT_LIMIT,	
+				a.QUANTITY_LIMIT,	
+				a.PALLET_LIMIT,	
+				a.LONG_UNIT,
+				a.WIDE_UNIT,
+				a.HIGH_UNIT,
+				a.PLIES_UNIT,
+				a.PRODUCT_MIX,	
+				a.BATCH_MIX,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.LOCATOR_ID,
+				a.LOCATOR_PRIORITY_LEVEL
+		from 
+				TB_LOCATOR a
+	</select>
+
+    <!-- 批量删除 -->
+    <delete id="deleteAll" parameterType="String">
+        delete from TB_LOCATOR
+        where
+        LOCATOR_ID in
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND LOCATOR_ID NOT IN (SELECT LOCATOR_ID FROM TM_STOCKMGRIN_DTL)
+    </delete>
+
+    <select id="findByCode" parameterType="pd" resultType="pd">
+        SELECT
+        a.LOCATOR_CODE,
+        b.STOCK_ID
+        FROM
+        TB_LOCATOR a,TB_STORAGE b
+        WHERE a.STORAGE_CODE = b.STORAGE_ID
+        AND a.DEL_FLG = 0
+        AND a.LOCATOR_CODE = #{LOCATORCODE}
+        AND a.STORAGE_CODE = #{STORAGE_ID}
+        <if test="LOCATORID != null and LOCATORID != ''">
+            and a.LOCATOR_ID != #{LOCATORID}
+        </if>
+    </select>
+
+    <select id="findStockHadLocator" parameterType="pd" resultType="pd">
+        SELECT c.stock_id
+         FROM TB_LOCATOR a,TB_STORAGE b,TB_STOCK c
+        WHERE a.STORAGE_CODE = b.STORAGE_ID
+          AND b.STOCK_ID = c.STOCK_ID
+          AND c.STOCK_ID =  #{STOCK_ID}
+          AND a.LOCATOR_CODE = #{LOCATORCODE}
+    </select>
+
+    <select id="findByCode_bak" parameterType="pd" resultType="pd">
+        select
+        LOCATOR_CODE,
+        STORAGE_CODE,
+        ROW_UNIT,
+        FLOOR_UNIT,
+        QUEUE_UNIT,
+        LOCATOR_STATE,
+        LOCATOR_USE,
+        LOCATOR_TYPE,
+        LOCATOR_UNIT,
+        TURNOVER_CYCLE,
+        MEMO,
+        VOLUME_LIMIT,
+        WEIGHT_LIMIT,
+        QUANTITY_LIMIT,
+        PALLET_LIMIT,
+        LONG_UNIT,
+        WIDE_UNIT,
+        HIGH_UNIT,
+        PLIES_UNIT,
+        PRODUCT_MIX,
+        BATCH_MIX,
+        CREATE_EMP,
+        CREATE_TM,
+        MODIFY_EMP,
+        MODIFY_TM,
+        LOCATOR_ID,
+        LOCATOR_PRIORITY_LEVEL
+        from
+        TB_LOCATOR
+        where DEL_FLG = 0
+        AND LOCATOR_CODE = #{LOCATORCODE}
+        <if test="LOCATORID != null and LOCATORID != ''">
+            and LOCATOR_ID != #{LOCATORID}
+        </if>
+    </select>
+
+</mapper>

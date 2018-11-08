@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CityMapper">
+
+	<resultMap type="City" id="cityResultMap">
+		<id column="PROVINCE_ID" property="PROVINCE_ID"/>
+		<result column="CITY_CODE" property="CITY_CODE"/>
+		<result column="CITY_PARENT_ID" property="CITY_PARENT_ID"/>
+		<result column="CITY_CN" property="CITY_CN"/>
+		<result column="OFFER_FLG" property="OFFER_FLG"/>
+		<result column="CITY_EN" property="CITY_EN"/>
+		<result column="CITY_AREA" property="CITY_AREA"/>
+		<result column="MEMO" property="MEMO"/>
+		<result column="CITY_ID" property="CITY_ID"/>
+	</resultMap>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_CITY(
+			PROVINCE_ID,	
+			CITY_CODE,	
+			CITY_PARENT_ID,
+			CITY_CN,	
+			OFFER_FLG,	
+			CITY_EN,	
+			CITY_AREA,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			CITY_ID
+		) values (
+			#{PROVINCE_ID},	
+			#{CITY_CODE},	
+			#{CITY_PARENT_ID},
+			#{CITY_CN},	
+			#{OFFER_FLG},	
+			#{CITY_EN},	
+			#{CITY_AREA},	
+			#{MEMO},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{CITY_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_CITY
+		where CITY_ID = #{CITY_ID}
+		  AND CITY_ID NOT IN (SELECT CITY_ID FROM TB_CUSTOMER)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_CITY
+			set 
+				PROVINCE_ID = #{PROVINCE_ID},
+				CITY_CODE = #{CITY_CODE},
+				CITY_PARENT_ID = #{CITY_PARENT_ID},
+				CITY_CN = #{CITY_CN},
+				OFFER_FLG = #{OFFER_FLG},
+				CITY_EN = #{CITY_EN},
+				CITY_AREA = #{CITY_AREA},
+				MEMO = #{MEMO},
+			CITY_ID = CITY_ID
+			where 
+				CITY_ID = #{CITY_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			PROVINCE_ID,	
+			CITY_CODE,	
+			CITY_PARENT_ID,
+			CITY_CN,	
+			OFFER_FLG,	
+			CITY_EN,	
+			CITY_AREA,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			CITY_ID
+		from 
+			TB_CITY a
+		where a.DEL_FLG = 0
+		  AND CITY_ID = #{CITY_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT A.PROVINCE_ID, A.PROVINCE_CN, A.CITY_CODE, A.CITY_PARENT_ID, B.CITY_CN CITY_PARENT_CN, A.CITY_CN, A.OFFER_FLG,
+		       A.CITY_EN, A.CITY_AREA, A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.MODIFY_EMP, A.MODIFY_TM, A.CITY_ID FROM
+		( SELECT A.PROVINCE_ID, B.PROVINCE_CN, A.CITY_CODE, A.CITY_PARENT_ID, A.CITY_CN, A.OFFER_FLG, A.CITY_EN,
+		         A.CITY_AREA, A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.MODIFY_EMP, A.MODIFY_TM, A.CITY_ID
+		FROM TB_CITY A, TB_PROVINCE B
+		WHERE a.PROVINCE_ID = b.PROVINCE_ID
+		and a.DEL_FLG = 0
+		<if test="pd != null and pd.CITY_CODE != null and pd.CITY_CODE != ''">
+			AND a.CITY_CODE LIKE CONCAT(CONCAT('%', #{pd.CITY_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.CITY_CN != null and pd.CITY_CN != ''">
+			AND a.CITY_CN LIKE CONCAT(CONCAT('%', #{pd.CITY_CN}),'%')
+		</if>
+		<if test="pd != null and pd.PROVINCE_ID != null and pd.PROVINCE_ID != ''">
+			AND a.PROVINCE_ID = #{pd.PROVINCE_ID}
+		</if>
+		<if test="pd != null and pd.COUNTRY_ID != null and pd.COUNTRY_ID != ''">
+			AND b.COUNTRY_ID = #{pd.COUNTRY_ID}
+		</if>
+		) a LEFT JOIN TB_CITY b on a.CITY_PARENT_ID = b.CITY_ID
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.PROVINCE_ID,	
+				a.CITY_CODE,	
+				a.CITY_PARENT_ID,
+				a.CITY_CN,	
+				a.OFFER_FLG,	
+				a.CITY_EN,	
+				a.CITY_AREA,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.CITY_ID
+		from 
+				TB_CITY a
+		WHERE DEL_FLG = 0
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_CITY
+		where  CITY_ID NOT IN (SELECT CITY_ID FROM TB_CUSTOMER)
+		 AND CITY_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByProvinceId" parameterType="pd" resultMap="cityResultMap">
+		select
+		PROVINCE_ID,
+		CITY_CODE,
+		CITY_PARENT_ID,
+		CITY_CN,
+		OFFER_FLG,
+		CITY_EN,
+		CITY_AREA,
+		MEMO,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		CITY_ID
+		from
+		TB_CITY
+		where DEL_FLG = 0
+		AND PROVINCE_ID = #{PROVINCEID}
+	</select>
+
+	<select id="findAll"  resultMap="cityResultMap">
+		select
+		PROVINCE_ID,
+		CITY_CODE,
+		CITY_PARENT_ID,
+		CITY_CN,
+		OFFER_FLG,
+		CITY_EN,
+		CITY_AREA,
+		MEMO,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		CITY_ID
+		from
+		TB_CITY
+		where DEL_FLG = 0
+	</select>
+
+	<select id="findByCityCode" parameterType="pd" resultType="pd">
+		select
+		PROVINCE_ID,
+		CITY_CODE,
+		CITY_PARENT_ID,
+		CITY_CN,
+		OFFER_FLG,
+		CITY_EN,
+		CITY_AREA,
+		MEMO,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		CITY_ID
+		from
+		TB_CITY
+		where DEL_FLG = 0
+		AND CITY_CODE = #{CITYCODE}
+		<if test="CITYID != null and CITYID != ''">
+			and CITY_ID != #{CITYID}
+		</if>
+	</select>
+
+	<select id="findByCityCn" parameterType="pd" resultType="pd">
+		select
+		PROVINCE_ID,
+		CITY_CODE,
+		CITY_PARENT_ID,
+		CITY_CN,
+		OFFER_FLG,
+		CITY_EN,
+		CITY_AREA,
+		MEMO,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		CITY_ID
+		from
+		TB_CITY
+		where DEL_FLG = 0
+		AND CITY_CN = #{CITYCN}
+		<if test="CITYID != null and CITYID != ''">
+			and CITY_ID != #{CITYID}
+		</if>
+	</select>
+
+	
+</mapper>

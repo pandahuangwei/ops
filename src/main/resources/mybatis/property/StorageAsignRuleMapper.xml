@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StorageAsignRuleMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_STORAGEASIGNRULE(
+			CUSTOMER_ID,	
+			STORAGEASING_CODE,	
+			STORAGEASING_CN,	
+			MEMO,	
+			SEAT_STATE,	
+			PROD_LIMIT,	
+			PROD_LIMIT_USE,	
+			VOLUME_LIMIT,	
+			VOLUME_LIMIT_USE,	
+			LONG_LIMIT,	
+			LONG_LIMIT_USE,	
+			WIDE_LIMIT,	
+			WIDE_LIMIT_USE,	
+			HIGH_LIMIT,	
+			HIGH_LIMIT_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STORAGEASIGNRULE_ID,
+			LOCATOR_PRIORITY_LEVEL
+		) values (
+			#{CUSTOMER_ID},	
+			#{STORAGEASING_CODE},	
+			#{STORAGEASING_CN},	
+			#{MEMO},	
+			#{SEAT_STATE},	
+			#{PROD_LIMIT},	
+			#{PROD_LIMIT_USE},	
+			#{VOLUME_LIMIT},	
+			#{VOLUME_LIMIT_USE},	
+			#{LONG_LIMIT},	
+			#{LONG_LIMIT_USE},	
+			#{WIDE_LIMIT},	
+			#{WIDE_LIMIT_USE},	
+			#{HIGH_LIMIT},	
+			#{HIGH_LIMIT_USE},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{STORAGEASIGNRULE_ID},
+			#{LOCATOR_PRIORITY_LEVEL}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_STORAGEASIGNRULE
+		where STORAGEASIGNRULE_ID = #{STORAGEASIGNRULE_ID}
+		 AND  STORAGEASIGNRULE_ID NOT IN (SELECT RULE_STOCK_ASIGN  FROM  TB_PRODUCT )
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_STORAGEASIGNRULE
+			set 
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				STORAGEASING_CODE = #{STORAGEASING_CODE},
+				STORAGEASING_CN = #{STORAGEASING_CN},
+				MEMO = #{MEMO},
+				SEAT_STATE = #{SEAT_STATE},
+				PROD_LIMIT = #{PROD_LIMIT},
+				PROD_LIMIT_USE = #{PROD_LIMIT_USE},
+				VOLUME_LIMIT = #{VOLUME_LIMIT},
+				VOLUME_LIMIT_USE = #{VOLUME_LIMIT_USE},
+				LONG_LIMIT = #{LONG_LIMIT},
+				LONG_LIMIT_USE = #{LONG_LIMIT_USE},
+				WIDE_LIMIT = #{WIDE_LIMIT},
+				WIDE_LIMIT_USE = #{WIDE_LIMIT_USE},
+				HIGH_LIMIT = #{HIGH_LIMIT},
+				HIGH_LIMIT_USE = #{HIGH_LIMIT_USE},
+			STORAGEASIGNRULE_ID = STORAGEASIGNRULE_ID,
+			LOCATOR_PRIORITY_LEVEL = #{LOCATOR_PRIORITY_LEVEL}
+			where 
+				STORAGEASIGNRULE_ID = #{STORAGEASIGNRULE_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			CUSTOMER_ID,	
+			STORAGEASING_CODE,	
+			STORAGEASING_CN,	
+			MEMO,	
+			SEAT_STATE,	
+			PROD_LIMIT,	
+			PROD_LIMIT_USE,	
+			VOLUME_LIMIT,	
+			VOLUME_LIMIT_USE,	
+			LONG_LIMIT,	
+			LONG_LIMIT_USE,	
+			WIDE_LIMIT,	
+			WIDE_LIMIT_USE,	
+			HIGH_LIMIT,	
+			HIGH_LIMIT_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STORAGEASIGNRULE_ID,
+			LOCATOR_PRIORITY_LEVEL
+		from 
+			TB_STORAGEASIGNRULE
+		where 
+			STORAGEASIGNRULE_ID = #{STORAGEASIGNRULE_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STORAGEASING_CODE,	
+				a.STORAGEASING_CN,	
+				a.MEMO,	
+				a.SEAT_STATE,	
+				a.PROD_LIMIT,	
+				a.PROD_LIMIT_USE,	
+				a.VOLUME_LIMIT,	
+				a.VOLUME_LIMIT_USE,	
+				a.LONG_LIMIT,	
+				a.LONG_LIMIT_USE,	
+				a.WIDE_LIMIT,	
+				a.WIDE_LIMIT_USE,	
+				a.HIGH_LIMIT,	
+				a.HIGH_LIMIT_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,
+				a.STORAGEASIGNRULE_ID,
+				a.LOCATOR_PRIORITY_LEVEL
+		from 
+				TB_STORAGEASIGNRULE a
+				WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.STORAGEASING_CODE != null and pd.STORAGEASING_CODE != ''">
+			AND STORAGEASING_CODE LIKE CONCAT(CONCAT('%', #{pd.STORAGEASING_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.STORAGEASING_CN != null and pd.STORAGEASING_CN != ''">
+			AND STORAGEASING_CN LIKE CONCAT(CONCAT('%', #{pd.STORAGEASING_CN}),'%')
+		</if>
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STORAGEASING_CODE,	
+				a.STORAGEASING_CN,	
+				a.MEMO,	
+				a.SEAT_STATE,	
+				a.PROD_LIMIT,	
+				a.PROD_LIMIT_USE,	
+				a.VOLUME_LIMIT,	
+				a.VOLUME_LIMIT_USE,	
+				a.LONG_LIMIT,	
+				a.LONG_LIMIT_USE,	
+				a.WIDE_LIMIT,	
+				a.WIDE_LIMIT_USE,	
+				a.HIGH_LIMIT,	
+				a.HIGH_LIMIT_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.LOCATOR_PRIORITY_LEVEL,
+				a.STORAGEASIGNRULE_ID
+		from 
+				TB_STORAGEASIGNRULE a
+		where DEL_FLG = '0'
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_STORAGEASIGNRULE
+		where 
+			STORAGEASIGNRULE_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND  STORAGEASIGNRULE_ID NOT IN (SELECT RULE_STOCK_ASIGN  FROM  TB_PRODUCT )
+	</delete>
+
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		STORAGEASING_CODE,
+		STORAGEASING_CN,
+		MEMO,
+		SEAT_STATE,
+		PROD_LIMIT,
+		PROD_LIMIT_USE,
+		VOLUME_LIMIT,
+		VOLUME_LIMIT_USE,
+		LONG_LIMIT,
+		LONG_LIMIT_USE,
+		WIDE_LIMIT,
+		WIDE_LIMIT_USE,
+		HIGH_LIMIT,
+		HIGH_LIMIT_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		LOCATOR_PRIORITY_LEVEL,
+		STORAGEASIGNRULE_ID
+		from
+		TB_STORAGEASIGNRULE
+		where DEL_FLG = '0'
+		  and STORAGEASING_CODE = #{STORAGEASING_CODE}
+		<if test="STORAGEASIGNRULE_ID != null and STORAGEASIGNRULE_ID != ''">
+			and STORAGEASIGNRULE_ID != #{STORAGEASIGNRULE_ID}
+		</if>
+		<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{CUSTOMER_ID}
+		</if>
+
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		STORAGEASING_CODE,
+		STORAGEASING_CN,
+		MEMO,
+		SEAT_STATE,
+		PROD_LIMIT,
+		PROD_LIMIT_USE,
+		VOLUME_LIMIT,
+		VOLUME_LIMIT_USE,
+		LONG_LIMIT,
+		LONG_LIMIT_USE,
+		WIDE_LIMIT,
+		WIDE_LIMIT_USE,
+		HIGH_LIMIT,
+		HIGH_LIMIT_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		LOCATOR_PRIORITY_LEVEL,
+		STORAGEASIGNRULE_ID
+		from
+		TB_STORAGEASIGNRULE
+		where DEL_FLG = '0'
+		and STORAGEASING_CN = #{STORAGEASING_CN}
+		<if test="STORAGEASIGNRULE_ID != null and STORAGEASIGNRULE_ID != ''">
+			and STORAGEASIGNRULE_ID != #{STORAGEASIGNRULE_ID}
+		</if>
+		<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{CUSTOMER_ID}
+		</if>
+
+	</select>
+	
+</mapper>

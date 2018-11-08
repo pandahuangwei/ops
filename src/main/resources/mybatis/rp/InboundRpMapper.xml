@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InboundRpMapper">
+
+    <select id="datalistPage" parameterType="page" resultType="pd">
+        SELECT
+        A.INSTOCK_NO,
+        A.CUSTOMER_ID,
+        A.PRE_INSTOCK_DATE,
+        A.REAL_INSTOCK_DATE,
+        A.ORDER_NO,
+        B.PRODUCT_ID,
+        B.EA_EA,
+        B.EA_ACTUAL,
+        B.ASSIGNED_EA,
+        B.PUT_EA,
+        A.INSTOCK_TYPE,
+        A.TOTAL_WEIGHT,
+        A.TOTAL_SUTTLE,
+        A.TOTAL_VOLUME,
+        A.TOTAL_PRICE,
+        A.TOTAL_EA,
+        A.PRIORITY_LEVEL,
+        A.COST_STATE,
+        A.MEMO,
+        E.RECEIPT_STATE INSTOCK_STATE,
+        E.ASSIGNED_STATE,
+        E.PUT_STATUS PUT_STATE,
+        C1.TIME_ONE CARRIER_ETA,
+        C1.TIME_TWO CARRIER_ATA,
+        C1.TIME_THR DATE03,
+        C1.TIME_FOU DATE04,
+        C1.TIME_FIV DATE05,
+        C1.TIME_SIX DATE06,
+        C1.TIME_SEV DATE07,
+        C1.TIME_EIG DATE08,
+        C1.TIME_NIG DATE09,
+        C1.TIME_TEN DATE10,
+        C1.NUM_ONE  GW,
+        C1.NUM_TWO TOTAL_INVOICE_VALUE,
+        C1.NUM_THR C1_NUM_THR,
+        C1.NUM_FOU NUMBER04,
+        C1.NUM_FIV NUMBER05,
+        C1.NUM_SIX NUMBER06,
+        C1.NUM_SEV NUMBER07,
+        C1.NUM_EIG NUMBER08,
+        C1.NUM_NIG NUMBER09,
+        C1.NUM_TEN NUMBER10,
+        C1.TXT_ONE INBOUND_REFERENCE,
+        C1.TXT_TWO MANUFACTURER,
+        C1.TXT_THR SHIPPER,
+        C1.TXT_FOU MAWB_MBL,
+        C1.TXT_FIV HAWB_HBL,
+        C1.TXT_SIX OF_PACKAGE,
+        C1.TXT_SEV DECLARATION,
+        C1.TXT_EIG CURRENCY,
+        C1.TXT_NIG FLIGHT_NO,
+        C1.TXT_TEN TRUCK_MANIFEST,
+        C1.TXT_ELEVEN TRANSPORTMODE,
+        C1.TXT_TWELVE C1_TXT_TWELVE,
+        C1.TXT_THIRT C1_TXT_THIRT,
+        C1.TXT_FOURT C1_TXT_FOURT,
+        C1.TXT_FIFT C1_TXT_FIFT,
+        C1.TXT_SIXT CASHADVANCE,
+        C1.TXT_SEVENT PICKAREA,
+        C1.TXT_EIGHT C1_TXT_EIGHT,
+        C1.TXT_NINET OT,
+        C1.TXT_TWENT INVOICENO,
+        C2.TIME_ONE,
+        C2.TIME_TWO,
+        C2.TIME_THR,
+        C2.TIME_FOU,
+        C2.TIME_FIV ,
+        C2.TIME_SIX,
+        C2.TIME_SEV,
+        C2.TIME_EIG,
+        C2.TIME_NIG,
+        C2.TIME_TEN,
+        C2.NUM_ONE,
+        C2.NUM_TWO,
+        C2.NUM_THR,
+        C2.NUM_FOU,
+        C2.NUM_FIV,
+        C2.NUM_SIX,
+        C2.NUM_SEV,
+        C2.NUM_EIG,
+        C2.NUM_NIG,
+        C2.NUM_TEN,
+        C2.TXT_ONE,
+        C2.TXT_TWO,
+        C2.TXT_THR,
+        C2.TXT_FOU,
+        C2.TXT_FIV,
+        C2.TXT_SIX,
+        C2.TXT_SEV,
+        C2.TXT_EIG,
+        C2.TXT_NIG,
+        C2.TXT_TEN,
+        C2.TXT_ELEVEN,
+        C2.TXT_TWELVE,
+        C2.TXT_THIRT,
+        C2.TXT_FOURT,
+        C2.TXT_FIFT,
+        C2.TXT_SIXT,
+        C2.TXT_SEVENT,
+        C2.TXT_EIGHT,
+        C2.TXT_NINET,
+        C2.TXT_TWENT,
+        E.PUT_LOCATOR,
+        E.LOT_NO          BOX_LOT_NO,
+        E.DATE_CODE       BOX_DATE_CODE,
+        E.SEPARATE_QTY    BOX_SEPARATE_QTY,
+        E.COO             BOX_COO,
+        E.BIN_CODE        BOX_BIN_CODE,
+        E.BIG_BOX_NO      BOX_BIG_BOX_NO,
+        E.BOX_NO          BOX_BOX_NO
+        FROM TM_STOCKMGRIN A,
+        TM_STOCKMGRIN_DTL B,
+        TM_STOCKMGRIN_PROPERTY C1,
+        TM_STOCKMGRIN_PROPERTY C2,
+        TB_PRODUCT D,
+        TM_BOX E
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+        AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+        AND B.PRODUCT_ID = D.PRODUCT_ID
+        AND B.DEL_FLG ='0'
+        AND B.RECEI_FLG = '1'
+        AND C1.ORDERBATCH_TYPE = '60'
+        AND C2.ORDERBATCH_TYPE = '62'
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+        </if>
+        <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+            AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+        </if>
+        <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+            AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+        </if>
+
+        <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+            AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+        </if>
+        <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+            AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+            AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+        </if>
+        <if test="pd != null and pd.COO != null and pd.COO != ''">
+            AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+        </if>
+        <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+            AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+            AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+        </if>
+        <!--  小于号转义 &lt;   大于号: &gt;  -->
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+        </if>
+
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+        </if>
+        <if test="pd != null and pd.TXT_TWENT != null and pd.TXT_TWENT != ''">
+            AND C1.TXT_TWENT  =#{pd.TXT_TWENT}
+        </if>
+        <if test="pd != null and pd.TXT_ONE != null and pd.TXT_ONE != ''">
+            AND C1.TXT_ONE  =#{pd.TXT_ONE}
+        </if>
+        <if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+            AND C2.TXT_FOU  =#{pd.TXT_FOU}
+        </if>
+        <if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+            AND C2.TXT_FIV  =#{pd.TXT_FOU}
+        </if>
+        <if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+            AND C2.TXT_SIX  =#{pd.TXT_SIX}
+        </if>
+
+    </select>
+
+    <select id="data2listPage" parameterType="page" resultType="pd">
+        SELECT 	INSTOCK_NO,
+        CUSTOMER_ID,
+        PRE_INSTOCK_DATE,
+        REAL_INSTOCK_DATE,
+        ORDER_NO,
+        PRODUCT_ID,
+        EA_EA,
+        EA_ACTUAL,
+        ASSIGNED_EA,
+        PUT_EA,
+        INSTOCK_TYPE,
+        TOTAL_WEIGHT,
+        TOTAL_SUTTLE,
+        TOTAL_VOLUME,
+        TOTAL_PRICE,
+        TOTAL_EA,
+        PRIORITY_LEVEL,
+        COST_STATE,
+        MEMO,
+        INSTOCK_STATE,
+        ASSIGNED_STATE,
+        PUT_STATE,
+        CARRIER_ETA,
+        CARRIER_ATA,
+        DATE03,
+        DATE04,
+        DATE05,
+        DATE06,
+        DATE07,
+        DATE08,
+        DATE09,
+        DATE10,
+        GW,
+        TOTAL_INVOICE_VALUE,
+        C1_NUM_THR,
+        NUMBER04,
+        NUMBER05,
+        NUMBER06,
+        NUMBER07,
+        NUMBER08,
+        NUMBER09,
+        NUMBER10,
+        INBOUND_REFERENCE,
+        MANUFACTURER,
+        SHIPPER,
+        MAWB_MBL,
+        HAWB_HBL,
+        OF_PACKAGE,
+        DECLARATION,
+        CURRENCY,
+        FLIGHT_NO,
+        TRUCK_MANIFEST,
+        TRANSPORTMODE,
+        C1_TXT_TWELVE,
+        C1_TXT_THIRT,
+        C1_TXT_FOURT,
+        C1_TXT_FIFT,
+        CASHADVANCE,
+        PICKAREA,
+        C1_TXT_EIGHT,
+        OT,
+        INVOICENO,
+        TIME_ONE,
+        TIME_TWO,
+        TIME_THR,
+        TIME_FOU,
+        TIME_FIV,
+        TIME_SIX,
+        TIME_SEV,
+        TIME_EIG,
+        TIME_NIG,
+        TIME_TEN,
+        NUM_ONE,
+        NUM_TWO,
+        NUM_THR,
+        NUM_FOU,
+        NUM_FIV,
+        NUM_SIX,
+        NUM_SEV,
+        NUM_EIG,
+        NUM_NIG,
+        NUM_TEN,
+        TXT_ONE,
+        TXT_TWO,
+        TXT_THR,
+        TXT_FOU,
+        TXT_FIV,
+        TXT_SIX,
+        TXT_SEV,
+        TXT_EIG,
+        TXT_NIG,
+        TXT_TEN,
+        TXT_ELEVEN,
+        TXT_TWELVE,
+        TXT_THIRT,
+        TXT_FOURT,
+        TXT_FIFT,
+        TXT_SIXT,
+        TXT_SEVENT,
+        TXT_EIGHT,
+        TXT_NINET,
+        TXT_TWENT,
+        PUT_LOCATOR,
+        BOX_LOT_NO,
+        BOX_DATE_CODE,
+        BOX_SEPARATE_QTY,
+        BOX_COO,
+        BOX_BIN_CODE,
+        BOX_BIG_BOX_NO,
+        BOX_BOX_NO
+        FROM
+        rp_instock
+        WHERE 1 = 1
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+        </if>
+        <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+            AND PRODUCT_ID =#{pd.PRODUCT_ID}
+        </if>
+        <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+            AND BOX_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+        </if>
+
+        <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+            AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+        </if>
+        <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+            AND DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+            AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+        </if>
+        <if test="pd != null and pd.COO != null and pd.COO != ''">
+            AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+        </if>
+        <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+            AND BOX_BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+            AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+        </if>
+        <!--  小于号转义 &lt;   大于号: &gt;  -->
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+            <![CDATA[ AND REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+        </if>
+
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+            <![CDATA[ AND REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+        </if>
+        <if test="pd != null and pd.TXT_TWENT != null and pd.TXT_TWENT != ''">
+            AND INVOICENO  =#{pd.TXT_TWENT}
+        </if>
+        <if test="pd != null and pd.TXT_ONE != null and pd.TXT_ONE != ''">
+            AND INBOUND_REFERENCE  =#{pd.TXT_ONE}
+        </if>
+        <if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+            AND TXT_FOU  =#{pd.TXT_FOU}
+        </if>
+        <if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+            AND TXT_FIV  =#{pd.TXT_FIV}
+        </if>
+        <if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+            AND TXT_SIX  =#{pd.TXT_SIX}
+        </if>
+    </select>
+
+    <select id="datalistForExcel" parameterType="page" resultType="pd">
+        SELECT
+        A.INSTOCK_NO,
+        A.CUSTOMER_ID,
+        A.PRE_INSTOCK_DATE,
+        A.REAL_INSTOCK_DATE,
+        A.ORDER_NO,
+        B.PRODUCT_ID,
+        B.EA_EA,
+        B.EA_ACTUAL,
+        B.ASSIGNED_EA,
+        B.PUT_EA,
+        A.INSTOCK_TYPE,
+        A.TOTAL_WEIGHT,
+        A.TOTAL_SUTTLE,
+        A.TOTAL_VOLUME,
+        A.TOTAL_PRICE,
+        A.TOTAL_EA,
+        A.PRIORITY_LEVEL,
+        A.COST_STATE,
+        A.MEMO,
+        E.RECEIPT_STATE INSTOCK_STATE,
+        E.ASSIGNED_STATE,
+        E.PUT_STATUS PUT_STATE,
+        C1.TIME_ONE CARRIER_ETA,
+        C1.TIME_TWO CARRIER_ATA,
+        C1.TIME_THR DATE03,
+        C1.TIME_FOU DATE04,
+        C1.TIME_FIV DATE05,
+        C1.TIME_SIX DATE06,
+        C1.TIME_SEV DATE07,
+        C1.TIME_EIG DATE08,
+        C1.TIME_NIG DATE09,
+        C1.TIME_TEN DATE10,
+        C1.NUM_ONE  GW,
+        C1.NUM_TWO TOTAL_INVOICE_VALUE,
+        C1.NUM_THR C1_NUM_THR,
+        C1.NUM_FOU NUMBER04,
+        C1.NUM_FIV NUMBER05,
+        C1.NUM_SIX NUMBER06,
+        C1.NUM_SEV NUMBER07,
+        C1.NUM_EIG NUMBER08,
+        C1.NUM_NIG NUMBER09,
+        C1.NUM_TEN NUMBER10,
+        C1.TXT_ONE INBOUND_REFERENCE,
+        C1.TXT_TWO MANUFACTURER,
+        C1.TXT_THR SHIPPER,
+        C1.TXT_FOU MAWB_MBL,
+        C1.TXT_FIV HAWB_HBL,
+        C1.TXT_SIX OF_PACKAGE,
+        C1.TXT_SEV DECLARATION,
+        C1.TXT_EIG CURRENCY,
+        C1.TXT_NIG FLIGHT_NO,
+        C1.TXT_TEN TRUCK_MANIFEST,
+        C1.TXT_ELEVEN TRANSPORTMODE,
+        C1.TXT_TWELVE C1_TXT_TWELVE,
+        C1.TXT_THIRT C1_TXT_THIRT,
+        C1.TXT_FOURT C1_TXT_FOURT,
+        C1.TXT_FIFT C1_TXT_FIFT,
+        C1.TXT_SIXT CASHADVANCE,
+        C1.TXT_SEVENT PICKAREA,
+        C1.TXT_EIGHT C1_TXT_EIGHT,
+        C1.TXT_NINET OT,
+        C1.TXT_TWENT INVOICENO,
+        C2.TIME_ONE,
+        C2.TIME_TWO,
+        C2.TIME_THR,
+        C2.TIME_FOU,
+        C2.TIME_FIV ,
+        C2.TIME_SIX,
+        C2.TIME_SEV,
+        C2.TIME_EIG,
+        C2.TIME_NIG,
+        C2.TIME_TEN,
+        C2.NUM_ONE,
+        C2.NUM_TWO,
+        C2.NUM_THR,
+        C2.NUM_FOU,
+        C2.NUM_FIV,
+        C2.NUM_SIX,
+        C2.NUM_SEV,
+        C2.NUM_EIG,
+        C2.NUM_NIG,
+        C2.NUM_TEN,
+        C2.TXT_ONE,
+        C2.TXT_TWO,
+        C2.TXT_THR,
+        C2.TXT_FOU,
+        C2.TXT_FIV,
+        C2.TXT_SIX,
+        C2.TXT_SEV,
+        C2.TXT_EIG,
+        C2.TXT_NIG,
+        C2.TXT_TEN,
+        C2.TXT_ELEVEN,
+        C2.TXT_TWELVE,
+        C2.TXT_THIRT,
+        C2.TXT_FOURT,
+        C2.TXT_FIFT,
+        C2.TXT_SIXT,
+        C2.TXT_SEVENT,
+        C2.TXT_EIGHT,
+        C2.TXT_NINET,
+        C2.TXT_TWENT,
+        E.PUT_LOCATOR,
+        E.LOT_NO          BOX_LOT_NO,
+        E.DATE_CODE       BOX_DATE_CODE,
+        E.SEPARATE_QTY    BOX_SEPARATE_QTY,
+        E.COO             BOX_COO,
+        E.BIN_CODE        BOX_BIN_CODE,
+        E.BIG_BOX_NO      BOX_BIG_BOX_NO,
+        E.BOX_NO          BOX_BOX_NO
+        FROM TM_STOCKMGRIN A,
+        TM_STOCKMGRIN_DTL B,
+        TM_STOCKMGRIN_PROPERTY C1,
+        TM_STOCKMGRIN_PROPERTY C2,
+        TB_PRODUCT D,
+        TM_BOX E
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+        AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+        AND B.PRODUCT_ID = D.PRODUCT_ID
+        AND B.DEL_FLG ='0'
+        AND B.RECEI_FLG = '1'
+        AND C1.ORDERBATCH_TYPE = '60'
+        AND C2.ORDERBATCH_TYPE = '62'
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+        </if>
+        <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+            AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+        </if>
+        <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+            AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+        </if>
+
+        <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+            AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+        </if>
+        <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+            AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+            AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+        </if>
+        <if test="pd != null and pd.COO != null and pd.COO != ''">
+            AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+        </if>
+        <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+            AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+            AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+        </if>
+        <!--  小于号转义 &lt;   大于号: &gt;  -->
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+        </if>
+
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+        </if>
+        <if test="pd != null and pd.TXT_TWENT != null and pd.TXT_TWENT != ''">
+            AND C1.TXT_TWENT  =#{pd.TXT_TWENT}
+        </if>
+        <if test="pd != null and pd.TXT_ONE != null and pd.TXT_ONE != ''">
+            AND C1.TXT_ONE  =#{pd.TXT_ONE}
+        </if>
+        <if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+            AND C2.TXT_FOU  =#{pd.TXT_FOU}
+        </if>
+        <if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+            AND C2.TXT_FIV  =#{pd.TXT_FIV}
+        </if>
+        <if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+            AND C2.TXT_SIX  =#{pd.TXT_SIX}
+        </if>
+    </select>
+
+    <select id="data2listForExcel" parameterType="page" resultType="pd">
+        SELECT 	INSTOCK_NO,
+        CUSTOMER_ID,
+        PRE_INSTOCK_DATE,
+        REAL_INSTOCK_DATE,
+        ORDER_NO,
+        PRODUCT_ID,
+        EA_EA,
+        EA_ACTUAL,
+        ASSIGNED_EA,
+        PUT_EA,
+        INSTOCK_TYPE,
+        TOTAL_WEIGHT,
+        TOTAL_SUTTLE,
+        TOTAL_VOLUME,
+        TOTAL_PRICE,
+        TOTAL_EA,
+        PRIORITY_LEVEL,
+        COST_STATE,
+        MEMO,
+        INSTOCK_STATE,
+        ASSIGNED_STATE,
+        PUT_STATE,
+        CARRIER_ETA,
+        CARRIER_ATA,
+        DATE03,
+        DATE04,
+        DATE05,
+        DATE06,
+        DATE07,
+        DATE08,
+        DATE09,
+        DATE10,
+        GW,
+        TOTAL_INVOICE_VALUE,
+        C1_NUM_THR,
+        NUMBER04,
+        NUMBER05,
+        NUMBER06,
+        NUMBER07,
+        NUMBER08,
+        NUMBER09,
+        NUMBER10,
+        INBOUND_REFERENCE,
+        MANUFACTURER,
+        SHIPPER,
+        MAWB_MBL,
+        HAWB_HBL,
+        OF_PACKAGE,
+        DECLARATION,
+        CURRENCY,
+        FLIGHT_NO,
+        TRUCK_MANIFEST,
+        TRANSPORTMODE,
+        C1_TXT_TWELVE,
+        C1_TXT_THIRT,
+        C1_TXT_FOURT,
+        C1_TXT_FIFT,
+        CASHADVANCE,
+        PICKAREA,
+        C1_TXT_EIGHT,
+        OT,
+        INVOICENO,
+        TIME_ONE,
+        TIME_TWO,
+        TIME_THR,
+        TIME_FOU,
+        TIME_FIV,
+        TIME_SIX,
+        TIME_SEV,
+        TIME_EIG,
+        TIME_NIG,
+        TIME_TEN,
+        NUM_ONE,
+        NUM_TWO,
+        NUM_THR,
+        NUM_FOU,
+        NUM_FIV,
+        NUM_SIX,
+        NUM_SEV,
+        NUM_EIG,
+        NUM_NIG,
+        NUM_TEN,
+        TXT_ONE,
+        TXT_TWO,
+        TXT_THR,
+        TXT_FOU,
+        TXT_FIV,
+        TXT_SIX,
+        TXT_SEV,
+        TXT_EIG,
+        TXT_NIG,
+        TXT_TEN,
+        TXT_ELEVEN,
+        TXT_TWELVE,
+        TXT_THIRT,
+        TXT_FOURT,
+        TXT_FIFT,
+        TXT_SIXT,
+        TXT_SEVENT,
+        TXT_EIGHT,
+        TXT_NINET,
+        TXT_TWENT,
+        PUT_LOCATOR,
+        BOX_LOT_NO,
+        BOX_DATE_CODE,
+        BOX_SEPARATE_QTY,
+        BOX_COO,
+        BOX_BIN_CODE,
+        BOX_BIG_BOX_NO,
+        BOX_BOX_NO
+        FROM
+        rp_instock
+        WHERE 1 = 1
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+        </if>
+        <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+            AND PRODUCT_ID =#{pd.PRODUCT_ID}
+        </if>
+        <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+            AND BOX_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+        </if>
+
+        <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+            AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+        </if>
+        <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+            AND DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+            AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+        </if>
+        <if test="pd != null and pd.COO != null and pd.COO != ''">
+            AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+        </if>
+        <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+            AND BOX_BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+            AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+        </if>
+        <!--  小于号转义 &lt;   大于号: &gt;  -->
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+            <![CDATA[ AND REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+        </if>
+
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+            <![CDATA[ AND REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+        </if>
+        <if test="pd != null and pd.TXT_TWENT != null and pd.TXT_TWENT != ''">
+            AND INVOICENO  =#{pd.TXT_TWENT}
+        </if>
+        <if test="pd != null and pd.TXT_ONE != null and pd.TXT_ONE != ''">
+            AND INBOUND_REFERENCE  =#{pd.TXT_ONE}
+        </if>
+        <if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+            AND TXT_FOU  =#{pd.TXT_FOU}
+        </if>
+        <if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+            AND TXT_FIV  =#{pd.TXT_FIV}
+        </if>
+        <if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+            AND TXT_SIX  =#{pd.TXT_SIX}
+        </if>
+    </select>
+
+
+    <delete id="truncateRpInStock">
+        DELETE FROM  rp_instock
+    </delete>
+
+    <delete id="deleteRpInStock">
+        DELETE FROM rp_instock
+    </delete>
+
+    <insert id="insertRpInStockSrc">
+      INSERT INTO rp_instock
+      SELECT
+        A.INSTOCK_NO,
+        A.CUSTOMER_ID,
+        A.PRE_INSTOCK_DATE,
+        A.REAL_INSTOCK_DATE,
+        A.ORDER_NO,
+        B.PRODUCT_ID,
+        B.EA_EA,
+        B.EA_ACTUAL,
+        B.ASSIGNED_EA,
+        B.PUT_EA,
+        A.INSTOCK_TYPE,
+        A.TOTAL_WEIGHT,
+        A.TOTAL_SUTTLE,
+        A.TOTAL_VOLUME,
+        A.TOTAL_PRICE,
+        A.TOTAL_EA,
+        A.PRIORITY_LEVEL,
+        A.COST_STATE,
+        A.MEMO,
+        A.INSTOCK_STATE,
+        A.ASSIGNED_STATE,
+        A.PUT_STATE,
+        C1.TIME_ONE CARRIER_ETA,
+        C1.TIME_TWO CARRIER_ATA,
+        C1.TIME_THR DATE03,
+        C1.TIME_FOU DATE04,
+        C1.TIME_FIV DATE05,
+        C1.TIME_SIX DATE06,
+        C1.TIME_SEV DATE07,
+        C1.TIME_EIG DATE08,
+        C1.TIME_NIG DATE09,
+        C1.TIME_TEN DATE10,
+        C1.NUM_ONE  GW,
+        C1.NUM_TWO TOTAL_INVOICE_VALUE,
+        C1.NUM_THR C1_NUM_THR,
+        C1.NUM_FOU NUMBER04,
+        C1.NUM_FIV NUMBER05,
+        C1.NUM_SIX NUMBER06,
+        C1.NUM_SEV NUMBER07,
+        C1.NUM_EIG NUMBER08,
+        C1.NUM_NIG NUMBER09,
+        C1.NUM_TEN NUMBER10,
+        C1.TXT_ONE INBOUND_REFERENCE,
+        C1.TXT_TWO MANUFACTURER,
+        C1.TXT_THR SHIPPER,
+        C1.TXT_FOU MAWB_MBL,
+        C1.TXT_FIV HAWB_HBL,
+        C1.TXT_SIX OF_PACKAGE,
+        C1.TXT_SEV DECLARATION,
+        C1.TXT_EIG CURRENCY,
+        C1.TXT_NIG FLIGHT_NO,
+        C1.TXT_TEN TRUCK_MANIFEST,
+        C1.TXT_ELEVEN TRANSPORTMODE,
+        C1.TXT_TWELVE C1_TXT_TWELVE,
+        C1.TXT_THIRT C1_TXT_THIRT,
+        C1.TXT_FOURT C1_TXT_FOURT,
+        C1.TXT_FIFT C1_TXT_FIFT,
+        C1.TXT_SIXT CASHADVANCE,
+        C1.TXT_SEVENT PICKAREA,
+        C1.TXT_EIGHT C1_TXT_EIGHT,
+        C1.TXT_NINET OT,
+        C1.TXT_TWENT INVOICENO,
+        C2.TIME_ONE,
+        C2.TIME_TWO,
+        C2.TIME_THR,
+        C2.TIME_FOU,
+        C2.TIME_FIV ,
+        C2.TIME_SIX,
+        C2.TIME_SEV,
+        C2.TIME_EIG,
+        C2.TIME_NIG,
+        C2.TIME_TEN,
+        C2.NUM_ONE,
+        C2.NUM_TWO,
+        C2.NUM_THR,
+        C2.NUM_FOU,
+        C2.NUM_FIV,
+        C2.NUM_SIX,
+        C2.NUM_SEV,
+        C2.NUM_EIG,
+        C2.NUM_NIG,
+        C2.NUM_TEN,
+        C2.TXT_ONE,
+        C2.TXT_TWO,
+        C2.TXT_THR,
+        C2.TXT_FOU,
+        C2.TXT_FIV,
+        C2.TXT_SIX,
+        C2.TXT_SEV,
+        C2.TXT_EIG,
+        C2.TXT_NIG,
+        C2.TXT_TEN,
+        C2.TXT_ELEVEN,
+        C2.TXT_TWELVE,
+        C2.TXT_THIRT,
+        C2.TXT_FOURT,
+        C2.TXT_FIFT,
+        C2.TXT_SIXT,
+        C2.TXT_SEVENT,
+        C2.TXT_EIGHT,
+        C2.TXT_NINET,
+        C2.TXT_TWENT,
+        E.PUT_LOCATOR,
+        E.LOT_NO          BOX_LOT_NO,
+        E.DATE_CODE       BOX_DATE_CODE,
+        E.SEPARATE_QTY    BOX_SEPARATE_QTY,
+        E.COO             BOX_COO,
+        E.BIN_CODE        BOX_BIN_CODE,
+        E.BIG_BOX_NO      BOX_BIG_BOX_NO,
+         E.BOX_NO          BOX_BOX_NO
+        FROM TM_STOCKMGRIN A,
+        TM_STOCKMGRIN_DTL B,
+        TM_STOCKMGRIN_PROPERTY C1,
+        TM_STOCKMGRIN_PROPERTY C2,
+        TB_PRODUCT D,
+        TM_BOX E
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+        AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+        AND B.PRODUCT_ID = D.PRODUCT_ID
+        AND B.DEL_FLG ='0'
+        AND B.RECEI_FLG = '1'
+        AND C1.ORDERBATCH_TYPE = '60'
+        AND C2.ORDERBATCH_TYPE = '62'
+    </insert>
+
+    <select id="selectRpInStockForInsert" resultType="pd">
+        SELECT
+        A.INSTOCK_NO,
+        A.CUSTOMER_ID,
+        A.PRE_INSTOCK_DATE,
+        A.REAL_INSTOCK_DATE,
+        A.ORDER_NO,
+        B.PRODUCT_ID,
+        B.EA_EA,
+        B.EA_ACTUAL,
+        B.ASSIGNED_EA,
+        B.PUT_EA,
+        A.INSTOCK_TYPE,
+        A.TOTAL_WEIGHT,
+        A.TOTAL_SUTTLE,
+        A.TOTAL_VOLUME,
+        A.TOTAL_PRICE,
+        A.TOTAL_EA,
+        A.PRIORITY_LEVEL,
+        A.COST_STATE,
+        A.MEMO,
+        E.RECEIPT_STATE INSTOCK_STATE,
+        E.ASSIGNED_STATE,
+        E.PUT_STATUS PUT_STATE,
+        C1.TIME_ONE CARRIER_ETA,
+        C1.TIME_TWO CARRIER_ATA,
+        C1.TIME_THR DATE03,
+        C1.TIME_FOU DATE04,
+        C1.TIME_FIV DATE05,
+        C1.TIME_SIX DATE06,
+        C1.TIME_SEV DATE07,
+        C1.TIME_EIG DATE08,
+        C1.TIME_NIG DATE09,
+        C1.TIME_TEN DATE10,
+        C1.NUM_ONE  GW,
+        C1.NUM_TWO TOTAL_INVOICE_VALUE,
+        C1.NUM_THR C1_NUM_THR,
+        C1.NUM_FOU NUMBER04,
+        C1.NUM_FIV NUMBER05,
+        C1.NUM_SIX NUMBER06,
+        C1.NUM_SEV NUMBER07,
+        C1.NUM_EIG NUMBER08,
+        C1.NUM_NIG NUMBER09,
+        C1.NUM_TEN NUMBER10,
+        C1.TXT_ONE INBOUND_REFERENCE,
+        C1.TXT_TWO MANUFACTURER,
+        C1.TXT_THR SHIPPER,
+        C1.TXT_FOU MAWB_MBL,
+        C1.TXT_FIV HAWB_HBL,
+        C1.TXT_SIX OF_PACKAGE,
+        C1.TXT_SEV DECLARATION,
+        C1.TXT_EIG CURRENCY,
+        C1.TXT_NIG FLIGHT_NO,
+        C1.TXT_TEN TRUCK_MANIFEST,
+        C1.TXT_ELEVEN TRANSPORTMODE,
+        C1.TXT_TWELVE C1_TXT_TWELVE,
+        C1.TXT_THIRT C1_TXT_THIRT,
+        C1.TXT_FOURT C1_TXT_FOURT,
+        C1.TXT_FIFT C1_TXT_FIFT,
+        C1.TXT_SIXT CASHADVANCE,
+        C1.TXT_SEVENT PICKAREA,
+        C1.TXT_EIGHT C1_TXT_EIGHT,
+        C1.TXT_NINET OT,
+        C1.TXT_TWENT INVOICENO,
+        C2.TIME_ONE,
+        C2.TIME_TWO,
+        C2.TIME_THR,
+        C2.TIME_FOU,
+        C2.TIME_FIV ,
+        C2.TIME_SIX,
+        C2.TIME_SEV,
+        C2.TIME_EIG,
+        C2.TIME_NIG,
+        C2.TIME_TEN,
+        C2.NUM_ONE,
+        C2.NUM_TWO,
+        C2.NUM_THR,
+        C2.NUM_FOU,
+        C2.NUM_FIV,
+        C2.NUM_SIX,
+        C2.NUM_SEV,
+        C2.NUM_EIG,
+        C2.NUM_NIG,
+        C2.NUM_TEN,
+        C2.TXT_ONE,
+        C2.TXT_TWO,
+        C2.TXT_THR,
+        C2.TXT_FOU,
+        C2.TXT_FIV,
+        C2.TXT_SIX,
+        C2.TXT_SEV,
+        C2.TXT_EIG,
+        C2.TXT_NIG,
+        C2.TXT_TEN,
+        C2.TXT_ELEVEN,
+        C2.TXT_TWELVE,
+        C2.TXT_THIRT,
+        C2.TXT_FOURT,
+        C2.TXT_FIFT,
+        C2.TXT_SIXT,
+        C2.TXT_SEVENT,
+        C2.TXT_EIGHT,
+        C2.TXT_NINET,
+        C2.TXT_TWENT,
+        E.PUT_LOCATOR,
+        E.LOT_NO          BOX_LOT_NO,
+        E.DATE_CODE       BOX_DATE_CODE,
+        E.SEPARATE_QTY    BOX_SEPARATE_QTY,
+        E.COO             BOX_COO,
+        E.BIN_CODE        BOX_BIN_CODE,
+        E.BIG_BOX_NO      BOX_BIG_BOX_NO,
+        E.BOX_NO          BOX_BOX_NO
+        FROM TM_STOCKMGRIN A,
+        TM_STOCKMGRIN_DTL B,
+        TM_STOCKMGRIN_PROPERTY C1,
+        TM_STOCKMGRIN_PROPERTY C2,
+        TB_PRODUCT D,
+        TM_BOX E
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+        AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+        AND B.PRODUCT_ID = D.PRODUCT_ID
+        AND B.DEL_FLG ='0'
+        AND B.RECEI_FLG = '1'
+        AND C1.ORDERBATCH_TYPE = '60'
+        AND C2.ORDERBATCH_TYPE = '62'
+    </select>
+
+    <insert id="insertRpInStock" parameterType="java.util.List">
+        INSERT INTO rp_instock
+        (INSTOCK_NO, CUSTOMER_ID, PRE_INSTOCK_DATE, REAL_INSTOCK_DATE, ORDER_NO, PRODUCT_ID, EA_EA, EA_ACTUAL, ASSIGNED_EA, PUT_EA,
+        INSTOCK_TYPE, TOTAL_WEIGHT, TOTAL_SUTTLE, TOTAL_VOLUME, TOTAL_PRICE, TOTAL_EA, PRIORITY_LEVEL, COST_STATE, MEMO, INSTOCK_STATE,
+        ASSIGNED_STATE, PUT_STATE, CARRIER_ETA, CARRIER_ATA, DATE03, DATE04, DATE05, DATE06, DATE07, DATE08, DATE09, DATE10, GW, TOTAL_INVOICE_VALUE,
+        C1_NUM_THR, NUMBER04, NUMBER05, NUMBER06, NUMBER07, NUMBER08, NUMBER09, NUMBER10, INBOUND_REFERENCE, MANUFACTURER, SHIPPER, MAWB_MBL, HAWB_HBL,
+        OF_PACKAGE, DECLARATION, CURRENCY, FLIGHT_NO, TRUCK_MANIFEST, TRANSPORTMODE, C1_TXT_TWELVE, C1_TXT_THIRT, C1_TXT_FOURT, C1_TXT_FIFT,
+        CASHADVANCE, PICKAREA, C1_TXT_EIGHT, OT, INVOICENO, TIME_ONE, TIME_TWO, TIME_THR, TIME_FOU, TIME_FIV, TIME_SIX, TIME_SEV, TIME_EIG,
+        TIME_NIG, TIME_TEN, NUM_ONE, NUM_TWO, NUM_THR, NUM_FOU, NUM_FIV, NUM_SIX, NUM_SEV, NUM_EIG, NUM_NIG, NUM_TEN, TXT_ONE, TXT_TWO, TXT_THR,
+        TXT_FOU, TXT_FIV, TXT_SIX, TXT_SEV, TXT_EIG, TXT_NIG, TXT_TEN, TXT_ELEVEN, TXT_TWELVE, TXT_THIRT, TXT_FOURT, TXT_FIFT, TXT_SIXT, TXT_SEVENT,
+        TXT_EIGHT, TXT_NINET, TXT_TWENT, PUT_LOCATOR, BOX_LOT_NO, BOX_DATE_CODE, BOX_SEPARATE_QTY, BOX_COO, BOX_BIN_CODE, BOX_BIG_BOX_NO,BOX_BOX_NO )
+        VALUES
+        <foreach collection="list"  item="item" index="index" separator=",">
+            (#{item.INSTOCK_NO},#{item.CUSTOMER_ID},#{item.PRE_INSTOCK_DATE},#{item.REAL_INSTOCK_DATE},#{item.ORDER_NO},#{item.PRODUCT_ID},#{item.EA_EA},#{item.EA_ACTUAL},
+             #{item.ASSIGNED_EA},#{item.PUT_EA},#{item.INSTOCK_TYPE},#{item.TOTAL_WEIGHT},#{item.TOTAL_SUTTLE},#{item.TOTAL_VOLUME},#{item.TOTAL_PRICE},#{item.TOTAL_EA},
+            #{item.PRIORITY_LEVEL},#{item.COST_STATE},#{item.MEMO},#{item.INSTOCK_STATE},#{item.ASSIGNED_STATE},#{item.PUT_STATE},#{item.CARRIER_ETA},#{item.CARRIER_ATA},
+            #{item.DATE03},#{item.DATE04},#{item.DATE05},#{item.DATE06},#{item.DATE07},#{item.DATE08},#{item.DATE09},#{item.DATE10},#{item.GW},#{item.TOTAL_INVOICE_VALUE},
+            #{item.C1_NUM_THR},#{item.NUMBER04},#{item.NUMBER05},#{item.NUMBER06},#{item.NUMBER07},#{item.NUMBER08},#{item.NUMBER09},#{item.NUMBER10},#{item.INBOUND_REFERENCE},
+            #{item.MANUFACTURER},#{item.SHIPPER},#{item.MAWB_MBL},#{item.HAWB_HBL},#{item.OF_PACKAGE},#{item.DECLARATION},#{item.CURRENCY},#{item.FLIGHT_NO},#{item.TRUCK_MANIFEST},
+            #{item.TRANSPORTMODE},#{item.C1_TXT_TWELVE},#{item.C1_TXT_THIRT},#{item.C1_TXT_FOURT},#{item.C1_TXT_FIFT},#{item.CASHADVANCE},#{item.PICKAREA},#{item.C1_TXT_EIGHT},#{item.OT},
+            #{item.INVOICENO},#{item.TIME_ONE},#{item.TIME_TWO},#{item.TIME_THR},#{item.TIME_FOU},#{item.TIME_FIV},#{item.TIME_SIX},#{item.TIME_SEV},#{item.TIME_EIG},#{item.TIME_NIG},
+            #{item.TIME_TEN},#{item.NUM_ONE},#{item.NUM_TWO},#{item.NUM_THR},#{item.NUM_FOU},#{item.NUM_FIV},#{item.NUM_SIX},#{item.NUM_SEV},#{item.NUM_EIG},#{item.NUM_NIG},#{item.NUM_TEN},
+            #{item.TXT_ONE},#{item.TXT_TWO},#{item.TXT_THR},#{item.TXT_FOU},#{item.TXT_FIV},#{item.TXT_SIX},#{item.TXT_SEV},#{item.TXT_EIG},#{item.TXT_NIG},#{item.TXT_TEN},#{item.TXT_ELEVEN},
+            #{item.TXT_TWELVE},#{item.TXT_THIRT},#{item.TXT_FOURT},#{item.TXT_FIFT},#{item.TXT_SIXT},#{item.TXT_SEVENT},#{item.TXT_EIGHT},#{item.TXT_NINET},#{item.TXT_TWENT},#{item.PUT_LOCATOR},
+            #{item.BOX_LOT_NO},#{item.BOX_DATE_CODE},#{item.BOX_SEPARATE_QTY},#{item.BOX_COO},#{item.BOX_BIN_CODE},#{item.BOX_BIG_BOX_NO},#{item.BOX_BOX_NO} )
+        </foreach>
+    </insert>
+
+    <select id="dataDynclistPage" parameterType="page" resultType="pd">
+        SELECT
+        ${pd.COLUM},
+        A.CUSTOMER_ID,
+        A.INSTOCK_NO,
+        E.LOT_NO BOX_LOT_NO,
+        E.DATE_CODE BOX_DATE_CODE,
+        E.SEPARATE_QTY BOX_SEPARATE_QTY,
+        E.COO BOX_COO,
+        E.BIN_CODE BOX_BIN_CODE,
+        E.BIG_BOX_NO BOX_BIG_BOX_NO
+        FROM TM_STOCKMGRIN A,
+        TM_STOCKMGRIN_DTL B,
+        TM_STOCKMGRIN_PROPERTY C1,
+        TM_STOCKMGRIN_PROPERTY C2,
+        TB_PRODUCT D,
+        TM_BOX E
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+        AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+        AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+        AND B.PRODUCT_ID = D.PRODUCT_ID
+        AND B.DEL_FLG ='0'
+        AND B.RECEI_FLG = '1'
+        AND C1.ORDERBATCH_TYPE = '60'
+        AND C2.ORDERBATCH_TYPE = '62'
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+        </if>
+        <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+            AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+        </if>
+        <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+            AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+            AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+        </if>
+        <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+            AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+        </if>
+        <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+            AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+        </if>
+        <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+            AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+        </if>
+        <if test="pd != null and pd.COO != null and pd.COO != ''">
+            AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+        </if>
+        <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+            AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+        </if>
+        <!--  小于号转义 &lt;   大于号: &gt;  -->
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+        </if>
+
+        <if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+            <![CDATA[ AND A.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+        </if>
+    </select>
+</mapper>

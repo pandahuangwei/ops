@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CustomerMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_CUSTOMER(
+			CUSTOMER_CODE,	
+			CUSTOMER_CN,	
+			CUSTOMER_SHORT,	
+			CUSTOMER_EN,
+			SEACH_CODE,	
+			UP_COMPANY,	
+			COUNTRY_ID,	
+			PROVINCE_ID,	
+			CITY_ID,	
+			CUSTOMER_ADDR,	
+			INTEL_ADDR,	
+			CUSTOMS_CODE,	
+			OPERATING_UNIT,	
+			PAY_PERIOD,	
+			TEL_PHONE,	
+			SERVIC_ER,	
+			SALE_MAN,	
+			CUSTOMER_FINANCE,	
+			SUPPLIER_FINANCE,	
+			PAY_MERCHANT,	
+			CUSTOMER_TYPE,	
+			TYPE_SUPPLIER,	
+			TYPE_FACTOR,	
+			TYPE_FOB,	
+			TYPE_SEND,	
+			TYPE_TAKE,	
+			TYPE_CAR,	
+			TYPE_CUSTOM,	
+			BELONE_COMPANY,	
+			USE_FLG,	
+			CONTACTS_CN,	
+			CONTACTS_EN,	
+			CONTACTS_CITY_ID,	
+			CONTACTS_ADDR,	
+			CONTACTS_DEPT,	
+			CONTACTS_POST,	
+			CONTACTS_PHONE,	
+			CONTACTS_FAX,	
+			CONTACTS_EMAIL,	
+			CONTACTS_BIRTH,	
+			CONTACTS_MEMORI,	
+			RULE_PACK,	
+			RULE_PUT,	
+			RULE_PICK,	
+			RULE_PICK_ASIGN,	
+			RULE_DEFALUT_ASIGN,	
+			RULE_BATCH,	
+			RULE_STOCK,	
+			RULE_STORAGE,	
+			RULE_BULK,	
+			SUPR_TAKE,	
+			SUPR_SEND,	
+			CONTRACTUAL_FILE,	
+			CONTRACTUAL_ACTIVE,	
+			CONTRACTUAL_DISABLE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			CUSTOMER_ID,
+			RULE_STORAGEASIGNR,
+            RULE_STOCKASIGN
+		) values (
+			#{CUSTOMER_CODE},	
+			#{CUSTOMER_CN},	
+			#{CUSTOMER_SHORT},	
+			#{CUSTOMER_EN},	
+			#{SEACH_CODE},	
+			#{UP_COMPANY},	
+			#{COUNTRY_ID},	
+			#{PROVINCE_ID},	
+			#{CITY_ID},	
+			#{CUSTOMER_ADDR},	
+			#{INTEL_ADDR},	
+			#{CUSTOMS_CODE},	
+			#{OPERATING_UNIT},	
+			#{PAY_PERIOD},	
+			#{TEL_PHONE},	
+			#{SERVIC_ER},	
+			#{SALE_MAN},	
+			#{CUSTOMER_FINANCE},	
+			#{SUPPLIER_FINANCE},	
+			#{PAY_MERCHANT},	
+			#{CUSTOMER_TYPE},	
+			#{TYPE_SUPPLIER},	
+			#{TYPE_FACTOR},	
+			#{TYPE_FOB},	
+			#{TYPE_SEND},	
+			#{TYPE_TAKE},	
+			#{TYPE_CAR},	
+			#{TYPE_CUSTOM},	
+			#{BELONE_COMPANY},	
+			#{USE_FLG},	
+			#{CONTACTS_CN},	
+			#{CONTACTS_EN},	
+			#{CONTACTS_CITY_ID},	
+			#{CONTACTS_ADDR},	
+			#{CONTACTS_DEPT},	
+			#{CONTACTS_POST},	
+			#{CONTACTS_PHONE},	
+			#{CONTACTS_FAX},	
+			#{CONTACTS_EMAIL},	
+			#{CONTACTS_BIRTH},	
+			#{CONTACTS_MEMORI},	
+			#{RULE_PACK},	
+			#{RULE_PUT},	
+			#{RULE_PICK},	
+			#{RULE_PICK_ASIGN},	
+			#{RULE_DEFALUT_ASIGN},	
+			#{RULE_BATCH},	
+			#{RULE_STOCK},	
+			#{RULE_STORAGE},	
+			#{RULE_BULK},	
+			#{SUPR_TAKE},	
+			#{SUPR_SEND},	
+			#{CONTRACTUAL_FILE},	
+			#{CONTRACTUAL_ACTIVE},	
+			#{CONTRACTUAL_DISABLE},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{CUSTOMER_ID},
+			#{RULE_STORAGEASIGNR},
+            #{RULE_STOCKASIGN}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_CUSTOMER
+		where CUSTOMER_ID = #{CUSTOMER_ID}
+		  AND CUSTOMER_ID NOT IN (SELECT CUSTOMER_ID FROM  TB_PRODUCT)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_CUSTOMER
+			set
+				CUSTOMER_CODE = #{CUSTOMER_CODE},
+				CUSTOMER_CN = #{CUSTOMER_CN},
+				CUSTOMER_SHORT = #{CUSTOMER_SHORT},
+				CUSTOMER_EN = #{CUSTOMER_EN},
+				SEACH_CODE = #{SEACH_CODE},
+				UP_COMPANY = #{UP_COMPANY},
+				COUNTRY_ID = #{COUNTRY_ID},
+				PROVINCE_ID = #{PROVINCE_ID},
+				CITY_ID = #{CITY_ID},
+				CUSTOMER_ADDR = #{CUSTOMER_ADDR},
+				INTEL_ADDR = #{INTEL_ADDR},
+				CUSTOMS_CODE = #{CUSTOMS_CODE},
+				OPERATING_UNIT = #{OPERATING_UNIT},
+				PAY_PERIOD = #{PAY_PERIOD},
+				TEL_PHONE = #{TEL_PHONE},
+				SERVIC_ER = #{SERVIC_ER},
+				SALE_MAN = #{SALE_MAN},
+				CUSTOMER_FINANCE = #{CUSTOMER_FINANCE},
+				SUPPLIER_FINANCE = #{SUPPLIER_FINANCE},
+				PAY_MERCHANT = #{PAY_MERCHANT},
+				CUSTOMER_TYPE = #{CUSTOMER_TYPE},
+				TYPE_SUPPLIER = #{TYPE_SUPPLIER},
+				TYPE_FACTOR = #{TYPE_FACTOR},
+				TYPE_FOB = #{TYPE_FOB},
+				TYPE_SEND = #{TYPE_SEND},
+				TYPE_TAKE = #{TYPE_TAKE},
+				TYPE_CAR = #{TYPE_CAR},
+				TYPE_CUSTOM = #{TYPE_CUSTOM},
+				BELONE_COMPANY = #{BELONE_COMPANY},
+				USE_FLG = #{USE_FLG},
+				CONTACTS_CN = #{CONTACTS_CN},
+				CONTACTS_EN = #{CONTACTS_EN},
+				CONTACTS_CITY_ID = #{CONTACTS_CITY_ID},
+				CONTACTS_ADDR = #{CONTACTS_ADDR},
+				CONTACTS_DEPT = #{CONTACTS_DEPT},
+				CONTACTS_POST = #{CONTACTS_POST},
+				CONTACTS_PHONE = #{CONTACTS_PHONE},
+				CONTACTS_FAX = #{CONTACTS_FAX},
+				CONTACTS_EMAIL = #{CONTACTS_EMAIL},
+				CONTACTS_BIRTH = #{CONTACTS_BIRTH},
+				CONTACTS_MEMORI = #{CONTACTS_MEMORI},
+				RULE_PACK = #{RULE_PACK},
+				RULE_PUT = #{RULE_PUT},
+				RULE_PICK = #{RULE_PICK},
+				RULE_PICK_ASIGN = #{RULE_PICK_ASIGN},
+				RULE_DEFALUT_ASIGN = #{RULE_DEFALUT_ASIGN},
+				RULE_BATCH = #{RULE_BATCH},
+				RULE_STOCK = #{RULE_STOCK},
+				RULE_STORAGE = #{RULE_STORAGE},
+				RULE_BULK = #{RULE_BULK},
+				SUPR_TAKE = #{SUPR_TAKE},
+				SUPR_SEND = #{SUPR_SEND},
+				CONTRACTUAL_FILE = #{CONTRACTUAL_FILE},
+				CONTRACTUAL_ACTIVE = #{CONTRACTUAL_ACTIVE},
+				CONTRACTUAL_DISABLE = #{CONTRACTUAL_DISABLE},
+				CREATE_EMP = #{CREATE_EMP},
+			    RULE_STORAGEASIGNR = #{RULE_STORAGEASIGNR},
+                RULE_STOCKASIGN = #{RULE_STOCKASIGN}
+			where 
+				CUSTOMER_ID = #{CUSTOMER_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			CUSTOMER_CODE,	
+			CUSTOMER_CN,	
+			CUSTOMER_SHORT,	
+			CUSTOMER_EN,	
+			SEACH_CODE,	
+			UP_COMPANY,	
+			COUNTRY_ID,	
+			PROVINCE_ID,	
+			CITY_ID,	
+			CUSTOMER_ADDR,	
+			INTEL_ADDR,	
+			CUSTOMS_CODE,	
+			OPERATING_UNIT,	
+			PAY_PERIOD,	
+			TEL_PHONE,	
+			SERVIC_ER,	
+			SALE_MAN,	
+			CUSTOMER_FINANCE,	
+			SUPPLIER_FINANCE,	
+			PAY_MERCHANT,	
+			CUSTOMER_TYPE,	
+			TYPE_SUPPLIER,	
+			TYPE_FACTOR,	
+			TYPE_FOB,	
+			TYPE_SEND,	
+			TYPE_TAKE,	
+			TYPE_CAR,	
+			TYPE_CUSTOM,	
+			BELONE_COMPANY,	
+			USE_FLG,	
+			CONTACTS_CN,	
+			CONTACTS_EN,	
+			CONTACTS_CITY_ID,	
+			CONTACTS_ADDR,	
+			CONTACTS_DEPT,	
+			CONTACTS_POST,	
+			CONTACTS_PHONE,	
+			CONTACTS_FAX,	
+			CONTACTS_EMAIL,	
+			CONTACTS_BIRTH,	
+			CONTACTS_MEMORI,	
+			RULE_PACK,	
+			RULE_PUT,	
+			RULE_PICK,	
+			RULE_PICK_ASIGN,	
+			RULE_DEFALUT_ASIGN,	
+			RULE_BATCH,	
+			RULE_STOCK,	
+			RULE_STORAGE,	
+			RULE_BULK,	
+			SUPR_TAKE,	
+			SUPR_SEND,	
+			CONTRACTUAL_FILE,	
+			CONTRACTUAL_ACTIVE,	
+			CONTRACTUAL_DISABLE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			a.CUSTOMER_ID,
+			RULE_STORAGEASIGNR,
+            RULE_STOCKASIGN
+		from 
+			TB_CUSTOMER a
+		where
+			 a.CUSTOMER_ID = #{CUSTOMER_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.CUSTOMER_CODE,	
+				a.CUSTOMER_CN,	
+				a.CUSTOMER_SHORT,	
+				a.CUSTOMER_EN,	
+				a.SEACH_CODE,	
+				a.UP_COMPANY,	
+				a.COUNTRY_ID,	
+				a.PROVINCE_ID,	
+				a.CITY_ID,	
+				a.CUSTOMER_ADDR,	
+				a.INTEL_ADDR,	
+				a.CUSTOMS_CODE,	
+				a.OPERATING_UNIT,	
+				a.PAY_PERIOD,	
+				a.TEL_PHONE,	
+				a.SERVIC_ER,	
+				a.SALE_MAN,	
+				a.CUSTOMER_FINANCE,	
+				a.SUPPLIER_FINANCE,	
+				a.PAY_MERCHANT,	
+				a.CUSTOMER_TYPE,	
+				a.TYPE_SUPPLIER,	
+				a.TYPE_FACTOR,	
+				a.TYPE_FOB,	
+				a.TYPE_SEND,	
+				a.TYPE_TAKE,	
+				a.TYPE_CAR,	
+				a.TYPE_CUSTOM,	
+				a.BELONE_COMPANY,	
+				a.USE_FLG,	
+				a.CONTACTS_CN,	
+				a.CONTACTS_EN,	
+				a.CONTACTS_CITY_ID,	
+				a.CONTACTS_ADDR,	
+				a.CONTACTS_DEPT,	
+				a.CONTACTS_POST,	
+				a.CONTACTS_PHONE,	
+				a.CONTACTS_FAX,	
+				a.CONTACTS_EMAIL,	
+				a.CONTACTS_BIRTH,	
+				a.CONTACTS_MEMORI,	
+				a.RULE_PACK,	
+				a.RULE_PUT,	
+				a.RULE_PICK,	
+				a.RULE_PICK_ASIGN,	
+				a.RULE_DEFALUT_ASIGN,	
+				a.RULE_BATCH,	
+				a.RULE_STOCK,	
+				a.RULE_STORAGE,	
+				a.RULE_BULK,	
+				a.SUPR_TAKE,	
+				a.SUPR_SEND,	
+				a.CONTRACTUAL_FILE,	
+				a.CONTRACTUAL_ACTIVE,	
+				a.CONTRACTUAL_DISABLE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.CUSTOMER_ID,
+				a.RULE_STORAGEASIGNR,
+                a.RULE_STOCKASIGN
+		from 
+				TB_CUSTOMER a
+		WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.CUSTOMER_CODE != null and pd.CUSTOMER_CODE != ''">
+			AND a.CUSTOMER_CODE LIKE CONCAT(CONCAT('%', #{pd.CUSTOMER_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.CUSTOMER_CN != null and pd.CUSTOMER_CN != ''">
+			AND a.CUSTOMER_CN LIKE CONCAT(CONCAT('%', #{pd.CUSTOMER_CN}),'%')
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.CUSTOMER_CODE,	
+				a.CUSTOMER_CN,	
+				a.CUSTOMER_SHORT,	
+				a.CUSTOMER_EN,	
+				a.SEACH_CODE,	
+				a.UP_COMPANY,	
+				a.COUNTRY_ID,	
+				a.PROVINCE_ID,	
+				a.CITY_ID,	
+				a.CUSTOMER_ADDR,	
+				a.INTEL_ADDR,	
+				a.CUSTOMS_CODE,	
+				a.OPERATING_UNIT,	
+				a.PAY_PERIOD,	
+				a.TEL_PHONE,	
+				a.SERVIC_ER,	
+				a.SALE_MAN,	
+				a.CUSTOMER_FINANCE,	
+				a.SUPPLIER_FINANCE,	
+				a.PAY_MERCHANT,	
+				a.CUSTOMER_TYPE,	
+				a.TYPE_SUPPLIER,	
+				a.TYPE_FACTOR,	
+				a.TYPE_FOB,	
+				a.TYPE_SEND,	
+				a.TYPE_TAKE,	
+				a.TYPE_CAR,	
+				a.TYPE_CUSTOM,	
+				a.BELONE_COMPANY,	
+				a.USE_FLG,	
+				a.CONTACTS_CN,	
+				a.CONTACTS_EN,	
+				a.CONTACTS_CITY_ID,	
+				a.CONTACTS_ADDR,	
+				a.CONTACTS_DEPT,	
+				a.CONTACTS_POST,	
+				a.CONTACTS_PHONE,	
+				a.CONTACTS_FAX,	
+				a.CONTACTS_EMAIL,	
+				a.CONTACTS_BIRTH,	
+				a.CONTACTS_MEMORI,	
+				a.RULE_PACK,	
+				a.RULE_PUT,	
+				a.RULE_PICK,	
+				a.RULE_PICK_ASIGN,	
+				a.RULE_DEFALUT_ASIGN,	
+				a.RULE_BATCH,	
+				a.RULE_STOCK,	
+				a.RULE_STORAGE,	
+				a.RULE_BULK,	
+				a.SUPR_TAKE,	
+				a.SUPR_SEND,	
+				a.CONTRACTUAL_FILE,	
+				a.CONTRACTUAL_ACTIVE,	
+				a.CONTRACTUAL_DISABLE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.CUSTOMER_ID,
+				a.RULE_STORAGEASIGNR,
+                a.RULE_STOCKASIGN
+		from 
+				TB_CUSTOMER a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_CUSTOMER
+		where 
+			CUSTOMER_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND CUSTOMER_ID NOT IN (SELECT CUSTOMER_ID FROM  TB_PRODUCT)
+	</delete>
+
+	<insert id="saveSeq" parameterType="pd">
+		insert into TB_CUSTOMER_SEQ(
+		SEQ_ID,
+		CUSTOMER_ID,
+		SEQ_TYPE,
+		CUR_YEAR,
+		CUR_SEQ
+		) values (
+		#{SEQ_ID},
+		#{CUSTOMER_ID},
+		#{SEQ_TYPE},
+		#{CUR_YEAR},
+		0
+		)
+	</insert>
+
+	<!-- 通过ID获取序列号 -->
+	<select id="findSeq" parameterType="pd" resultType="pd">
+		 SELECT a.CUSTOMER_ID,a.CUSTOMER_CODE,b.CUR_YEAR,b.CUR_SEQ  FROM  TB_CUSTOMER_SEQ b
+		  LEFT JOIN TB_CUSTOMER a ON (a.CUSTOMER_ID = b.CUSTOMER_ID)
+         WHERE b.CUSTOMER_ID = #{CUSTOMER_ID}
+           AND b.SEQ_TYPE = #{SEQ_TYPE}
+	</select>
+
+	<select id="findSeq_bak" parameterType="pd" resultType="pd">
+		SELECT a.CUSTOMER_ID,a.CUSTOMER_CODE,b.CUR_YEAR,b.CUR_SEQ  FROM  TB_CUSTOMER a,TB_CUSTOMER_SEQ b
+		WHERE a.CUSTOMER_ID = b.CUSTOMER_ID
+		AND b.CUSTOMER_ID = #{CUSTOMER_ID}
+		AND b.SEQ_TYPE = #{SEQ_TYPE}
+	</select>
+
+	<update id="updateSeq" parameterType="pd">
+		UPDATE TB_CUSTOMER_SEQ a SET CUR_YEAR = #{CUR_YEAR},a.CUR_SEQ = #{CUR_SEQ} WHERE a.CUSTOMER_ID =#{CUSTOMER_ID} AND SEQ_TYPE = #{SEQ_TYPE}
+	</update>
+
+
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_CODE,
+		CUSTOMER_CN,
+		CUSTOMER_SHORT,
+		CUSTOMER_EN,
+		SEACH_CODE,
+		UP_COMPANY,
+		COUNTRY_ID,
+		PROVINCE_ID,
+		CITY_ID,
+		CUSTOMER_ADDR,
+		INTEL_ADDR,
+		CUSTOMS_CODE,
+		OPERATING_UNIT,
+		PAY_PERIOD,
+		TEL_PHONE,
+		SERVIC_ER,
+		SALE_MAN,
+		CUSTOMER_FINANCE,
+		SUPPLIER_FINANCE,
+		PAY_MERCHANT,
+		CUSTOMER_TYPE,
+		TYPE_SUPPLIER,
+		TYPE_FACTOR,
+		TYPE_FOB,
+		TYPE_SEND,
+		TYPE_TAKE,
+		TYPE_CAR,
+		TYPE_CUSTOM,
+		BELONE_COMPANY,
+		USE_FLG,
+		CONTACTS_CN,
+		CONTACTS_EN,
+		CONTACTS_CITY_ID,
+		CONTACTS_ADDR,
+		CONTACTS_DEPT,
+		CONTACTS_POST,
+		CONTACTS_PHONE,
+		CONTACTS_FAX,
+		CONTACTS_EMAIL,
+		CONTACTS_BIRTH,
+		CONTACTS_MEMORI,
+		RULE_PACK,
+		RULE_PUT,
+		RULE_PICK,
+		RULE_PICK_ASIGN,
+		RULE_DEFALUT_ASIGN,
+		RULE_BATCH,
+		RULE_STOCK,
+		RULE_STORAGE,
+		RULE_BULK,
+		SUPR_TAKE,
+		SUPR_SEND,
+		CONTRACTUAL_FILE,
+		CONTRACTUAL_ACTIVE,
+		CONTRACTUAL_DISABLE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		CUSTOMER_ID,
+		RULE_STORAGEASIGNR,
+		RULE_STOCKASIGN
+		from
+		TB_CUSTOMER
+		where DEL_FLG = 0
+		  AND CUSTOMER_CODE = #{CUSTOMERCODE}
+		<if test="CUSTOMERID != null and CUSTOMERID != ''">
+			and CUSTOMER_ID != #{CUSTOMERID}
+		</if>
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_CODE,
+		CUSTOMER_CN,
+		CUSTOMER_SHORT,
+		CUSTOMER_EN,
+		SEACH_CODE,
+		UP_COMPANY,
+		COUNTRY_ID,
+		PROVINCE_ID,
+		CITY_ID,
+		CUSTOMER_ADDR,
+		INTEL_ADDR,
+		CUSTOMS_CODE,
+		OPERATING_UNIT,
+		PAY_PERIOD,
+		TEL_PHONE,
+		SERVIC_ER,
+		SALE_MAN,
+		CUSTOMER_FINANCE,
+		SUPPLIER_FINANCE,
+		PAY_MERCHANT,
+		CUSTOMER_TYPE,
+		TYPE_SUPPLIER,
+		TYPE_FACTOR,
+		TYPE_FOB,
+		TYPE_SEND,
+		TYPE_TAKE,
+		TYPE_CAR,
+		TYPE_CUSTOM,
+		BELONE_COMPANY,
+		USE_FLG,
+		CONTACTS_CN,
+		CONTACTS_EN,
+		CONTACTS_CITY_ID,
+		CONTACTS_ADDR,
+		CONTACTS_DEPT,
+		CONTACTS_POST,
+		CONTACTS_PHONE,
+		CONTACTS_FAX,
+		CONTACTS_EMAIL,
+		CONTACTS_BIRTH,
+		CONTACTS_MEMORI,
+		RULE_PACK,
+		RULE_PUT,
+		RULE_PICK,
+		RULE_PICK_ASIGN,
+		RULE_DEFALUT_ASIGN,
+		RULE_BATCH,
+		RULE_STOCK,
+		RULE_STORAGE,
+		RULE_BULK,
+		SUPR_TAKE,
+		SUPR_SEND,
+		CONTRACTUAL_FILE,
+		CONTRACTUAL_ACTIVE,
+		CONTRACTUAL_DISABLE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		CUSTOMER_ID,
+		RULE_STORAGEASIGNR,
+		RULE_STOCKASIGN
+		from
+		TB_CUSTOMER
+		where DEL_FLG = 0
+		 AND CUSTOMER_CN = #{CUSTOMERCN}
+		<if test="CUSTOMERID != null and CUSTOMERID != ''">
+			and CUSTOMER_ID != #{CUSTOMERID}
+		</if>
+	</select>
+
+	<insert id="saveDeal" parameterType="pd">
+	INSERT INTO TB_CUSTOMER_DEAL
+	(DEAL_ID,CUSTOMER_ID, DEAL_NAME, DEAL_PATH, ACTIVE_DT, DISABLE_DT, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG )
+	VALUES
+	(#{DEAL_ID}, #{CUSTOMER_ID}, #{DEAL_NAME}, #{DEAL_PATH}, #{ACTIVE_DT}, #{DISABLE_DT}, #{CREATE_EMP}, #{CREATE_TM}, #{MODIFY_EMP}, #{MODIFY_TM}, #{DEL_FLG} )
+	</insert>
+
+	<update id="delDeal" parameterType="pd">
+		UPDATE TB_CUSTOMER_DEAL SET DEL_FLG = '1' WHERE DEAL_ID = #{DEAL_ID}
+	</update>
+
+	<select id="findDeal" parameterType="pd" resultType="pd">
+	 SELECT DEAL_ID, CUSTOMER_ID, DEAL_NAME, DEAL_PATH, ACTIVE_DT, DISABLE_DT, CREATE_EMP
+	  FROM TB_CUSTOMER_DEAL
+	  WHERE CUSTOMER_ID = #{CUSTOMER_ID}
+	    AND DEL_FLG = '0'
+	</select>
+
+	<select id="findDealById" parameterType="pd" resultType="pd">
+		SELECT DEAL_ID, CUSTOMER_ID, DEAL_NAME, DEAL_PATH, ACTIVE_DT, DISABLE_DT, CREATE_EMP
+		FROM TB_CUSTOMER_DEAL
+		WHERE DEAL_ID = #{DEAL_ID}
+		AND DEL_FLG = '0'
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findReceivopt2DById" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		RECEIVOPT_2D ,
+		PN,
+		DATE_CODE,
+		LOT_CODE,
+		BIN,
+		COO,
+		QTY,
+		REMARK1 ,
+		REMARK2 ,
+		REMARK3,
+		INV_NO,
+		SEPERATOR
+		FROM
+		tb_customer_2d
+		WHERE
+		CUSTOMER_ID = #{CUSTOMER_ID}
+	</select>
+	<!-- 列表 -->
+	<select id="listPageReceivopt2D" parameterType="page" resultType="pd">
+		select
+		CUSTOMER_ID,
+		RECEIVOPT_2D ,
+		PN,
+		DATE_CODE,
+		LOT_CODE,
+		BIN,
+		COO,
+		Qty,
+		REMARK1 ,
+		REMARK2 ,
+		REMARK3,
+		INV_NO
+		FROM
+		tb_customer_2d
+
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			WHERE CUSTOMER_ID LIKE CONCAT(CONCAT('%', #{pd.CUSTOMER_ID}),'%')
+		</if>
+	</select>
+
+	<insert id="saveReceivopt2D" parameterType="pd">
+		INSERT INTO tb_customer_2d
+		(CUSTOMER_ID,RECEIVOPT_2D ,PN,DATE_CODE, LOT_CODE, BIN, COO, QTY, REMARK1 ,REMARK2 ,REMARK3,INV_NO,SEPERATOR )
+		VALUES
+		(#{CUSTOMER_ID},#{RECEIVOPT_2D},#{PN},#{DATE_CODE}, #{LOT_CODE}, #{BIN}, #{COO}, #{QTY}, #{REMARK1}, #{REMARK2},
+		#{REMARK3}, #{INV_NO}, #{SEPERATOR}  )
+	</insert>
+
+	<update id="editReceivopt2D" parameterType="pd">
+		UPDATE tb_customer_2d  SET RECEIVOPT_2D= #{RECEIVOPT_2D} ,PN= #{PN},
+		DATE_CODE= #{DATE_CODE}, LOT_CODE= #{LOT_CODE}, BIN= #{BIN},
+		 COO= #{COO}, QTY= #{QTY}, REMARK1= #{REMARK1} ,
+		 REMARK2= #{REMARK2} ,REMARK3= #{REMARK3},INV_NO= #{INV_NO},
+		 SEPERATOR = #{SEPERATOR}
+		WHERE CUSTOMER_ID = #{CUSTOMER_ID}
+	</update>
+
+	<!-- 删除-->
+	<delete id="deleteReceivopt2D" parameterType="pd">
+		delete from tb_customer_2d
+		where CUSTOMER_ID = #{CUSTOMER_ID}
+		 AND CUSTOMER_ID NOT IN (SELECT CUSTOMER_ID FROM  TB_PRODUCT)
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteAllReceivopt2D" parameterType="String">
+		delete from tb_customer_2d
+		where
+		CUSTOMER_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		AND CUSTOMER_ID NOT IN (SELECT CUSTOMER_ID FROM  TB_PRODUCT)
+	</delete>
+
+</mapper>

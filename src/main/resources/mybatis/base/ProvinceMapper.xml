@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProvinceMapper">
+
+	<resultMap type="Province" id="provinceResultMap">
+		<id column="PROVINCE_CODE" property="PROVINCE_CODE"/>
+		<result column="PROVINCE_CN" property="PROVINCE_CN"/>
+		<result column="COUNTRY_ID" property="COUNTRY_ID"/>
+		<result column="PROVINCE_EN" property="PROVINCE_EN"/>
+		<result column="MEMO" property="MEMO"/>
+		<result column="PROVINCE_ID" property="PROVINCE_ID"/>
+	</resultMap>
+
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_PROVINCE(
+			PROVINCE_CODE,	
+			PROVINCE_CN,	
+			COUNTRY_ID,	
+			PROVINCE_EN,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PROVINCE_ID
+		) values (
+			#{PROVINCE_CODE},	
+			#{PROVINCE_CN},	
+			#{COUNTRY_ID},	
+			#{PROVINCE_EN},	
+			#{MEMO},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{PROVINCE_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_PROVINCE
+		where PROVINCE_ID = #{PROVINCE_ID}
+		  AND PROVINCE_ID NOT IN (SELECT PROVINCE_ID FROM TB_CITY)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_PROVINCE
+			set 
+				PROVINCE_CODE = #{PROVINCE_CODE},
+				PROVINCE_CN = #{PROVINCE_CN},
+				COUNTRY_ID = #{COUNTRY_ID},
+				PROVINCE_EN = #{PROVINCE_EN},
+				MEMO = #{MEMO},
+				MODIFY_EMP = #{MODIFY_EMP},
+				MODIFY_TM = #{MODIFY_TM}
+			where 
+				PROVINCE_ID = #{PROVINCE_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			a.PROVINCE_CODE,
+			a.PROVINCE_CN,
+			a.COUNTRY_ID,
+			b.COUNTRY_CN,
+			a.PROVINCE_EN,
+			a.MEMO,
+			a.CREATE_EMP,
+			a.CREATE_TM,
+			a.MODIFY_EMP,
+			a.MODIFY_TM,
+			a.PROVINCE_ID
+		from 
+			TB_PROVINCE a, TB_COUNTRY b
+		WHERE  a.COUNTRY_ID = b.COUNTRY_ID
+		  and  a.DEL_FLG = 0
+		  AND  a.PROVINCE_ID = #{PROVINCE_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.PROVINCE_CODE,	
+				a.PROVINCE_CN,	
+				a.COUNTRY_ID,
+				b.COUNTRY_CN,
+				a.PROVINCE_EN,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PROVINCE_ID
+		from 
+				TB_PROVINCE a , TB_COUNTRY b
+		WHERE  a.COUNTRY_ID = b.COUNTRY_ID
+		  and a.DEL_FLG = 0
+		<if test="pd != null and pd.PROVINCE_CODE != null and pd.PROVINCE_CODE != ''">
+			AND a.PROVINCE_CODE LIKE CONCAT(CONCAT('%', #{pd.PROVINCE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.PROVINCE_CN != null and pd.PROVINCE_CN != ''">
+			AND a.PROVINCE_CN LIKE CONCAT(CONCAT('%', #{pd.PROVINCE_CN}),'%')
+		</if>
+		<if test="pd != null and pd.PROVINCE_EN != null and pd.PROVINCE_EN != ''">
+			AND a.PROVINCE_EN LIKE CONCAT(CONCAT('%', #{pd.PROVINCE_EN}),'%')
+		</if>
+		<if test="pd != null and pd.COUNTRY_ID != null and pd.COUNTRY_ID != ''">
+			AND a.COUNTRY_ID = #{pd.COUNTRY_ID}
+		</if>
+
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.PROVINCE_CODE,	
+				a.PROVINCE_CN,	
+				a.COUNTRY_ID,
+				b.COUNTRY_CN,
+				a.PROVINCE_EN,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PROVINCE_ID
+		from 
+				TB_PROVINCE a , TB_COUNTRY b
+        WHERE a.COUNTRY_ID = b.COUNTRY_ID
+          and a.DEL_FLG = 0
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_PROVINCE
+		where 
+			PROVINCE_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND PROVINCE_ID NOT IN (SELECT PROVINCE_ID FROM TB_CITY)
+	</delete>
+
+	<select id="findByProvinceCode" parameterType="pd" resultType="pd">
+		select
+		a.PROVINCE_CODE,
+		a.PROVINCE_CN,
+		a.COUNTRY_ID,
+		b.COUNTRY_CN,
+		a.PROVINCE_EN,
+		a.MEMO,
+		a.CREATE_EMP,
+		a.CREATE_TM,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.PROVINCE_ID
+		from
+		TB_PROVINCE a, TB_COUNTRY b
+		WHERE  a.COUNTRY_ID = b.COUNTRY_ID
+		AND  a.DEL_FLG = 0
+		AND a.PROVINCE_CODE = #{PROVINCECODE}
+		AND a.COUNTRY_ID = #{COUNTRYID}
+		<if test="PROVINCEID != null and PROVINCEID != ''">
+			and PROVINCE_ID != #{PROVINCEID}
+		</if>
+	</select>
+
+	<select id="findByProvinceCn" parameterType="pd" resultType="pd">
+		select
+		a.PROVINCE_CODE,
+		a.PROVINCE_CN,
+		a.COUNTRY_ID,
+		b.COUNTRY_CN,
+		a.PROVINCE_EN,
+		a.MEMO,
+		a.CREATE_EMP,
+		a.CREATE_TM,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.PROVINCE_ID
+		from
+		TB_PROVINCE a, TB_COUNTRY b
+		WHERE  a.COUNTRY_ID = b.COUNTRY_ID
+		AND  a.DEL_FLG = 0
+		AND a.PROVINCE_CN = #{PROVINCECN}
+		AND a.COUNTRY_ID = #{COUNTRYID}
+		<if test="PROVINCEID != null and PROVINCEID != ''">
+			and PROVINCE_ID != #{PROVINCEID}
+		</if>
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByCountryId" parameterType="pd" resultMap="provinceResultMap">
+		select
+		a.PROVINCE_CODE,
+		a.PROVINCE_CN,
+		a.COUNTRY_ID,
+		a.PROVINCE_EN,
+		a.MEMO,
+		a.CREATE_EMP,
+		a.CREATE_TM,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.PROVINCE_ID
+		from
+		TB_PROVINCE a
+		WHERE  a.DEL_FLG = 0
+		<if test="COUNTRYID != null and COUNTRYID != ''">
+			AND  a.COUNTRY_ID = #{COUNTRYID}
+		</if>
+
+	</select>
+
+</mapper>

@@ -1,0 +1,1050 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockReportMapper">
+	<!-- 库存报表统计-->
+
+	<!-- 列表 已经码放82，且未分配库存的才可以冻结-->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT 	A.STOCKDTLMGRIN_ID, A.STOCKMGRIN_ID, A.ROW_NO, C.INSTOCK_NO, B.CUSTOMER_ID, C.REAL_INSTOCK_DATE, A.PRODUCT_ID,
+		A.OT_EA, A.PALLET_EA, A.BOX_EA, A.INPACK_EA, A.EA_EA, B.FREEZE_STATE, B.PUT_LOCATOR,B.BOX_NO,B.PUT_LOCATOR_BF,B.CUSTOMER_ID_BF
+		FROM TM_STOCKMGRIN_DTL A,TM_BOX B,TM_STOCKMGRIN C
+		WHERE A.STOCKDTLMGRIN_ID = B.BOX_ID
+		AND A.STOCKMGRIN_ID = C.STOCKMGRIN_ID
+		AND B.PUT_STATUS ='82'
+		AND B.ASSIGNED_STOCK_STATE='100'
+		AND A.DEL_FLG ='0'
+		AND A.RECEI_FLG = '1'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND C.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.STORAGE_ID != null and pd.STORAGE_ID != ''">
+			AND B.PUT_STORAGE =#{pd.STORAGE_ID}
+		</if>
+		<if test="pd != null and pd.LOCATOR_ID != null and pd.LOCATOR_ID != ''">
+			AND B.PUT_LOCATOR =#{pd.LOCATOR_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND C.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (C.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR B.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND C.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND C.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		ORDER BY C.INSTOCK_NO DESC
+	</select>
+
+
+
+
+	<select id="findCalcStockList" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, EA_NUM, RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS, ASSIGNED_STOCK_STATE,
+		        ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE,PUT_LOCATOR
+          FROM TM_BOX
+		 WHERE DEL_FLG = '0'
+		   AND DEPOT_TYPE ='142'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%'))
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND RECEIPT_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND RECEIPT_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+	<insert id="saveStockNow" parameterType="java.util.List">
+		INSERT INTO TM_RP_STOCKNOW
+	(CUSTOMER_ID,PRODUCT_ID,TOTAL_EA,ASSIGNED_EA,FREEZE_EA,USE_EA,CREATE_EMP,CREATE_TM,COMB_ID,BOXS,LOCATORS)
+	VALUES
+		<foreach collection="list"  item="item" index="index" separator=",">
+			(#{item.CUSTOMER_ID},#{item.PRODUCT_ID},#{item.TOTAL_EA},#{item.ASSIGNED_EA},#{item.FREEZE_EA},#{item.USE_EA},#{item.CREATE_EMP},#{item.CREATE_TM},#{item.COMB_ID},
+			#{item.BOXS},#{item.LOCATORS})
+		</foreach>
+	</insert>
+
+    <select id="findStockNowlistPage" parameterType="page" resultType="pd">
+		SELECT CUSTOMER_ID,PRODUCT_ID,TOTAL_EA,ASSIGNED_EA,FREEZE_EA,USE_EA,CREATE_EMP,CREATE_TM,COMB_ID,BOXS,LOCATORS
+		FROM TM_RP_STOCKNOW
+		WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</select>
+
+	<select id="findStockNowlistName" parameterType="page" resultType="pd">
+		SELECT C.CUSTOMER_CN,CONCAT(B.PRODUCT_CODE ,CONCAT('(',B.PRODUCT_CN,')')) PRODUCT_CODE,A.TOTAL_EA,A.ASSIGNED_EA,A.FREEZE_EA,A.USE_EA,A.CREATE_EMP,A.CREATE_TM
+		FROM TM_RP_STOCKNOW A,TB_PRODUCT B,TB_CUSTOMER C
+		WHERE A.PRODUCT_ID = B.PRODUCT_ID
+		  AND A.CUSTOMER_ID = C.CUSTOMER_ID
+		  AND A.CREATE_EMP = #{pd.CREATE_EMP}
+	</select>
+
+	<select id="findStockNowOne" parameterType="page" resultType="pd">
+		SELECT MAX(CREATE_TM) CREATE_TM
+		FROM TM_RP_STOCKNOW
+		WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</select>
+
+	<delete id="deleteStockNow" parameterType="page">
+		DELETE FROM TM_RP_STOCKNOW WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</delete>
+
+
+	<select id="findStockDtlListForShowlistPage" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT,
+		        WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, RECEIV_QTY,EA_NUM,
+		        RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE,
+		        FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG, GROUP_KEY, SUPPLIER_PROD,
+		        RECEIPT_TM, ASSIGNED_TM, PUT_TM, ASSIGNED_STOCK_TM, PICK_TM, CARGO_TM, DEPOT_TM, FREEZE_TM, TRANSFER_TM,
+		        PUT_STORAGE_BF, PUT_LOCATOR_BF, CUSTOMER_ID_BF, PRODRIGHT_TM, AUDIT_EMP, AUDIT_TM, AUDIT_FLG, LOT_NO, DATE_CODE,
+		        SEPARATE_QTY, COO, BIN_CODE
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		AND DEPOT_TYPE ='142'
+		AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		AND PRODUCT_ID = #{pd.PRODUCT_ID}
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			    OR BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%'))
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR = #{pd.PUT_LOCATOR}
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+	<select id="dataDtllistPage" parameterType="page" resultType="pd">
+		SELECT
+		E.INSTOCK_NO,
+		E.CREATE_TM              REAL_INSTOCK_DATE,
+		E.CUSTOMER_ID,
+		E.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		''                        TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		''                        REMARK1,
+		''                        REMARK2,
+		''                        TXT_SIX,
+		''                        INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		E.EA_NUM                 EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		''                        ORDER_NO,
+		''                        INB_REF_A,
+		''                        INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		''                        TXT_THR,
+		''                        TXT_SEV,
+		''                        TXT_EIG,
+		''                        TXT_NIG,
+		''                        TXT_ELEVEN,
+		''                        TXT_TWELVE,
+		''                        TXT_FOURT,
+		''                        TXT_SEVENT,
+		''                        TXT_TWENT,
+		''                        MANUFACTUER,
+		''                        SHIPPER,
+		E.EA_NUM
+		FROM TM_BOX E
+		WHERE E.DEL_FLG = '0'
+		AND NOT EXISTS (SELECT 1 FROM tm_stockmgrin_dtl a WHERE e.BOX_ID = a.STOCKDTLMGRIN_ID)
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND E.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND E.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND E.CREATE_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND E.CREATE_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND E.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		UNION ALL
+
+		SELECT
+		A.INSTOCK_NO,
+		A.REAL_INSTOCK_DATE,
+		A.CUSTOMER_ID,
+		B.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		C2.TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		C2.TXT_FOU                REMARK1,
+		C2.TXT_FIV                REMARK2,
+		C2.TXT_SIX,
+		C2.TXT_TWO                INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		B.EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		A.ORDER_NO,
+		C1.TXT_ONE                INB_REF_A,
+		C1.TXT_TWENT              INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		C2.TXT_THR,
+		C2.TXT_SEV,
+		C2.TXT_EIG,
+		C2.TXT_NIG,
+		C2.TXT_ELEVEN,
+		C2.TXT_TWELVE,
+		C2.TXT_FOURT,
+		C2.TXT_SEVENT,
+		C2.TXT_TWENT,
+		C1.TXT_TWO                MANUFACTUER,
+		C1.TXT_THR                SHIPPER,
+		E.EA_NUM
+		FROM TM_STOCKMGRIN A,
+			TM_STOCKMGRIN_DTL B,
+			TM_STOCKMGRIN_PROPERTY C1,
+			TM_STOCKMGRIN_PROPERTY C2,
+			TB_PRODUCT D,
+			TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+		AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+		AND B.PRODUCT_ID = D.PRODUCT_ID
+		AND B.DEL_FLG = '0'
+		AND B.RECEI_FLG = '1'
+		AND C1.ORDERBATCH_TYPE = '60'
+		AND C2.ORDERBATCH_TYPE = '62'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+	<!-- 库存明细 dataDtllistforExcel 与到出  dataDtllistForExcel 保持字段保持一致-->
+	<select id="dataDtllistForExcel" parameterType="page" resultType="pd">
+		SELECT
+		E.INSTOCK_NO,
+		E.CREATE_TM              REAL_INSTOCK_DATE,
+		E.CUSTOMER_ID,
+		E.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		''                        TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		''                        REMARK1,
+		''                        REMARK2,
+		''                        TXT_SIX,
+		''                        INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		E. EA_NUM                 EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		''                        ORDER_NO,
+		''                        INB_REF_A,
+		''                        INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		''                        TXT_THR,
+		''                        TXT_SEV,
+		''                        TXT_EIG,
+		''                        TXT_NIG,
+		''                        TXT_ELEVEN,
+		''                        TXT_TWELVE,
+		''                        TXT_FOURT,
+		''                        TXT_SEVENT,
+		''                        TXT_TWENT,
+		''                        MANUFACTUER,
+		''                        SHIPPER,
+		E.EA_NUM
+		FROM TM_BOX E
+		WHERE E.DEL_FLG = '0'
+		AND NOT EXISTS (SELECT 1 FROM tm_stockmgrin_dtl a WHERE e.BOX_ID = a.STOCKDTLMGRIN_ID)
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND E.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND E.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND E.CREATE_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND E.CREATE_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND E.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		UNION ALL
+		SELECT
+		A.INSTOCK_NO,
+		A.REAL_INSTOCK_DATE,
+		A.CUSTOMER_ID,
+		B.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		C2.TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		C2.TXT_FOU                REMARK1,
+		C2.TXT_FIV                REMARK2,
+		C2.TXT_SIX,
+		C2.TXT_TWO                INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		B.EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		A.ORDER_NO,
+		C1.TXT_ONE                INB_REF_A,
+		C1.TXT_TWENT              INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		C2.TXT_THR,
+		C2.TXT_SEV,
+		C2.TXT_EIG,
+		C2.TXT_NIG,
+		C2.TXT_ELEVEN,
+		C2.TXT_TWELVE,
+		C2.TXT_FOURT,
+		C2.TXT_SEVENT,
+		C2.TXT_TWENT,
+		C1.TXT_TWO                MANUFACTUER,
+		C1.TXT_THR                SHIPPER,
+		E.EA_NUM
+		FROM TM_STOCKMGRIN A,
+		TM_STOCKMGRIN_DTL B,
+		TM_STOCKMGRIN_PROPERTY C1,
+		TM_STOCKMGRIN_PROPERTY C2,
+		TB_PRODUCT D,
+		TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+		AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+		AND B.PRODUCT_ID = D.PRODUCT_ID
+		AND B.DEL_FLG = '0'
+		AND B.RECEI_FLG = '1'
+		AND C1.ORDERBATCH_TYPE = '60'
+		AND C2.ORDERBATCH_TYPE = '62'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  E.COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+	<!-- 库存明细 dataDtl2listPage 与到出  dataDtl2listForExcel 保持字段保持一致-->
+	<select id="dataDtl2listPage" parameterType="page" resultType="pd">
+		SELECT 	INSTOCK_NO,
+		REAL_INSTOCK_DATE,
+		CUSTOMER_ID,
+		PRODUCT_ID,
+		BIG_BOX_NO,
+		BOX_NO,
+		TIME_TWO,
+		DATE_CODE,
+		LOT_NO,
+		BIN_CODE,
+		COO,
+		REMARK1,
+		REMARK2,
+		TXT_SIX,
+		INVNO,
+		PUT_LOCATOR,
+		RECEIV_QTY,
+		IN_EA,
+		EA_ACTUAL,
+		FREEZE_EA,
+		USE_EA,
+		ASSIGNED_STATE,
+		PUT_STATUS,
+		FREEZE_STATE,
+		ASSIGNED_STOCK_STATE,
+		ORDER_NO,
+		INB_REF_A,
+		INVNO_A,
+		SCAN_CODE,
+		SEPARATE_QTY,
+		TXT_THR,
+		TXT_SEV,
+		TXT_EIG,
+		TXT_NIG,
+		TXT_ELEVEN,
+		TXT_TWELVE,
+		TXT_FOURT,
+		TXT_SEVENT,
+		TXT_TWENT,
+		MANUFACTUER,
+		SHIPPER,
+		EA_NUM
+		FROM
+		rp_stockdtl
+		WHERE 1 = 1
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+	<!-- 库存明细 dataDtl2listPage 与到出  dataDtl2listForExcel 保持字段保持一致-->
+	<select id="dataDtl2listForExcel" parameterType="page" resultType="pd">
+		SELECT 	INSTOCK_NO,
+		REAL_INSTOCK_DATE,
+		CUSTOMER_ID,
+		PRODUCT_ID,
+		BIG_BOX_NO,
+		BOX_NO,
+		TIME_TWO,
+		DATE_CODE,
+		LOT_NO,
+		BIN_CODE,
+		COO,
+		REMARK1,
+		REMARK2,
+		TXT_SIX,
+		INVNO,
+		PUT_LOCATOR,
+		RECEIV_QTY,
+		IN_EA,
+		EA_ACTUAL,
+		FREEZE_EA,
+		USE_EA,
+		ASSIGNED_STATE,
+		PUT_STATUS,
+		FREEZE_STATE,
+		ASSIGNED_STOCK_STATE,
+		ORDER_NO,
+		INB_REF_A,
+		INVNO_A,
+		SCAN_CODE,
+		SEPARATE_QTY,
+		TXT_THR,
+		TXT_SEV,
+		TXT_EIG,
+		TXT_NIG,
+		TXT_ELEVEN,
+		TXT_TWELVE,
+		TXT_FOURT,
+		TXT_SEVENT,
+		TXT_TWENT,
+		MANUFACTUER,
+		SHIPPER,
+		EA_NUM
+		FROM
+		rp_stockdtl
+		WHERE 1 = 1
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+	<delete id="truncateRpStockDtl">
+		DELETE FROM rp_stockdtl
+	</delete>
+
+	<delete id="deleteRpStockDtl">
+		DELETE FROM rp_stockdtl
+	</delete>
+
+	<insert id="insertRpStockDtl2">
+        INSERT rp_stockdtl
+		SELECT
+		E.INSTOCK_NO,
+		E.CREATE_TM              REAL_INSTOCK_DATE,
+		E.CUSTOMER_ID,
+		E.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		''                        TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		''                        REMARK1,
+		''                        REMARK2,
+		''                        TXT_SIX,
+		''                        INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		E. EA_NUM                 EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		''                        ORDER_NO,
+		''                        INB_REF_A,
+		''                        INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		''                        TXT_THR,
+		''                        TXT_SEV,
+		''                        TXT_EIG,
+		''                        TXT_NIG,
+		''                        TXT_ELEVEN,
+		''                        TXT_TWELVE,
+		''                        TXT_FOURT,
+		''                        TXT_SEVENT,
+		''                        TXT_TWENT,
+		''                        MANUFACTUER,
+		''                        SHIPPER,
+		E.EA_NUM
+		FROM TM_BOX E
+		WHERE E.DEL_FLG = '0'
+
+		AND NOT EXISTS (SELECT 1 FROM tm_stockmgrin_dtl a WHERE e.BOX_ID = a.STOCKDTLMGRIN_ID)
+		UNION ALL
+
+		SELECT
+		A.INSTOCK_NO,
+		A.REAL_INSTOCK_DATE,
+		A.CUSTOMER_ID,
+		B.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		C2.TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		C2.TXT_FOU                REMARK1,
+		C2.TXT_FIV                REMARK2,
+		C2.TXT_SIX,
+		C2.TXT_TWO                INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		B.EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		A.ORDER_NO,
+		C1.TXT_ONE                INB_REF_A,
+		C1.TXT_TWENT              INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		C2.TXT_THR,
+		C2.TXT_SEV,
+		C2.TXT_EIG,
+		C2.TXT_NIG,
+		C2.TXT_ELEVEN,
+		C2.TXT_TWELVE,
+		C2.TXT_FOURT,
+		C2.TXT_SEVENT,
+		C2.TXT_TWENT,
+		C1.TXT_TWO                MANUFACTUER,
+		C1.TXT_THR                SHIPPER,
+		E.EA_NUM
+		FROM TM_STOCKMGRIN A,
+			TM_STOCKMGRIN_DTL B,
+			TM_STOCKMGRIN_PROPERTY C1,
+			TM_STOCKMGRIN_PROPERTY C2,
+			TB_PRODUCT D,
+			TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+		AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+		AND B.PRODUCT_ID = D.PRODUCT_ID
+		AND B.DEL_FLG = '0'
+		AND B.RECEI_FLG = '1'
+		AND C1.ORDERBATCH_TYPE = '60'
+		AND C2.ORDERBATCH_TYPE = '62'
+	</insert>
+
+	<select id="selectRpStockForInsert" resultType="pd">
+      SELECT
+		E.INSTOCK_NO,
+		E.CREATE_TM              REAL_INSTOCK_DATE,
+		E.CUSTOMER_ID,
+		E.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		''                        TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		''                        REMARK1,
+		''                        REMARK2,
+		''                        TXT_SIX,
+		''                        INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		E. EA_NUM                 EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		''                        ORDER_NO,
+		''                        INB_REF_A,
+		''                        INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		''                        TXT_THR,
+		''                        TXT_SEV,
+		''                        TXT_EIG,
+		''                        TXT_NIG,
+		''                        TXT_ELEVEN,
+		''                        TXT_TWELVE,
+		''                        TXT_FOURT,
+		''                        TXT_SEVENT,
+		''                        TXT_TWENT,
+		''                        MANUFACTUER,
+		''                        SHIPPER,
+		E.EA_NUM
+		FROM TM_BOX E
+		WHERE E.DEL_FLG = '0'
+		AND NOT EXISTS (SELECT 1 FROM tm_stockmgrin_dtl a WHERE e.BOX_ID = a.STOCKDTLMGRIN_ID)
+
+		UNION ALL
+
+		SELECT
+		A.INSTOCK_NO,
+		A.REAL_INSTOCK_DATE,
+		A.CUSTOMER_ID,
+		B.PRODUCT_ID,
+		E.BIG_BOX_NO,
+		E.BOX_NO,
+		C2.TIME_TWO,
+		E.DATE_CODE,
+		E.LOT_NO,
+		E.BIN_CODE,
+		E.COO,
+		C2.TXT_FOU                REMARK1,
+		C2.TXT_FIV                REMARK2,
+		C2.TXT_SIX,
+		C2.TXT_TWO                INVNO,
+		E.PUT_LOCATOR,
+		'0'                       IN_EA,
+		B.EA_ACTUAL,
+		'0'                       FREEZE_EA,
+		'0'                       USE_EA,
+		E.ASSIGNED_STATE,
+		E.PUT_STATUS,
+		E.FREEZE_STATE,
+		E.ASSIGNED_STOCK_STATE,
+		A.ORDER_NO,
+		C1.TXT_ONE                INB_REF_A,
+		C1.TXT_TWENT              INVNO_A,
+		E.SUPPLIER_PROD           SCAN_CODE,
+		E.SEPARATE_QTY,
+		C2.TXT_THR,
+		C2.TXT_SEV,
+		C2.TXT_EIG,
+		C2.TXT_NIG,
+		C2.TXT_ELEVEN,
+		C2.TXT_TWELVE,
+		C2.TXT_FOURT,
+		C2.TXT_SEVENT,
+		C2.TXT_TWENT,
+		C1.TXT_TWO                MANUFACTUER,
+		C1.TXT_THR                SHIPPER,
+		E.EA_NUM
+		FROM TM_STOCKMGRIN A,
+			TM_STOCKMGRIN_DTL B,
+			TM_STOCKMGRIN_PROPERTY C1,
+			TM_STOCKMGRIN_PROPERTY C2,
+			TB_PRODUCT D,
+			TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+		AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+		AND B.PRODUCT_ID = D.PRODUCT_ID
+		AND B.DEL_FLG = '0'
+		AND B.RECEI_FLG = '1'
+		AND C1.ORDERBATCH_TYPE = '60'
+		AND C2.ORDERBATCH_TYPE = '62'
+	</select>
+
+	<insert id="insertRpStockDtl" parameterType="java.util.List">
+		INSERT INTO rp_stockdtl
+		(INSTOCK_NO, REAL_INSTOCK_DATE, CUSTOMER_ID, PRODUCT_ID, BIG_BOX_NO, BOX_NO, TIME_TWO, DATE_CODE, LOT_NO, BIN_CODE, COO, REMARK1, REMARK2, TXT_SIX, INVNO, PUT_LOCATOR,
+		RECEIV_QTY,IN_EA, EA_ACTUAL, FREEZE_EA, USE_EA, ASSIGNED_STATE, PUT_STATUS, FREEZE_STATE, ASSIGNED_STOCK_STATE, ORDER_NO, INB_REF_A, INVNO_A, SCAN_CODE, SEPARATE_QTY, TXT_THR,
+		TXT_SEV, TXT_EIG, TXT_NIG, TXT_ELEVEN, TXT_TWELVE, TXT_FOURT, TXT_SEVENT, TXT_TWENT, MANUFACTUER, SHIPPER, EA_NUM )
+		VALUES
+		<foreach collection="list"  item="item" index="index" separator=",">
+			(#{item.INSTOCK_NO},#{item.REAL_INSTOCK_DATE},#{item.CUSTOMER_ID},#{item.PRODUCT_ID},#{item.BIG_BOX_NO},#{item.BOX_NO},#{item.TIME_TWO},
+			#{item.DATE_CODE},#{item.LOT_NO},#{item.BIN_CODE},#{item.COO},#{item.REMARK1},#{item.REMARK2},#{item.TXT_SIX},#{item.INVNO},
+			#{item.PUT_LOCATOR},#{item.RECEIV_QTY},#{item.IN_EA},#{item.EA_ACTUAL},#{item.FREEZE_EA},#{item.USE_EA},#{item.ASSIGNED_STATE},#{item.PUT_STATUS},
+			#{item.FREEZE_STATE},#{item.ASSIGNED_STOCK_STATE},#{item.ORDER_NO},#{item.INB_REF_A},#{item.INVNO_A},#{item.SCAN_CODE},
+			#{item.SEPARATE_QTY},#{item.TXT_THR},#{item.TXT_SEV},#{item.TXT_EIG},#{item.TXT_NIG},#{item.TXT_ELEVEN},#{item.TXT_TWELVE},
+			#{item.TXT_FOURT},#{item.TXT_SEVENT},#{item.TXT_TWENT},#{item.MANUFACTUER},#{item.SHIPPER},#{item.EA_NUM} )
+		</foreach>
+	</insert>
+
+	<select id="dataDtllistForExl" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT,
+		WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, EA_NUM,
+		RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE,
+		FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG, GROUP_KEY, SUPPLIER_PROD,
+		RECEIPT_TM, ASSIGNED_TM, PUT_TM, ASSIGNED_STOCK_TM, PICK_TM, CARGO_TM, DEPOT_TM, FREEZE_TM, TRANSFER_TM,
+		PUT_STORAGE_BF, PUT_LOCATOR_BF, CUSTOMER_ID_BF, PRODRIGHT_TM, AUDIT_EMP, AUDIT_TM, AUDIT_FLG, LOT_NO, DATE_CODE,
+		SEPARATE_QTY, COO, BIN_CODE
+		FROM TM_BOX C
+		WHERE DEL_FLG = '0'
+		AND DEPOT_TYPE ='142'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND RECEIPT_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND RECEIPT_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+
+	<select id="dataDtllistPage_bak" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT,
+		WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, RECEIV_QTY,EA_NUM,
+		RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE,
+		FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM, MODIFY_EMP, MODIFY_TM, DEL_FLG, GROUP_KEY, SUPPLIER_PROD,
+		RECEIPT_TM, ASSIGNED_TM, PUT_TM, ASSIGNED_STOCK_TM, PICK_TM, CARGO_TM, DEPOT_TM, FREEZE_TM, TRANSFER_TM,
+		PUT_STORAGE_BF, PUT_LOCATOR_BF, CUSTOMER_ID_BF, PRODRIGHT_TM, AUDIT_EMP, AUDIT_TM, AUDIT_FLG, LOT_NO, DATE_CODE,
+		SEPARATE_QTY, COO, BIN_CODE
+		FROM TM_BOX C
+		WHERE DEL_FLG = '0'
+		AND DEPOT_TYPE ='142'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (BOARD_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND RECEIPT_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND RECEIPT_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+
+		</if>
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+	</select>
+
+</mapper>

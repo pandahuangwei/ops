@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_PRODUCT(
+			CUSTOMER_ID,	
+			STOCK_ID,	
+			PRODUCT_CODE,	
+			PRODUCT_CN,	
+			PRODUCT_EN,	
+			LONG_UNIT,	
+			WIDE_UNIT,	
+			HIGH_UNIT,	
+			UNIT_PRICE,	
+			TOTAL_WEIGHT_UNIT,	
+			TOTAL_WEIGHT,	
+			TOTAL_SUTTLE_UNIT,	
+			TOTAL_SUTTLE,	
+			VOLUME_UNIT,	
+			VOLUME_UN,	
+			PRODUCT_TYPE,	
+			STORAGE_ID,	
+			LOCATOR_ID,	
+			FREEZE_REJECT_CODE,	
+			MEMO,	
+			DANGER_FLG,	
+			MANAGER_FLG,	
+			COMBI_FLG,	
+			ACTIVE_FLG,	
+			RULE_PACK,	
+			RULE_PICK,	
+			RULE_STORAGE,	
+			RULE_STORAGE_ASIGN,	
+			RULE_STOCK_ASIGN,	
+			USE_VALIDITY,	
+			PERIOD_TYPE,	
+			INBOUND_DAY,	
+			OUTBOUND_DAY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PRODUCT_ID,
+			STOCKTURN_ID
+		) values (
+			#{CUSTOMER_ID},	
+			#{STOCK_ID},	
+			#{PRODUCT_CODE},	
+			#{PRODUCT_CN},	
+			#{PRODUCT_EN},	
+			#{LONG_UNIT},	
+			#{WIDE_UNIT},	
+			#{HIGH_UNIT},	
+			#{UNIT_PRICE},	
+			#{TOTAL_WEIGHT_UNIT},	
+			#{TOTAL_WEIGHT},	
+			#{TOTAL_SUTTLE_UNIT},	
+			#{TOTAL_SUTTLE},	
+			#{VOLUME_UNIT},	
+			#{VOLUME_UN},	
+			#{PRODUCT_TYPE},	
+			#{STORAGE_ID},	
+			#{LOCATOR_ID},	
+			#{FREEZE_REJECT_CODE},	
+			#{MEMO},	
+			#{DANGER_FLG},	
+			#{MANAGER_FLG},	
+			#{COMBI_FLG},	
+			#{ACTIVE_FLG},	
+			#{RULE_PACK},	
+			#{RULE_PICK},	
+			#{RULE_STORAGE},	
+			#{RULE_STORAGE_ASIGN},	
+			#{RULE_STOCK_ASIGN},	
+			#{USE_VALIDITY},	
+			#{PERIOD_TYPE},	
+			#{INBOUND_DAY},	
+			#{OUTBOUND_DAY},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{PRODUCT_ID},
+			#{STOCKTURN_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_PRODUCT
+		where PRODUCT_ID = #{PRODUCT_ID}
+		  AND PRODUCT_ID NOT IN (SELECT PRODUCT_ID FROM TM_STOCKMGRIN_DTL)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_PRODUCT
+			set 
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				STOCK_ID = #{STOCK_ID},
+				PRODUCT_CODE = #{PRODUCT_CODE},
+				PRODUCT_CN = #{PRODUCT_CN},
+				PRODUCT_EN = #{PRODUCT_EN},
+				LONG_UNIT = #{LONG_UNIT},
+				WIDE_UNIT = #{WIDE_UNIT},
+				HIGH_UNIT = #{HIGH_UNIT},
+				UNIT_PRICE = #{UNIT_PRICE},
+				TOTAL_WEIGHT_UNIT = #{TOTAL_WEIGHT_UNIT},
+				TOTAL_WEIGHT = #{TOTAL_WEIGHT},
+				TOTAL_SUTTLE_UNIT = #{TOTAL_SUTTLE_UNIT},
+				TOTAL_SUTTLE = #{TOTAL_SUTTLE},
+				VOLUME_UNIT = #{VOLUME_UNIT},
+				VOLUME_UN = #{VOLUME_UN},
+				PRODUCT_TYPE = #{PRODUCT_TYPE},
+				STORAGE_ID = #{STORAGE_ID},
+				LOCATOR_ID = #{LOCATOR_ID},
+				FREEZE_REJECT_CODE = #{FREEZE_REJECT_CODE},
+				MEMO = #{MEMO},
+				DANGER_FLG = #{DANGER_FLG},
+				MANAGER_FLG = #{MANAGER_FLG},
+				COMBI_FLG = #{COMBI_FLG},
+				ACTIVE_FLG = #{ACTIVE_FLG},
+				RULE_PACK = #{RULE_PACK},
+				RULE_PICK = #{RULE_PICK},
+				RULE_STORAGE = #{RULE_STORAGE},
+				RULE_STORAGE_ASIGN = #{RULE_STORAGE_ASIGN},
+				RULE_STOCK_ASIGN = #{RULE_STOCK_ASIGN},
+				USE_VALIDITY = #{USE_VALIDITY},
+				PERIOD_TYPE = #{PERIOD_TYPE},
+				INBOUND_DAY = #{INBOUND_DAY},
+				OUTBOUND_DAY = #{OUTBOUND_DAY},
+				STOCKTURN_ID = #{STOCKTURN_ID}
+			where 
+				PRODUCT_ID = #{PRODUCT_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			CUSTOMER_ID,	
+			STOCK_ID,	
+			PRODUCT_CODE,	
+			PRODUCT_CN,	
+			PRODUCT_EN,	
+			LONG_UNIT,	
+			WIDE_UNIT,	
+			HIGH_UNIT,	
+			UNIT_PRICE,	
+			TOTAL_WEIGHT_UNIT,	
+			TOTAL_WEIGHT,	
+			TOTAL_SUTTLE_UNIT,	
+			TOTAL_SUTTLE,	
+			VOLUME_UNIT,	
+			VOLUME_UN,	
+			PRODUCT_TYPE,	
+			STORAGE_ID,	
+			LOCATOR_ID,	
+			FREEZE_REJECT_CODE,	
+			MEMO,	
+			DANGER_FLG,	
+			MANAGER_FLG,	
+			COMBI_FLG,	
+			ACTIVE_FLG,	
+			RULE_PACK,	
+			RULE_PICK,	
+			RULE_STORAGE,	
+			RULE_STORAGE_ASIGN,	
+			RULE_STOCK_ASIGN,	
+			USE_VALIDITY,	
+			PERIOD_TYPE,	
+			INBOUND_DAY,	
+			OUTBOUND_DAY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PRODUCT_ID,
+			STOCKTURN_ID
+		from 
+			TB_PRODUCT
+		where 
+			PRODUCT_ID = #{PRODUCT_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STOCK_ID,	
+				a.PRODUCT_CODE,	
+				a.PRODUCT_CN,	
+				a.PRODUCT_EN,	
+				a.LONG_UNIT,	
+				a.WIDE_UNIT,	
+				a.HIGH_UNIT,	
+				a.UNIT_PRICE,	
+				a.TOTAL_WEIGHT_UNIT,	
+				a.TOTAL_WEIGHT,	
+				a.TOTAL_SUTTLE_UNIT,	
+				a.TOTAL_SUTTLE,	
+				a.VOLUME_UNIT,	
+				a.VOLUME_UN,	
+				a.PRODUCT_TYPE,	
+				a.STORAGE_ID,	
+				a.LOCATOR_ID,	
+				a.FREEZE_REJECT_CODE,	
+				a.MEMO,	
+				a.DANGER_FLG,	
+				a.MANAGER_FLG,	
+				a.COMBI_FLG,	
+				a.ACTIVE_FLG,	
+				a.RULE_PACK,	
+				a.RULE_PICK,	
+				a.RULE_STORAGE,	
+				a.RULE_STORAGE_ASIGN,	
+				a.RULE_STOCK_ASIGN,	
+				a.USE_VALIDITY,	
+				a.PERIOD_TYPE,	
+				a.INBOUND_DAY,	
+				a.OUTBOUND_DAY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PRODUCT_ID,
+		        a.STOCKTURN_ID
+		  from  TB_PRODUCT a,TB_STOCK b
+		WHERE a.STOCK_ID = b.STOCK_ID
+		  AND a.DEL_FLG = '0'
+		<if test="pd != null and pd.PRODUCT_CODE != null and pd.PRODUCT_CODE != ''">
+			AND a.PRODUCT_CODE LIKE CONCAT(CONCAT('%', #{pd.PRODUCT_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.PRODUCT_CN != null and pd.PRODUCT_CN != ''">
+			AND a.PRODUCT_CN LIKE CONCAT(CONCAT('%', #{pd.PRODUCT_CN}),'%')
+		</if>
+		<if test="pd != null and pd.STOCK_ID != null and pd.STOCK_ID != ''">
+			AND a.STOCK_ID = #{pd.STOCK_ID}
+		</if>
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND a.CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="PRODUCT_CODE" '>
+			ORDER BY a.PRODUCT_CODE
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="STOCK_CODE"'>
+			ORDER BY b.STOCK_CODE
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STOCK_ID,	
+				a.PRODUCT_CODE,	
+				a.PRODUCT_CN,	
+				a.PRODUCT_EN,	
+				a.LONG_UNIT,	
+				a.WIDE_UNIT,	
+				a.HIGH_UNIT,	
+				a.UNIT_PRICE,	
+				a.TOTAL_WEIGHT_UNIT,	
+				a.TOTAL_WEIGHT,	
+				a.TOTAL_SUTTLE_UNIT,	
+				a.TOTAL_SUTTLE,	
+				a.VOLUME_UNIT,	
+				a.VOLUME_UN,	
+				a.PRODUCT_TYPE,	
+				a.STORAGE_ID,	
+				a.LOCATOR_ID,	
+				a.FREEZE_REJECT_CODE,	
+				a.MEMO,	
+				a.DANGER_FLG,	
+				a.MANAGER_FLG,	
+				a.COMBI_FLG,	
+				a.ACTIVE_FLG,	
+				a.RULE_PACK,	
+				a.RULE_PICK,	
+				a.RULE_STORAGE,	
+				a.RULE_STORAGE_ASIGN,	
+				a.RULE_STOCK_ASIGN,	
+				a.USE_VALIDITY,	
+				a.PERIOD_TYPE,	
+				a.INBOUND_DAY,	
+				a.OUTBOUND_DAY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PRODUCT_ID,
+				a.STOCKTURN_ID
+		from 
+				TB_PRODUCT a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_PRODUCT
+		where PRODUCT_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND PRODUCT_ID NOT IN (SELECT PRODUCT_ID FROM TM_STOCKMGRIN_DTL)
+	</delete>
+
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		STOCK_ID,
+		PRODUCT_CODE,
+		PRODUCT_CN,
+		PRODUCT_EN,
+		LONG_UNIT,
+		WIDE_UNIT,
+		HIGH_UNIT,
+		UNIT_PRICE,
+		TOTAL_WEIGHT_UNIT,
+		TOTAL_WEIGHT,
+		TOTAL_SUTTLE_UNIT,
+		TOTAL_SUTTLE,
+		VOLUME_UNIT,
+		VOLUME_UN,
+		PRODUCT_TYPE,
+		STORAGE_ID,
+		LOCATOR_ID,
+		FREEZE_REJECT_CODE,
+		MEMO,
+		DANGER_FLG,
+		MANAGER_FLG,
+		COMBI_FLG,
+		ACTIVE_FLG,
+		RULE_PACK,
+		RULE_PICK,
+		RULE_STORAGE,
+		RULE_STORAGE_ASIGN,
+		RULE_STOCK_ASIGN,
+		USE_VALIDITY,
+		PERIOD_TYPE,
+		INBOUND_DAY,
+		OUTBOUND_DAY,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		PRODUCT_ID,
+		STOCKTURN_ID
+		from
+		TB_PRODUCT
+		where DEL_FLG = 0
+		  and PRODUCT_CODE = #{PRODUCT_CODE}
+		  and CUSTOMER_ID = #{CUSTOMER_ID}
+		<if test="PRODUCTID != null and PRODUCTID != ''">
+			and PRODUCT_ID != #{PRODUCTID}
+		</if>
+	</select>
+
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		STOCK_ID,
+		PRODUCT_CODE,
+		PRODUCT_CN,
+		PRODUCT_EN,
+		LONG_UNIT,
+		WIDE_UNIT,
+		HIGH_UNIT,
+		UNIT_PRICE,
+		TOTAL_WEIGHT_UNIT,
+		TOTAL_WEIGHT,
+		TOTAL_SUTTLE_UNIT,
+		TOTAL_SUTTLE,
+		VOLUME_UNIT,
+		VOLUME_UN,
+		PRODUCT_TYPE,
+		STORAGE_ID,
+		LOCATOR_ID,
+		FREEZE_REJECT_CODE,
+		MEMO,
+		DANGER_FLG,
+		MANAGER_FLG,
+		COMBI_FLG,
+		ACTIVE_FLG,
+		RULE_PACK,
+		RULE_PICK,
+		RULE_STORAGE,
+		RULE_STORAGE_ASIGN,
+		RULE_STOCK_ASIGN,
+		USE_VALIDITY,
+		PERIOD_TYPE,
+		INBOUND_DAY,
+		OUTBOUND_DAY,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		PRODUCT_ID,
+		STOCKTURN_ID
+		from
+		TB_PRODUCT
+		where DEL_FLG = 0
+		and PRODUCT_CN = #{PRODUCT_CN}
+		and CUSTOMER_ID = #{CUSTOMER_ID}
+		<if test="PRODUCTID != null and PRODUCTID != ''">
+			and PRODUCT_ID != #{PRODUCTID}
+		</if>
+	</select>
+</mapper>

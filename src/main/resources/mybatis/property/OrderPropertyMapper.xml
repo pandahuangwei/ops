@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderPropertyMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="java.util.List">
+		INSERT INTO TB_ORDERPROPERTY
+			(ORDERPROPERTY_ID,
+			CUSTOMER_ID,
+			ORDERBATCH_TYPE,
+			PROPERTY_KEY,
+			PROPERTY_USE,
+			PROPERTY_SORT,
+			CREATE_EMP,
+			CREATE_TM,
+			MODIFY_EMP,
+			MODIFY_TM,
+			DEL_FLG,
+			SRC_SORT
+			)
+			VALUES
+		<foreach collection="list"  item="item" index="index" separator=",">
+			(#{item.ORDERPROPERTY_ID},
+			#{item.CUSTOMER_ID},
+			#{item.ORDERBATCH_TYPE},
+			#{item.PROPERTY_KEY},
+			#{item.PROPERTY_USE},
+			#{item.PROPERTY_SORT},
+			#{item.CREATE_EMP},
+			#{item.CREATE_TM},
+			#{item.MODIFY_EMP},
+			#{item.MODIFY_TM},
+			#{item.DEL_FLG},
+			#{item.SRC_SORT})
+		</foreach>
+
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_ORDERPROPERTY
+		where 
+			ORDERPROPERTY_ID = #{ORDERPROPERTY_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_ORDERPROPERTY
+			set 
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				ORDERBATCH_TYPE = #{ORDERBATCH_TYPE},
+				NUM_ONE = #{NUM_ONE},
+				NUM_TWO = #{NUM_TWO},
+				NUM_THR = #{NUM_THR},
+				NUM_FOU = #{NUM_FOU},
+				NUM_FIV = #{NUM_FIV},
+				NUM_SIX = #{NUM_SIX},
+				NUM_SEV = #{NUM_SEV},
+				NUM_EIG = #{NUM_EIG},
+				NUM_NIG = #{NUM_NIG},
+				NUM_TEN = #{NUM_TEN},
+				TIME_ONE = #{TIME_ONE},
+				TIME_TWO = #{TIME_TWO},
+				TIME_THR = #{TIME_THR},
+				TIME_FOU = #{TIME_FOU},
+				TIME_FIV = #{TIME_FIV},
+				TIME_SIX = #{TIME_SIX},
+				TIME_SEV = #{TIME_SEV},
+				TIME_EIG = #{TIME_EIG},
+				TIME_NIG = #{TIME_NIG},
+				TIME_TEN = #{TIME_TEN},
+				TXT_ONE = #{TXT_ONE},
+				TXT_TWO = #{TXT_TWO},
+				TXT_THR = #{TXT_THR},
+				TXT_FOU = #{TXT_FOU},
+				TXT_FIV = #{TXT_FIV},
+				TXT_SIX = #{TXT_SIX},
+				TXT_SEV = #{TXT_SEV},
+				TXT_EIG = #{TXT_EIG},
+				TXT_NIG = #{TXT_NIG},
+				TXT_TEN = #{TXT_TEN},
+				TXT_ELEVEN = #{TXT_ELEVEN},
+				TXT_TWELVE = #{TXT_TWELVE},
+				TXT_THIRT = #{TXT_THIRT},
+				TXT_FOURT = #{TXT_FOURT},
+				TXT_FIFT = #{TXT_FIFT},
+				TXT_SIXT = #{TXT_SIXT},
+				TXT_SEVENT = #{TXT_SEVENT},
+				TXT_EIGHT = #{TXT_EIGHT},
+				TXT_NINET = #{TXT_NINET},
+				TXT_TWENT = #{TXT_TWENT},
+				NUM_ONE_USE = #{NUM_ONE_USE},
+				NUM_TWO_USE = #{NUM_TWO_USE},
+				NUM_THR_USE = #{NUM_THR_USE},
+				NUM_FOU_USE = #{NUM_FOU_USE},
+				NUM_FIV_USE = #{NUM_FIV_USE},
+				NUM_SIX_USE = #{NUM_SIX_USE},
+				NUM_SEV_USE = #{NUM_SEV_USE},
+				NUM_EIG_USE = #{NUM_EIG_USE},
+				NUM_NIG_USE = #{NUM_NIG_USE},
+				NUM_TEN_USE = #{NUM_TEN_USE},
+				TIME_ONE_USE = #{TIME_ONE_USE},
+				TIME_TWO_USE = #{TIME_TWO_USE},
+				TIME_THR_USE = #{TIME_THR_USE},
+				TIME_FOU_USE = #{TIME_FOU_USE},
+				TIME_FIV_USE = #{TIME_FIV_USE},
+				TIME_SIX_USE = #{TIME_SIX_USE},
+				TIME_SEV_USE = #{TIME_SEV_USE},
+				TIME_EIG_USE = #{TIME_EIG_USE},
+				TIME_NIG_USE = #{TIME_NIG_USE},
+				TIME_TEN_USE = #{TIME_TEN_USE},
+				TXT_ONE_USE = #{TXT_ONE_USE},
+				TXT_TWO_USE = #{TXT_TWO_USE},
+				TXT_THR_USE = #{TXT_THR_USE},
+				TXT_FOU_USE = #{TXT_FOU_USE},
+				TXT_FIV_USE = #{TXT_FIV_USE},
+				TXT_SIX_USE = #{TXT_SIX_USE},
+				TXT_SEV_USE = #{TXT_SEV_USE},
+				TXT_EIG_USE = #{TXT_EIG_USE},
+				TXT_NIG_USE = #{TXT_NIG_USE},
+				TXT_TEN_USE = #{TXT_TEN_USE},
+				TXT_ELEVEN_USE = #{TXT_ELEVEN_USE},
+				TXT_TWELVE_USE = #{TXT_TWELVE_USE},
+				TXT_THIRT_USE = #{TXT_THIRT_USE},
+				TXT_FOURT_USE = #{TXT_FOURT_USE},
+				TXT_FIFT_USE = #{TXT_FIFT_USE},
+				TXT_SIXT_USE = #{TXT_SIXT_USE},
+				TXT_SEVENT_USE = #{TXT_SEVENT_USE},
+				TXT_EIGHT_USE = #{TXT_EIGHT_USE},
+				TXT_NINET_USE = #{TXT_NINET_USE},
+				TXT_TWENT_USE = #{TXT_TWENT_USE},
+				NUM_ONE_SORT = #{NUM_ONE_SORT},
+				NUM_TWO_SORT = #{NUM_TWO_SORT},
+				NUM_THR_SORT = #{NUM_THR_SORT},
+				NUM_FOU_SORT = #{NUM_FOU_SORT},
+				NUM_FIV_SORT = #{NUM_FIV_SORT},
+				NUM_SIX_SORT = #{NUM_SIX_SORT},
+				NUM_SEV_SORT = #{NUM_SEV_SORT},
+				NUM_EIG_SORT = #{NUM_EIG_SORT},
+				NUM_NIG_SORT = #{NUM_NIG_SORT},
+				NUM_TEN_SORT = #{NUM_TEN_SORT},
+				TIME_ONE_SORT = #{TIME_ONE_SORT},
+				TIME_TWO_SORT = #{TIME_TWO_SORT},
+				TIME_THR_SORT = #{TIME_THR_SORT},
+				TIME_FOU_SORT = #{TIME_FOU_SORT},
+				TIME_FIV_SORT = #{TIME_FIV_SORT},
+				TIME_SIX_SORT = #{TIME_SIX_SORT},
+				TIME_SEV_SORT = #{TIME_SEV_SORT},
+				TIME_EIG_SORT = #{TIME_EIG_SORT},
+				TIME_NIG_SORT = #{TIME_NIG_SORT},
+				TIME_TEN_SORT = #{TIME_TEN_SORT},
+				TXT_ONE_SORT = #{TXT_ONE_SORT},
+				TXT_TWO_SORT = #{TXT_TWO_SORT},
+				TXT_THR_SORT = #{TXT_THR_SORT},
+				TXT_FOU_SORT = #{TXT_FOU_SORT},
+				TXT_FIV_SORT = #{TXT_FIV_SORT},
+				TXT_SIX_SORT = #{TXT_SIX_SORT},
+				TXT_SEV_SORT = #{TXT_SEV_SORT},
+				TXT_EIG_SORT = #{TXT_EIG_SORT},
+				TXT_NIG_SORT = #{TXT_NIG_SORT},
+				TXT_TEN_SORT = #{TXT_TEN_SORT},
+				TXT_ELEVEN_SORT = #{TXT_ELEVEN_SORT},
+				TXT_TWELVE_SORT = #{TXT_TWELVE_SORT},
+				TXT_THIRT_SORT = #{TXT_THIRT_SORT},
+				TXT_FOURT_SORT = #{TXT_FOURT_SORT},
+				TXT_FIFT_SORT = #{TXT_FIFT_SORT},
+				TXT_SEVENT_SORT = #{TXT_SEVENT_SORT},
+				TXT_EIGHT_SORT = #{TXT_EIGHT_SORT},
+				TXT_NINET_SORT = #{TXT_NINET_SORT},
+				TXT_TWENT_SORT = #{TXT_TWENT_SORT},
+			ORDERPROPERTY_ID = ORDERPROPERTY_ID
+			where 
+				ORDERPROPERTY_ID = #{ORDERPROPERTY_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		SELECT 	ORDERPROPERTY_ID,
+			CUSTOMER_ID,
+			ORDERBATCH_TYPE,
+			PROPERTY_KEY,
+			PROPERTY_USE,
+			PROPERTY_SORT,
+			CREATE_EMP,
+			CREATE_TM,
+			MODIFY_EMP,
+			MODIFY_TM
+      FROM TB_ORDERPROPERTY
+		where 
+			ORDERPROPERTY_ID = #{ORDERPROPERTY_ID}
+	</select>
+
+	<select id="findByCustomerAndType" parameterType="pd" resultType="pd">
+		SELECT 	ORDERPROPERTY_ID,
+		CUSTOMER_ID,
+		ORDERBATCH_TYPE,
+		PROPERTY_KEY,
+		PROPERTY_USE,
+		PROPERTY_SORT,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		SRC_SORT
+		FROM TB_ORDERPROPERTY
+		WHERE
+		CUSTOMER_ID = #{CUSTOMER_ID}
+		AND ORDERBATCH_TYPE = #{ORDERBATCH_TYPE}
+	</select>
+
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+	SELECT 	ORDERPROPERTY_ID,
+			CUSTOMER_ID,
+			ORDERBATCH_TYPE,
+			PROPERTY_KEY,
+			PROPERTY_USE,
+			PROPERTY_SORT,
+			CREATE_EMP,
+			CREATE_TM,
+			MODIFY_EMP,
+			MODIFY_TM,
+			SRC_SORT
+      FROM TB_ORDERPROPERTY a
+      WHERE DEL_FLG = 0
+		<if test="pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd.ORDERBATCH_TYPE != null and pd.ORDERBATCH_TYPE != ''">
+			and ORDERBATCH_TYPE = #{pd.ORDERBATCH_TYPE}
+		</if>
+      ORDER BY SRC_SORT ASC
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		SELECT 	ORDERPROPERTY_ID,
+			CUSTOMER_ID,
+			ORDERBATCH_TYPE,
+			PROPERTY_KEY,
+			PROPERTY_USE,
+			PROPERTY_SORT,
+			CREATE_EMP,
+			CREATE_TM,
+			MODIFY_EMP,
+			MODIFY_TM
+		from 
+			TB_ORDERPROPERTY a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_ORDERPROPERTY
+		where 
+			ORDERPROPERTY_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+
+
+	<!-- 删除-->
+	<delete id="delAll" parameterType="pd">
+		delete from TB_ORDERPROPERTY
+		where
+		CUSTOMER_ID = #{CUSTOMER_ID}
+		AND  ORDERBATCH_TYPE =  #{ORDERBATCH_TYPE}
+	</delete>
+
+	<select id="findPropertyByCustAndType" parameterType="pd" resultType="pd">
+	SELECT
+		  a.PROPERTY_KEY,
+		  a.PROPERTY_SORT,
+		  a.SRC_SORT
+		FROM tb_orderproperty a
+		WHERE a.CUSTOMER_ID = #{CUSTOMER_ID}
+			AND a.ORDERBATCH_TYPE = #{ORDERBATCH_TYPE}
+			AND a.PROPERTY_USE = '1'
+			ORDER BY a.SRC_SORT ASC
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		SELECT 	ORDERPROPERTY_ID,
+		CUSTOMER_ID,
+		ORDERBATCH_TYPE,
+		PROPERTY_KEY,
+		PROPERTY_USE,
+		PROPERTY_SORT
+		FROM TB_ORDERPROPERTY
+		WHERE DEL_FLG = '0'
+		  AND CUSTOMER_ID = #{CUSTOMER_ID}
+		  AND ORDERBATCH_TYPE = #{ORDERBATCH_TYPE}
+	</select>
+
+</mapper>

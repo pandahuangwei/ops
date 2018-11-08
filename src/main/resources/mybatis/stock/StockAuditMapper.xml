@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockAuditMapper">
+	<!-- 库存报表统计-->
+
+	<!-- 列表 且未分配库存100 的才可以库存调整-->
+	<select id="stockAuditDatalistPage" parameterType="page" resultType="pd">
+		SELECT 	B.BOX_ID, B.INSTOCK_NO, B.CUSTOMER_ID, B.RECEIPT_TM REAL_INSTOCK_DATE,RECEIPT_TM, B.PRODUCT_ID,
+		0 OT_EA,0 PALLET_EA, 0 BOX_EA, 0 INPACK_EA, B.EA_NUM EA_EA, B.FREEZE_STATE, B.PUT_LOCATOR,B.BOX_NO,
+		AUDIT_APPLY_EMP,AUDIT_TYPE,AUDIT_STATE
+		FROM TM_BOX B
+		WHERE B.DEL_FLG IN ('0','2')
+		  AND B.ASSIGNED_STOCK_STATE = '100'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND B.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.STORAGE_ID != null and pd.STORAGE_ID != ''">
+			AND B.PUT_STORAGE =#{pd.STORAGE_ID}
+		</if>
+		<if test="pd != null and pd.LOCATOR_ID != null and pd.LOCATOR_ID != ''">
+			AND B.PUT_LOCATOR =#{pd.LOCATOR_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND B.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.AUDIT_TYPE != null and pd.AUDIT_TYPE != ''">
+			AND B.AUDIT_TYPE =#{pd.AUDIT_TYPE}
+		</if>
+		<if test="pd.AUDIT_STATE_S != null">
+			AND B.AUDIT_STATE IN
+			<foreach item="item" index="index" collection="pd.AUDIT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (B.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			  OR B.BOARD_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+
+
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND B.RECEIPT_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND B.RECEIPT_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		ORDER BY B.INSTOCK_NO DESC
+	</select>
+
+	<update id="editAuditQtyApply" parameterType="pd" >
+	 UPDATE TM_BOX
+        SET DEL_FLG = '2',
+            EA_NUM_BF = #{EA_NUM_BF},
+		    EA_NUM_AF = #{EA_NUM_AF},
+		   AUDIT_STATE = #{AUDIT_STATE},
+		   AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		   AUDIT_APPLY_TM = #{AUDIT_APPLY_TM},
+		   AUDIT_TYPE = #{AUDIT_TYPE}
+       WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditQtyPass" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '0',
+		     EA_NUM = EA_NUM_AF,
+			AUDIT_STATE = #{AUDIT_STATE},
+			AUDIT_PASS_EMP = #{AUDIT_PASS_EMP},
+			AUDIT_PASS_TM = #{AUDIT_PASS_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditQtyReject" parameterType="pd" >
+		UPDATE TM_BOX
+		SET  DEL_FLG = '0',
+			AUDIT_STATE = #{AUDIT_STATE},
+			AUDIT_PASS_EMP = #{AUDIT_PASS_EMP},
+			AUDIT_PASS_TM = #{AUDIT_PASS_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditDelApply" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '2',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		AUDIT_APPLY_TM = #{AUDIT_APPLY_TM},
+		AUDIT_TYPE = #{AUDIT_TYPE}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditPass" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '0',
+		EA_NUM = case WHEN  AUDIT_TYPE ='3' then EA_NUM_AF else EA_NUM end,
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_PASS_EMP = #{AUDIT_PASS_EMP},
+		AUDIT_PASS_TM = #{AUDIT_PASS_TM}
+		WHERE BOX_ID IN
+		<foreach item="item" index="index" collection="IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+	<update id="editAuditReject" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '0',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_PASS_EMP = #{AUDIT_PASS_EMP},
+		AUDIT_PASS_TM = #{AUDIT_PASS_TM}
+		WHERE BOX_ID  IN
+		<foreach item="item" index="index" collection="IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+
+	<update id="editAuditDelPass" parameterType="pd" >
+		UPDATE TM_BOX
+		SET
+		DEL_FLG = '1',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		AUDIT_APPLY_TM = #{AUDIT_APPLY_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditDelReject" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '0',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		AUDIT_APPLY_TM = #{AUDIT_APPLY_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<insert id="saveBoxAudit" parameterType="pd">
+		INSERT INTO TM_BOX( BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT, WIDE_UNIT,
+		HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, EA_NUM, RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS,
+		ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM,MODIFY_EMP,MODIFY_TM, DEL_FLG,SUPPLIER_PROD,AUDIT_EMP,AUDIT_TM,AUDIT_FLG,
+		LOT_NO,DATE_CODE,SEPARATE_QTY,COO,BIN_CODE,
+		EA_NUM_BF, EA_NUM_AF, AUDIT_STATE,
+	    AUDIT_APPLY_EMP, AUDIT_APPLY_TM, AUDIT_PASS_EMP, AUDIT_PASS_TM, AUDIT_TYPE)
+		VALUES ( #{BOX_ID}, #{BOX_NO}, #{BOARD_NO}, #{PRODUCT_ID}, #{CUSTOMER_ID}, #{BIG_BOX_STATUS}, #{BIG_BOX_NO}, #{INSTOCK_NO}, #{OUTSTOCK_NO}, #{CARGO_NO}, #{LONG_UNIT}, #{WIDE_UNIT},
+		#{HIGH_UNIT}, #{VOLUME_UNIT}, #{TOTAL_SUTTLE}, #{TOTAL_WEIGHT}, #{ASIGN_STORAGE}, #{ASIGN_LOCATOR}, #{PUT_STORAGE}, #{PUT_LOCATOR}, #{EA_NUM}, #{RECEIPT_STATE}, #{ASSIGNED_STATE}, #{PUT_STATUS},
+		#{ASSIGNED_STOCK_STATE}, #{ASSIGNED_STOCK_NUM}, #{PICK_STATE}, #{CARGO_STATE}, #{DEPOT_TYPE}, #{FREEZE_STATE}, #{BOX_STATE}, #{MEMO}, #{CREATE_EMP}, #{CREATE_TM},#{MODIFY_EMP}, #{MODIFY_TM},#{DEL_FLG}, #{SUPPLIER_PROD}, #{AUDIT_EMP}, #{AUDIT_TM}, #{AUDIT_FLG},
+		#{LOT_NO}, #{DATE_CODE}, #{SEPARATE_QTY}, #{COO}, #{BIN_CODE}
+		, #{EA_NUM_BF}, #{EA_NUM_AF}, #{AUDIT_STATE}
+		, #{AUDIT_APPLY_EMP}, #{AUDIT_APPLY_TM}, #{AUDIT_PASS_EMP}, #{AUDIT_PASS_TM}, #{AUDIT_TYPE})
+	</insert>
+
+	<update id="editAuditAddPass" parameterType="pd" >
+		UPDATE TM_BOX
+		SET
+		DEL_FLG = '0',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		AUDIT_APPLY_TM = #{AUDIT_APPLY_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+	<update id="editAuditAddReject" parameterType="pd" >
+		UPDATE TM_BOX
+		SET DEL_FLG = '0',
+		AUDIT_STATE = #{AUDIT_STATE},
+		AUDIT_APPLY_EMP = #{AUDIT_APPLY_EMP},
+		AUDIT_APPLY_TM = #{AUDIT_APPLY_TM}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+
+	<!-- 列表 且未分配库存100 的才可以库存调整-->
+	<select id="stockAuditData2listPage" parameterType="page" resultType="pd">
+		SELECT 	B.BOX_ID, B.INSTOCK_NO, B.CUSTOMER_ID, B.RECEIPT_TM REAL_INSTOCK_DATE,RECEIPT_TM, B.PRODUCT_ID,
+		0 OT_EA,0 PALLET_EA, 0 BOX_EA, 0 INPACK_EA, B.EA_NUM EA_EA, B.FREEZE_STATE, B.PUT_LOCATOR,B.BOX_NO,
+		AUDIT_APPLY_EMP,AUDIT_TYPE,AUDIT_STATE, B.EA_NUM_BF, EA_NUM_AF,CONCAT(EA_NUM_BF ,CONCAT('->(',EA_NUM_AF,')')) EA_AUDIT
+		FROM TM_BOX B
+		WHERE B.DEL_FLG ='2'
+		AND B.ASSIGNED_STOCK_STATE = '100'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND B.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.STORAGE_ID != null and pd.STORAGE_ID != ''">
+			AND B.PUT_STORAGE =#{pd.STORAGE_ID}
+		</if>
+		<if test="pd != null and pd.LOCATOR_ID != null and pd.LOCATOR_ID != ''">
+			AND B.PUT_LOCATOR =#{pd.LOCATOR_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND B.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.AUDIT_TYPE != null and pd.AUDIT_TYPE != ''">
+			AND B.AUDIT_TYPE =#{pd.AUDIT_TYPE}
+		</if>
+		<if test="pd.AUDIT_STATE_S != null">
+			AND B.AUDIT_STATE IN
+			<foreach item="item" index="index" collection="pd.AUDIT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (B.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR B.BOARD_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.AUDIT_APPLY_TM_BEGIN != null and pd.AUDIT_APPLY_TM_BEGIN != ''">
+			<![CDATA[ AND B.AUDIT_APPLY_TM >= #{pd.AUDIT_APPLY_TM_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.AUDIT_APPLY_TM_END != null and pd.AUDIT_APPLY_TM_END != ''">
+			<![CDATA[ AND B.AUDIT_APPLY_TM <= #{pd.AUDIT_APPLY_TM_END} ]]>
+		</if>
+		ORDER BY B.INSTOCK_NO DESC
+	</select>
+</mapper>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockNowProsMapper">
+	<!-- 库存报表统计-->
+	<select id="findDtlList" parameterType="page" resultType="pd">
+		SELECT T1.*,T2.* FROM (
+		SELECT 	BOX_ID, PRODUCT_ID, CUSTOMER_ID,ASSIGNED_STOCK_STATE,FREEZE_STATE, EA_NUM,ASSIGNED_STOCK_NUM,
+		   LOT_NO, DATE_CODE, COO, BIN_CODE,REMARK1, REMARK2, REMARK3
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND  BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.BIN_CODE != null and pd.BIN_CODE != ''">
+			AND  BIN_CODE LIKE CONCAT(CONCAT('%', #{pd.BIN_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+			AND  REMARK1 LIKE CONCAT(CONCAT('%', #{pd.REMARK1}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+			AND  REMARK2 LIKE CONCAT(CONCAT('%', #{pd.REMARK2}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+			AND  REMARK3 LIKE CONCAT(CONCAT('%', #{pd.REMARK3}),'%')
+		</if>
+		) T1 LEFT JOIN
+		(SELECT A.STOCKDTLMGRIN_ID,B.TIME_TWO FROM TM_STOCKMGRIN_DTL A,TM_STOCKMGRIN_PROPERTY B
+		WHERE A.STOCKDTLMGRIN_ID = B.STOCKDTLMGRIN_ID
+		AND A.RECEI_FLG='1'
+		AND A.DEL_FLG='0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.TIME_TWO != null and pd.TIME_TWO != ''">
+			AND  B.TIME_TWO LIKE CONCAT(CONCAT('%', #{pd.TIME_TWO}),'%')
+		</if>
+		) T2 ON (T1.BOX_ID = T2.STOCKDTLMGRIN_ID)
+
+	</select>
+
+	<select id="findBoxDtlList" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, PRODUCT_ID, CUSTOMER_ID,ASSIGNED_STOCK_STATE,FREEZE_STATE, EA_NUM,ASSIGNED_STOCK_NUM,
+		LOT_NO, DATE_CODE, COO, BIN_CODE,SEPARATE_QTY,REMARK1, REMARK2, REMARK3,BIG_BOX_NO,BOX_NO,INSTOCK_NO,PUT_LOCATOR
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND  BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND  COO LIKE CONCAT(CONCAT('%', #{pd.COO}),'%')
+		</if>
+		<if test="pd != null and pd.BIN_CODE != null and pd.BIN_CODE != ''">
+			AND  BIN_CODE LIKE CONCAT(CONCAT('%', #{pd.BIN_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+			AND  REMARK1 LIKE CONCAT(CONCAT('%', #{pd.REMARK1}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+			AND  REMARK2 LIKE CONCAT(CONCAT('%', #{pd.REMARK2}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+			AND  REMARK3 LIKE CONCAT(CONCAT('%', #{pd.REMARK3}),'%')
+		</if>
+	</select>
+
+	<select id="findProsDtlList" parameterType="page" resultType="pd">
+		SELECT A.STOCKDTLMGRIN_ID BOX_ID,B.TIME_TWO FROM TM_STOCKMGRIN_DTL A,TM_STOCKMGRIN_PROPERTY B
+		WHERE A.STOCKDTLMGRIN_ID = B.STOCKDTLMGRIN_ID
+		AND A.RECEI_FLG='1'
+		AND A.DEL_FLG='0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.TIME_TWO != null and pd.TIME_TWO != ''">
+			AND  B.TIME_TWO LIKE CONCAT(CONCAT('%', #{pd.TIME_TWO}),'%')
+		</if>
+	</select>
+
+	<select id="findBoxLookDtlList" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, PRODUCT_ID, CUSTOMER_ID,ASSIGNED_STOCK_STATE,FREEZE_STATE, ASSIGNED_STATE,PUT_STATUS,EA_NUM,ASSIGNED_STOCK_NUM,
+		LOT_NO, DATE_CODE, COO, BIN_CODE,SEPARATE_QTY,REMARK1, REMARK2, REMARK3,BIG_BOX_NO,BOX_NO,INSTOCK_NO,PUT_LOCATOR
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		  AND CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		  AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		  AND  (DATE_CODE =#{pd.DATE_CODE} OR DATE_CODE is null )
+		  AND  (LOT_NO =#{pd.LOT_NO} OR LOT_NO is null )
+		  AND  (COO  =#{pd.COO} OR COO is null )
+		  AND  (BIN_CODE =#{pd.BIN_CODE} OR BIN_CODE is null )
+		  AND  (REMARK1 =#{pd.REMARK1} OR REMARK1 is null )
+	      AND  (REMARK2 =#{pd.REMARK2} OR REMARK2 is null )
+	      AND  (REMARK3 =#{pd.REMARK3} OR REMARK3 is null )
+	</select>
+
+	<select id="findProsLookDtlList" parameterType="page" resultType="pd">
+		SELECT A.STOCKDTLMGRIN_ID BOX_ID, B.TIME_TWO, B.TXT_TWO, C.INSTOCK_NO
+		 FROM TM_STOCKMGRIN_DTL A,TM_STOCKMGRIN_PROPERTY B,TM_STOCKMGRIN C
+		WHERE A.STOCKDTLMGRIN_ID = B.STOCKDTLMGRIN_ID
+		  AND A.STOCKMGRIN_ID = C.STOCKMGRIN_ID
+		  AND A.RECEI_FLG='1'
+		  AND A.DEL_FLG='0'
+		  AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		  AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		  AND (B.TIME_TWO =#{pd.TIME_TWO} OR B.TIME_TWO is null )
+	</select>
+
+	<delete id="deleteRpStockpros" parameterType="page">
+		DELETE FROM rp_stockpros WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</delete>
+
+   <insert id="insertRpStockpros" parameterType="java.util.List">
+	   INSERT INTO rp_stockpros
+	    (COMB_ID, CUSTOMER_ID, PRODUCT_ID, LOT_NO, DATE_CODE, COO, BIN_CODE, REMARK1, REMARK2, REMARK3, TIME_TWO, ASSIGNED_EA, FREEZE_EA, TOTAL_EA, USE_EA, CREATE_EMP )
+	    VALUES
+	   <foreach collection="list" item="item" index="index" separator=",">
+		   (#{item.COMB_ID}, #{item.CUSTOMER_ID}, #{item.PRODUCT_ID}, #{item.LOT_NO}, #{item.DATE_CODE}, #{item.COO}, #{item.BIN_CODE}, #{item.REMARK1}, #{item.REMARK2}, #{item.REMARK3},
+		    #{item.TIME_TWO}, #{item.ASSIGNED_EA}, #{item.FREEZE_EA}, #{item.TOTAL_EA}, #{item.USE_EA}, #{item.CREATE_EMP} )
+	   </foreach>
+   </insert>
+
+	<select id="datalistPage" parameterType="page" resultType="pd">
+     SELECT COMB_ID, CUSTOMER_ID, PRODUCT_ID, LOT_NO, DATE_CODE, COO, BIN_CODE, REMARK1, REMARK2, REMARK3, TIME_TWO, ASSIGNED_EA, FREEZE_EA, TOTAL_EA, USE_EA, CREATE_EMP
+      FROM rp_stockpros
+      WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</select>
+
+	<select id="findForExcel" parameterType="page" resultType="pd">
+		SELECT COMB_ID, CUSTOMER_ID, PRODUCT_ID, LOT_NO, DATE_CODE, COO, BIN_CODE, REMARK1, REMARK2, REMARK3, TIME_TWO, ASSIGNED_EA, FREEZE_EA, TOTAL_EA, USE_EA, CREATE_EMP
+		FROM rp_stockpros
+		WHERE CREATE_EMP = #{pd.CREATE_EMP}
+	</select>
+
+	<delete id="truncateRpStockPros">
+		DELETE FROM rp_stockpros
+	</delete>
+
+</mapper>

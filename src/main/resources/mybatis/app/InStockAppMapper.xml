@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InStockAppMapper">
+
+    <!-- 通过ID获取数据 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+        SELECT
+        A.STOCKMGRIN_ID,
+        A.INSTOCK_NO,
+        A.CUSTOMER_ID,
+        A.INSTOCK_TYPE,
+        A.PRE_INSTOCK_DATE,
+        A.REAL_INSTOCK_DATE,
+        A.INSTOCK_STATE,
+        C.PRODUCT_CODE,
+        B.EA_EA,
+        B.BOX_NO,
+        B.EA_ACTUAL
+        FROM tm_stockmgrin A,
+        tm_stockmgrin_dtl B,
+        tb_product C
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND B.PRODUCT_ID = C.PRODUCT_ID
+        AND A.CUSTOMER_ID=#{CUSTOMER_ID}
+        <if test="INSTOCK_NO != null "><!-- 用户名检索 -->
+            and A.INSTOCK_NO=#{INSTOCK_NO}
+        </if>
+        <if test="INSTOCK_NO == null and INSTOCKDT != null"><!-- 用户名检索 -->
+            and A.PRE_INSTOCK_DATE=#{INSTOCKDT}
+        </if>
+    </select>
+    <!-- 通过ID获取数据 -->
+    <select id="findInstockNoById" parameterType="pd" resultType="pd">
+        SELECT DISTINCT
+        A.INSTOCK_NO
+        FROM tm_stockmgrin A,
+        tm_stockmgrin_dtl B
+        WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+        AND A.CUSTOMER_ID=#{CUSTOMER_ID}
+        <if test="QUERY_DATE != null "><!-- 用户名检索 -->
+            and A.CREATE_TM>#{QUERY_DATE}
+        </if>
+    </select>
+    <!-- 通过ID获取数据 -->
+    <select id="findDateById" parameterType="pd" resultType="pd">
+        SELECT DISTINCT
+        A.QUERY_DATE
+        FROM tm_recordquery_dtl A
+        WHERE A.CUSTOMER_ID=#{CUSTOMER_ID}
+    </select>
+    <!-- 更新查询时间 -->
+    <update id="updateLastDate" parameterType="pd">
+        update tm_recordquery_dtl set
+        QUERY_DATE = #{QUERY_DATE}
+        WHERE CUSTOMER_ID=#{CUSTOMER_ID}
+    </update>
+    <!-- 新增app用户 -->
+    <insert id="insertLastDate" parameterType="pd">
+        insert into tm_recordquery_dtl (
+        CUSTOMER_ID,
+        QUERY_DATE
+        ) values (
+        #{CUSTOMER_ID},
+       #{QUERY_DATE}
+        )
+    </insert>
+
+</mapper>

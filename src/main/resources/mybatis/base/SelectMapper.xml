@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SelectMapper">
+
+	<resultMap type="Select" id="selectResultMap">
+		<result column="SELECT_ID" property="id"/>
+		<result column="GROUP_KEY" property="group"/>
+		<result column="C_CODE" property="code"/>
+		<result column="C_VALUE" property="value"/>
+		<result column="C_SORT" property="sort"/>
+
+	</resultMap>
+
+	<resultMap type="Select" id="countryMap">
+		<result column="COUNTRY_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+	</resultMap>
+
+	<resultMap type="Select" id="provinceMap">
+		<result column="PROVINCE_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+	</resultMap>
+
+	<resultMap type="Select" id="cityMap">
+		<result column="CITY_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+	</resultMap>
+
+	<resultMap type="Select" id="stockMap">
+		<result column="STOCK_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+	</resultMap>
+
+	<resultMap type="Select" id="customerMap">
+		<result column="CUSTOMER_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+		<result column="CUSTOMER_CODE" property="code"/>
+	</resultMap>
+
+	<resultMap type="Select" id="userMap">
+		<result column="ID" property="id"/>
+		<result column="USERNAME" property="value"/>
+	</resultMap>
+
+
+	<resultMap type="Select" id="storageMap">
+		<result column="STORAGE_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+		<result column="STORAGE_CODE" property="code"/>
+	</resultMap>
+
+	<resultMap type="Select" id="locatorMap">
+		<result column="LOCATOR_ID" property="id"/>
+		<result column="VALUE" property="value"/>
+		<result column="STORAGE_CODE" property="group"/>
+	</resultMap>
+	<!--包装规则-->
+	<resultMap type="Select" id="packRuleMap">
+		<result column="PACKRULE_ID" property="id"/>
+		<result column="PACK_CN" property="value"/>
+	</resultMap>
+	<!--拣货规则-->
+	<resultMap type="Select" id="pickRuleMap">
+		<result column="PICKRULE_ID" property="id"/>
+		<result column="PICK_RULE_CN" property="value"/>
+		<result column="CUSTOMER_ID" property="group"/>
+	</resultMap>
+	<!--库位分配规则-->
+	<resultMap type="Select" id="stockrageAssinedMap">
+		<result column="STORAGEASIGNRULE_ID" property="id"/>
+		<result column="STORAGEASING_CN" property="value"/>
+		<result column="CUSTOMER_ID" property="group"/>
+
+	</resultMap>
+	<!--库存周转规则-->
+	<resultMap type="Select" id="stockTurnMap">
+		<result column="STOCKTURN_ID" property="id"/>
+		<result column="STOCKTURN_CN" property="value"/>
+	</resultMap>
+	<!--库存分配规则-->
+	<resultMap type="Select" id="stockAssinedMap">
+		<result column="STOCKASIGNRULE_ID" property="id"/>
+		<result column="STOCKASIGN_CN" property="value"/>
+		<result column="CUSTOMER_ID" property="group"/>
+	</resultMap>
+	<!--产品-->
+	<resultMap type="Select" id="productMap">
+		<result column="PRODUCT_ID" property="id"/>
+		<result column="C_VALUE" property="value"/>
+		<result column="CUSTOMER_ID" property="group"/>
+	</resultMap>
+
+	<resultMap type="Select" id="batchModifyMap">
+		<result column="MODIFY_BATCH" property="id"/>
+		<result column="MODIFY_BATCH" property="value"/>
+	</resultMap>
+
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_SELECT(
+		GROUP_KEY,
+		GROUP_NAME,
+		C_CODE,
+		C_VALUE,
+		C_DESC,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		C_SORT,
+		SELECT_ID
+		) values (
+		#{GROUP_KEY},
+		#{GROUP_NAME},
+		#{C_CODE},
+		#{C_VALUE},
+		#{C_DESC},
+		#{MODIFY_EMP},
+		#{MODIFY_TM},
+		#{DEL_FLG},
+		#{C_SORT},
+		#{SELECT_ID}
+		)
+	</insert>
+
+	<update id="updateByKey" parameterType="pd">
+		update  TB_SELECT
+		set
+		C_DESC = #{C_DESC}
+		where
+		GROUP_KEY = #{GROUP_KEY}
+	</update>
+
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		UPDATE TB_SELECT SET DEL_FLG = 1
+		WHERE SELECT_ID = #{SELECT_ID}
+	</delete>
+
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_SELECT
+		set
+		GROUP_KEY = #{GROUP_KEY},
+		GROUP_NAME = #{GROUP_NAME},
+		C_CODE = #{C_CODE},
+		C_VALUE = #{C_VALUE},
+		C_DESC = #{C_DESC},
+		C_SORT = #{C_SORT}
+		where
+		SELECT_ID = #{SELECT_ID}
+	</update>
+
+
+	<select id="findMaxId" parameterType="String" resultType="pd">
+		SELECT MAX(SELECT_ID+0) SELECT_ID FROM TB_SELECT A
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		GROUP_KEY,
+		GROUP_NAME,
+		C_CODE,
+		C_VALUE,
+		C_DESC,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		C_SORT,
+		SELECT_ID
+		from
+		TB_SELECT
+		where
+		SELECT_ID = #{SELECT_ID}
+	</select>
+
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT DISTINCT
+		  a.GROUP_KEY,
+		  a.GROUP_NAME,
+		  a.C_DESC
+		FROM TB_SELECT a
+		WHERE 1 = 1
+		  AND  GROUP_KEY NOT IN('ORDERBATCH_TYPE','TOTAL_WEIGHT_UNIT','TOTAL_SUTTLE_UNIT','VOLUME_UNIT','INSTOCK_STATE','ASSIGNED_STATE','PUT_STATE','CARGO_STATE','PICK_STATE','LOADED_TYPE')
+		<if test="pd != null and pd.GROUP_NAME != null and pd.GROUP_NAME != ''">
+			AND GROUP_NAME LIKE CONCAT(CONCAT('%', #{pd.GROUP_NAME}),'%')
+		</if>
+	</select>
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		a.GROUP_KEY,
+		a.GROUP_NAME,
+		a.C_CODE,
+		a.C_VALUE,
+		a.C_DESC,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.C_SORT,
+		a.SELECT_ID
+		from
+		TB_SELECT a
+	</select>
+
+
+	<select id="findByGroupKey" parameterType="pd" resultType="pd">
+		select
+		a.GROUP_KEY,
+		a.GROUP_NAME,
+		a.C_CODE,
+		a.C_VALUE,
+		a.C_DESC,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.C_SORT,
+		a.SELECT_ID
+		from
+		TB_SELECT a
+		WHERE GROUP_KEY = #{GROUP_KEY}
+	</select>
+
+	<select id="findByActiveGroupKey" parameterType="pd" resultType="pd">
+		select
+		a.GROUP_KEY,
+		a.GROUP_NAME,
+		a.C_CODE,
+		a.C_VALUE,
+		a.C_DESC,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.C_SORT,
+		a.SELECT_ID
+		from
+		TB_SELECT a
+		WHERE DEL_FLG = '0'
+		  AND GROUP_KEY = #{GROUP_KEY}
+	</select>
+
+	<select id="findByCcode" parameterType="pd" resultType="pd">
+		select
+		a.GROUP_KEY,
+		a.GROUP_NAME,
+		a.C_CODE,
+		a.C_VALUE,
+		a.C_DESC,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.C_SORT,
+		a.SELECT_ID
+		from
+		TB_SELECT a
+		WHERE DEL_FLG = '0'
+		 AND C_CODE = #{C_CODE}
+		AND GROUP_KEY = #{GROUP_KEY}
+		<if test="SELECT_ID != null and SELECT_ID != ''">
+			and SELECT_ID != #{SELECT_ID}
+		</if>
+	</select>
+
+	<select id="findByCvalue" parameterType="pd" resultType="pd">
+		select
+		a.GROUP_KEY,
+		a.GROUP_NAME,
+		a.C_CODE,
+		a.C_VALUE,
+		a.C_DESC,
+		a.MODIFY_EMP,
+		a.MODIFY_TM,
+		a.DEL_FLG,
+		a.C_SORT,
+		a.SELECT_ID
+		from
+		TB_SELECT a
+		WHERE DEL_FLG = '0'
+		AND C_VALUE = #{C_VALUE}
+		AND GROUP_KEY = #{GROUP_KEY}
+		<if test="SELECT_ID != null and SELECT_ID != ''">
+			and SELECT_ID != #{SELECT_ID}
+		</if>
+	</select>
+
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		UPDATE TB_SELECT SET DEL_FLG = '1'
+		where
+		SELECT_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findAll" resultMap="selectResultMap">
+		SELECT a.SELECT_ID,a.GROUP_KEY ,a.C_CODE,a.C_VALUE  FROM tb_select a WHERE del_flg = 0
+	</select>
+
+	<!-- 获取所有国家数据 -->
+	<select id="findAllCountry" resultMap="countryMap">
+		SELECT a.COUNTRY_ID,CONCAT(a.COUNTRY_CN ,CONCAT('(',a.COUNTRY_CODE,')')) VALUE  FROM TB_COUNTRY a WHERE a.DEL_FLG = 0
+		ORDER  BY SORT_BY
+	</select>
+	<!-- 获取所有省份数据 -->
+	<select id="findAllProvince" resultMap="provinceMap">
+        SELECT a.PROVINCE_ID,CONCAT(a.PROVINCE_CN ,CONCAT('(',a.PROVINCE_CODE,')')) VALUE  FROM TB_PROVINCE a WHERE a.DEL_FLG = 0
+        ORDER  BY SORT_BY
+	</select>
+	<!-- 获取所有城市数据 -->
+	<select id="findAllCity" resultMap="cityMap">
+		SELECT a.CITY_ID,CONCAT(a.CITY_CN ,CONCAT('(',a.CITY_CODE,')')) VALUE  FROM TB_CITY a WHERE a.DEL_FLG = 0
+	</select>
+	<!-- 根据国家Id获取所有省份数据 -->
+	<select id="findProvinceByCountry" parameterType="String" resultMap="provinceMap">
+		SELECT a.PROVINCE_ID,CONCAT(a.PROVINCE_CN ,CONCAT('(',a.PROVINCE_CODE,')')) VALUE  FROM TB_PROVINCE a
+		 WHERE a.DEL_FLG = 0 AND COUNTRY_ID = #{value}
+	</select>
+	<!-- 根据省份ID获取所有城市数据 -->
+	<select id="findCityByProvince" parameterType="String" resultMap="cityMap">
+		SELECT a.CITY_ID,CONCAT(a.CITY_CN ,CONCAT('(',a.CITY_CODE,')')) VALUE  FROM TB_CITY a
+		 WHERE a.DEL_FLG = 0 AND PROVINCE_ID = #{provinceId}
+	</select>
+
+	<!-- 获取所有的仓库 -->
+	<select id="findAllStock" resultMap="stockMap">
+		SELECT a.STOCK_ID,CONCAT(a.STOCK_NAME ,CONCAT('(',a.STOCK_CODE,')')) VALUE  FROM TB_STOCK a WHERE a.DEL_FLG = 0
+		 ORDER  BY STOCK_CODE
+	</select>
+
+	<!-- 获取所有的客户 -->
+	<select id="findAllCustomer" resultMap="customerMap">
+		SELECT a.CUSTOMER_ID,CONCAT(a.CUSTOMER_CN ,CONCAT('(',a.CUSTOMER_CODE,')')) VALUE,a.CUSTOMER_CODE  FROM TB_CUSTOMER a WHERE a.DEL_FLG = 0
+		ORDER  BY CREATE_TM
+	</select>
+
+	<!-- 获取所有的客户 -->
+	<select id="findAllUser" resultMap="userMap">
+		SELECT 	USERNAME ID, USERNAME FROM TS_USER WHERE DEL_FLAG ='0' AND USERNAME NOT IN('administrator','panda') ORDER BY USERNAME
+	</select>
+
+	<!-- 获取所有的库区 -->
+	<select id="findAllStorage" resultMap="storageMap">
+		SELECT a.STORAGE_ID,CONCAT(a.STORAGE_NAME ,CONCAT('(',a.STORAGE_CODE,')')) VALUE ,a.STORAGE_CODE  FROM TB_STORAGE a WHERE a.DEL_FLG = 0
+		ORDER  BY STORAGE_CODE
+	</select>
+
+	<!-- 获取所有的库位 -->
+	<select id="findAllLocator" resultMap="locatorMap">
+		SELECT A.LOCATOR_ID,A.LOCATOR_CODE VALUE,A.STORAGE_CODE    FROM TB_LOCATOR A WHERE A.DEL_FLG = 0
+	    ORDER  BY LOCATOR_CODE
+	</select>
+
+	<!-- 获取所有的库位 -->
+	<select id="findAllLocatorForShow" resultMap="locatorMap">
+		SELECT A.LOCATOR_ID,A.LOCATOR_CODE VALUE,A.STORAGE_CODE    FROM TB_LOCATOR A
+		ORDER  BY LOCATOR_CODE
+	</select>
+
+	<!-- 获取包装规则 -->
+	<select id="findPackRule" resultMap="packRuleMap">
+		SELECT PACKRULE_ID, PACK_CN FROM TB_PACKRULE  A WHERE A.DEL_FLG ='0'
+		ORDER  BY PACK_CN
+	</select>
+
+	<!-- 获取拣货规则 -->
+	<select id="findPickRule" parameterType="String" resultMap="pickRuleMap">
+		SELECT 	CUSTOMER_ID,PICKRULE_ID, PICK_RULE_CN  FROM tb_pickrule WHERE DEL_FLG ='0'
+		<if test="_parameter != null and _parameter != ''">
+			AND CUSTOMER_ID =  #{value}
+		</if>
+		ORDER  BY PICK_RULE_CODE
+	</select>
+
+	<!-- 获取库位分配规则 -->
+	<select id="findStorageAssignedRule" parameterType="String" resultMap="stockrageAssinedMap">
+		 SELECT CUSTOMER_ID,STORAGEASIGNRULE_ID, STORAGEASING_CODE, STORAGEASING_CN  FROM tb_storageasignrule WHERE DEL_FLG ='0'
+		<if test="_parameter != null and _parameter != ''">
+			AND CUSTOMER_ID =  #{value}
+		</if>
+		ORDER  BY STORAGEASING_CODE
+	</select>
+
+	<!-- 获取库存分配规则 -->
+	<select id="findStockAssignedRule" parameterType="String" resultMap="stockAssinedMap">
+		SELECT 	CUSTOMER_ID,STOCKASIGNRULE_ID, STOCKASIGN_CN  FROM TB_STOCKASIGNRULE WHERE DEL_FLG ='0'
+		<if test="_parameter != null and _parameter != ''">
+			AND CUSTOMER_ID =  #{value}
+		</if>
+		ORDER  BY STOCKASIGN_CODE
+	</select>
+
+	<!-- 获取库存周转规则 -->
+	<select id="findStockTurnRule" parameterType="String" resultMap="stockTurnMap">
+	     SELECT A.STOCKTURN_ID,A.STOCKTURN_CN FROM TB_STOCKTURN A WHERE A.DEL_FLG = '0'
+		ORDER  BY A.STOCKTURN_CODE
+	</select>
+
+
+
+	<!-- 获取所有省份数据 -->
+	<select id="findAllProduct" parameterType="String" resultMap="productMap">
+		SELECT A.CUSTOMER_ID,A.PRODUCT_ID,CONCAT(A.PRODUCT_CODE ,CONCAT('(',A.PRODUCT_CN,')')) C_VALUE  FROM TB_PRODUCT A WHERE A.DEL_FLG = 0
+		<if test="_parameter != null and _parameter != ''">
+			AND A.CUSTOMER_ID =#{value}
+		</if>
+		ORDER  BY PRODUCT_CODE
+	</select>
+
+	<select id="findAllProdCode" parameterType="String" resultMap="productMap">
+		SELECT A.CUSTOMER_ID,A.PRODUCT_ID,PRODUCT_CODE C_VALUE FROM TB_PRODUCT A WHERE A.DEL_FLG = 0
+		<if test="_parameter != null and _parameter != ''">
+			AND A.CUSTOMER_ID = #{value}
+		</if>
+	</select>
+
+	<select id="findProduct" parameterType="String" resultType="pd">
+		SELECT A.PRODUCT_ID,A.CUSTOMER_ID,A.STOCK_ID,A.PRODUCT_CODE,A.PRODUCT_CN,A.PRODUCT_EN,A.LONG_UNIT,A.WIDE_UNIT,A.HIGH_UNIT,A.UNIT_PRICE,
+				 TOTAL_WEIGHT_UNIT,A.TOTAL_WEIGHT,A.TOTAL_SUTTLE_UNIT,A.TOTAL_SUTTLE,A.VOLUME_UNIT,A.VOLUME_UN,A.PRODUCT_TYPE,A.STORAGE_ID,A.LOCATOR_ID,
+				 FREEZE_REJECT_CODE,A.MEMO,A.DANGER_FLG,A.MANAGER_FLG,A.COMBI_FLG,A.ACTIVE_FLG,A.RULE_PACK,A.RULE_PICK,A.RULE_STORAGE,
+				 RULE_STORAGE_ASIGN,A.RULE_STOCK_ASIGN,A.USE_VALIDITY,A.PERIOD_TYPE,A.INBOUND_DAY,A.OUTBOUND_DAY,
+                 B.EA_NUM,B.INPACK_NUM,B.BOX_NUM,B.PALLET_NUM ,B.OTHER_NUM,
+                 B.EA_IN,B.INPACK_IN,B.BOX_IN,B.PALLET_IN ,B.OTHER_IN,
+                 B.EA_OUT,B.INPACK_OUT,B.BOX_OUT,B.PALLET_OUT,B.OTHER_OUT
+		FROM TB_PRODUCT  A LEFT JOIN TB_PACKRULE B ON A.RULE_PACK = B.PACKRULE_ID
+		 WHERE A.DEL_FLG = 0
+		<if test="_parameter != null and _parameter != ''">
+		   AND A.PRODUCT_ID=  #{value}
+		</if>
+	</select>
+
+	<select id="findPackRuleById" parameterType="String" resultType="pd">
+		SELECT B.PACKRULE_ID,
+		   B.EA_NUM,B.INPACK_NUM,B.BOX_NUM,B.PALLET_NUM ,B.OTHER_NUM,
+		   B.EA_IN,B.INPACK_IN,B.BOX_IN,B.PALLET_IN ,B.OTHER_IN,
+		   B.EA_OUT,B.INPACK_OUT,B.BOX_OUT,B.PALLET_OUT,B.OTHER_OUT
+		FROM TB_PACKRULE B
+		WHERE B.DEL_FLG = 0
+		<if test="_parameter != null and _parameter != ''">
+		 AND B.PACKRULE_ID=  #{value}
+		</if>
+	</select>
+
+
+
+	<select id="findProductByCustomerId" parameterType="String" resultType="pd">
+		SELECT A.PRODUCT_ID,A.CUSTOMER_ID,A.STOCK_ID,A.PRODUCT_CODE,A.PRODUCT_CN,A.PRODUCT_EN,A.LONG_UNIT,A.WIDE_UNIT,A.HIGH_UNIT,A.UNIT_PRICE,
+		A.TOTAL_WEIGHT_UNIT,A.TOTAL_WEIGHT,A.TOTAL_SUTTLE_UNIT,A.TOTAL_SUTTLE,A.VOLUME_UNIT,A.VOLUME_UN,
+		A.FREEZE_REJECT_CODE,A.MEMO,A.DANGER_FLG,A.MANAGER_FLG,A.COMBI_FLG,A.ACTIVE_FLG,A.RULE_PACK,A.RULE_PICK,A.RULE_STORAGE,
+		A.RULE_STORAGE_ASIGN,A.RULE_STOCK_ASIGN,A.USE_VALIDITY,A.PERIOD_TYPE,A.INBOUND_DAY,A.OUTBOUND_DAY,
+		B.EA_NUM,B.INPACK_NUM,B.BOX_NUM,B.PALLET_NUM ,B.OTHER_NUM,
+		B.EA_IN,B.INPACK_IN,B.BOX_IN,B.PALLET_IN ,B.OTHER_IN,
+		B.EA_OUT,B.INPACK_OUT,B.BOX_OUT,B.PALLET_OUT ,B.OTHER_OUT
+		FROM TB_PRODUCT  A LEFT JOIN TB_PACKRULE B ON A.RULE_PACK = B.PACKRULE_ID
+		WHERE A.DEL_FLG = 0
+		<if test="_parameter != null and _parameter != ''">
+			AND A.CUSTOMER_ID = #{value}
+		</if>
+	</select>
+
+	<!-- 获取所有的仓库 -->
+	<select id="findAllStockPd" resultType="pd">
+		 SELECT STOCK_ID, STOCK_CODE, STOCK_NAME, STOCK_DSC, CITY_ID, STOCK_ADDR, MEMO, HEAD_EMP, HEAD_MOBILE, HEAD_FAX, HEAD_MAIL, USE_FLG  FROM TB_STOCK WHERE DEL_FLG ='0'
+	</select>
+
+	<select id="findModifyBatch" resultMap="batchModifyMap">
+		SELECT DISTINCT MODIFY_BATCH FROM hist_remark
+	</select>
+
+</mapper>

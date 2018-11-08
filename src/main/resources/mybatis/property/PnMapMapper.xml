@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PnMapMapper">
+
+
+    <!-- 新增-->
+    <insert id="save" parameterType="pd">
+		insert into TB_PN_MAP(
+		    CUSTOMER_ID,
+			SCAN_PN,	
+			ACTUAL_PN,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PNMAP_ID
+		) values (
+		    #{CUSTOMER_ID},
+			#{SCAN_PN},	
+			#{ACTUAL_PN},	
+			#{MEMO},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{PNMAP_ID}
+		)
+	</insert>
+
+
+    <!-- 删除-->
+    <delete id="delete" parameterType="pd">
+		delete from TB_PN_MAP
+		where 
+			PNMAP_ID = #{PNMAP_ID}
+	</delete>
+
+
+    <!-- 修改 -->
+    <update id="edit" parameterType="pd">
+		update  TB_PN_MAP
+			set 
+				CUSTOMER_ID= #{CUSTOMER_ID},
+				SCAN_PN = #{SCAN_PN},
+				ACTUAL_PN = #{ACTUAL_PN},
+				MEMO = #{MEMO},
+				MODIFY_EMP = #{MODIFY_EMP},
+			    MODIFY_TM = #{MODIFY_TM}
+			where 
+				PNMAP_ID = #{PNMAP_ID}
+	</update>
+
+
+    <!-- 通过ID获取数据 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+			SCAN_PN,	
+			ACTUAL_PN,	
+			MEMO,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			PNMAP_ID
+		from 
+			TB_PN_MAP
+		where DEL_FLG = '0'
+		  AND PNMAP_ID = #{PNMAP_ID}
+	</select>
+
+
+    <!-- 列表 -->
+    <select id="datalistPage" parameterType="page" resultType="pd">
+        select
+        a.CUSTOMER_ID,
+        a.SCAN_PN,
+        a.ACTUAL_PN,
+        a.MEMO,
+        a.CREATE_EMP,
+        a.CREATE_TM,
+        a.MODIFY_EMP,
+        a.MODIFY_TM,
+        a.PNMAP_ID,
+        b.PRODUCT_CODE
+        from
+        TB_PN_MAP a,TB_PRODUCT b
+        WHERE a.ACTUAL_PN = b.PRODUCT_ID
+        AND a.DEL_FLG = '0'
+        AND b.DEL_FLG = '0'
+        <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+            AND a.CUSTOMER_ID LIKE CONCAT(CONCAT('%', #{pd.CUSTOMER_ID}),'%')
+        </if>
+        <if test="pd != null and pd.SCAN_PN != null and pd.SCAN_PN != ''">
+            AND a.SCAN_PN LIKE CONCAT(CONCAT('%', #{pd.SCAN_PN}),'%')
+        </if>
+        <if test="pd != null and pd.ACTUAL_PN != null and pd.ACTUAL_PN != ''">
+            AND b.PRODUCT_CODE LIKE CONCAT(CONCAT('%', #{pd.ACTUAL_PN}),'%')
+        </if>
+    </select>
+
+    <!-- 列表(全部) -->
+    <select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.SCAN_PN,	
+				a.ACTUAL_PN,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.PNMAP_ID
+		from 
+				TB_PN_MAP a
+				where DEL_FLG = '0'
+	</select>
+
+    <!-- 批量删除 -->
+    <delete id="deleteAll" parameterType="String">
+        delete from TB_PN_MAP
+        where
+        PNMAP_ID in
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 通过ID获取数据 -->
+    <select id="findByPn" parameterType="pd" resultType="pd">
+        select
+        CUSTOMER_ID,
+        SCAN_PN,
+        ACTUAL_PN,
+        MEMO,
+        PNMAP_ID
+        from
+        TB_PN_MAP
+        where DEL_FLG = '0'
+        AND SCAN_PN = #{SCAN_PN}
+		AND CUSTOMER_ID = #{CUSTOMER_ID}
+        <if test="PNMAP_ID != null and PNMAP_ID != ''">
+            AND PNMAP_ID != #{PNMAP_ID}
+        </if>
+    </select>
+
+    <!-- 通过ID获取数据 -->
+    <select id="findAll" parameterType="pd" resultType="pd">
+		select
+		SCAN_PN,
+		ACTUAL_PN,
+		MEMO,
+		PNMAP_ID
+		from
+		TB_PN_MAP
+		where DEL_FLG = '0'
+	</select>
+
+</mapper>

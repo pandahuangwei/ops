@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReceivOptMapper">
+
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT
+		A.INSTOCK_NO, A.CUSTOMER_ID, A.INSTOCK_TYPE, A.PRE_INSTOCK_DATE, A.REAL_INSTOCK_DATE, A.INSTOCK_STATE, A.PUT_STATE,
+		A.TOTAL_WEIGHT, A.TOTAL_SUTTLE, A.TOTAL_VOLUME, A.TOTAL_PRICE, A.TOTAL_EA, A.PRIORITY_LEVEL, A.ORDER_NO, A.COST_STATE,
+		A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.MODIFY_EMP, A.MODIFY_TM, A.DEL_FLG, A.STOCKMGRIN_ID
+		FROM TM_STOCKMGRIN A LEFT JOIN
+		(SELECT * FROM TM_STOCKMGRIN_DTL
+		WHERE DEL_FLG = '0'
+		  AND RECEI_FLG ='0'
+		<if test="pd != null and pd.DTL_CUSTOMER_ID != null and pd.DTL_CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.DTL_CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		) B
+		ON A.STOCKMGRIN_ID = b.STOCKMGRIN_ID
+		WHERE A.DEL_FLG = '0'
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.ORDER_NO != null and pd.ORDER_NO != ''">
+			AND A.ORDER_NO LIKE CONCAT(CONCAT('%', #{pd.ORDER_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COST_STATE != null and pd.COST_STATE != ''">
+			AND A.COST_STATE = #{pd.COST_STATE}
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.PRE_INSTOCK_DATE_BEGIN != null and pd.PRE_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.PRE_INSTOCK_DATE >= #{pd.PRE_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.PRE_INSTOCK_DATE_END != null and pd.PRE_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.PRE_INSTOCK_DATE <= #{pd.PRE_INSTOCK_DATE_END} ]]>
+		</if>
+
+		<!-- 入库类型-->
+		<if test="pd.INSTOCK_TYPE_S != null">
+			AND A.INSTOCK_TYPE IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_TYPE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 入库状态-->
+		<if test="pd.INSTOCK_STATE_S != null">
+			AND A.INSTOCK_STATE IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<!-- 码放状态-->
+		<if test="pd.PUT_STATE_S != null">
+			AND A.PUT_STATE IN
+			<foreach item="item" index="index" collection="pd.PUT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 分配状态-->
+		<if test="pd.ASSIGNED_STATE_S != null">
+			AND A.ASSIGNED_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		ORDER BY A.INSTOCK_NO DESC
+	</select>
+
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TM_RECEIVOPT(
+			INSTOCK_NO,	
+			BOX_NO,	
+			PREFIX_PROD,	
+			PROD_CODE,	
+			PREFIX_QTY,	
+			RECEIV_QTY,	
+			COO,	
+			PACKAGE_QTY,	
+			BOARD_NO,	
+			QR_CODE,	
+			PREFIX_LOTNO,	
+			LOT_NO,	
+			PREFIX_DATECODE,	
+			DATE_CODE,	
+			PREFIX_SCAN,	
+			SCAN_CODE,	
+			SCAN_QTY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			RECEIVOPT_ID,
+			GROUP_KEY,
+			SUPPLIER_PROD,
+			BIG_BOX_NO,
+			BIN_CODE,
+			REMARK1,REMARK2,REMARK3,INV_NO
+		) values (
+			#{INSTOCK_NO},	
+			#{BOX_NO},	
+			#{PREFIX_PROD},	
+			#{PROD_CODE},	
+			#{PREFIX_QTY},	
+			#{RECEIV_QTY},	
+			#{COO},	
+			#{PACKAGE_QTY},	
+			#{BOARD_NO},	
+			#{QR_CODE},	
+			#{PREFIX_LOTNO},	
+			#{LOT_NO},	
+			#{PREFIX_DATECODE},	
+			#{DATE_CODE},	
+			#{PREFIX_SCAN},	
+			#{SUPPLIER_PROD},
+			#{SCAN_QTY},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},
+			#{RECEIVOPT_ID},
+			#{GROUP_KEY},
+			#{SUPPLIER_PROD},
+			#{BIG_BOX_NO},
+			#{BIN_CODE},
+			#{REMARK1},#{REMARK2},#{REMARK3},#{INV_NO}
+		)
+	</insert>
+
+
+	<!-- 通过ID获取数据 -->
+	<select id="countBoxCnt" parameterType="pd" resultType="pd">
+	  SELECT COUNT(*) CNT FROM TM_BOX A WHERE A.BOX_NO = #{BOX_NO} AND DEL_FLG = '0'
+	</select>
+
+	<select id="findCustomerId" parameterType="pd" resultType="pd">
+      SELECT  CUSTOMER_ID FROM tm_stockmgrin WHERE INSTOCK_NO= #{INSTOCK_NO}
+	</select>
+
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TM_RECEIVOPT
+			set 
+				INSTOCK_NO = #{INSTOCK_NO},
+				BOX_NO = #{BOX_NO},
+				PREFIX_PROD = #{PREFIX_PROD},
+				PROD_CODE = #{PROD_CODE},
+				PREFIX_QTY = #{PREFIX_QTY},
+				RECEIV_QTY = #{RECEIV_QTY},
+				COO = #{COO},
+				PACKAGE_QTY = #{PACKAGE_QTY},
+				BOARD_NO = #{BOARD_NO},
+				QR_CODE = #{QR_CODE},
+				PREFIX_LOTNO = #{PREFIX_LOTNO},
+				LOT_NO = #{LOT_NO},
+				PREFIX_DATECODE = #{PREFIX_DATECODE},
+				DATE_CODE = #{DATE_CODE},
+				PREFIX_SCAN = #{PREFIX_SCAN},
+				SCAN_CODE = #{SCAN_CODE},
+				SCAN_QTY = #{SCAN_QTY},
+			RECEIVOPT_ID = RECEIVOPT_ID
+			where 
+				RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			INSTOCK_NO,	
+			BOX_NO,	
+			PREFIX_PROD,	
+			PROD_CODE,	
+			PREFIX_QTY,	
+			RECEIV_QTY,	
+			COO,	
+			PACKAGE_QTY,	
+			BOARD_NO,	
+			QR_CODE,	
+			PREFIX_LOTNO,	
+			LOT_NO,	
+			PREFIX_DATECODE,	
+			DATE_CODE,	
+			PREFIX_SCAN,	
+			SCAN_CODE,	
+			SCAN_QTY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			RECEIVOPT_ID,BIG_BOX_NO,BIN_CODE
+		from 
+			TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findCurReceivlistPage" parameterType="page" resultType="pd">
+		SELECT 	RECEIVOPT_ID, INSTOCK_NO, RECEIV_TYPE, BOX_NO, PREFIX_PROD, PROD_CODE, PREFIX_QTY, RECEIV_QTY, COO, PACKAGE_QTY,
+				BOARD_NO, QR_CODE, QR_CODE_USE, PREFIX_LOTNO, LOT_NO, PREFIX_DATECODE, DATE_CODE,
+				PREFIX_SCAN, SCAN_CODE, SCAN_QTY, GROUP_KEY, CNT_SCAN, BOX_SCAN,SUPPLIER_PROD,
+				BIG_BOX_NO,BIN_CODE,REMARK1,REMARK2,REMARK3,INV_NO
+          FROM TM_RECEIVOPT
+		  WHERE DEL_FLG = '0'
+		    AND GROUP_KEY = #{pd.GROUP_KEY}
+		    ORDER BY BOX_NO
+	</select>
+
+
+	<!-- 批量删除 -->
+	<delete id="deleteReceivDtl" parameterType="pd">
+		DELETE FROM  TM_RECEIVOPT
+		WHERE
+		RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</delete>
+
+	
+	<!-- 列表 -->
+	<select id="datalistPage1" parameterType="page" resultType="pd">
+		select
+				a.INSTOCK_NO,	
+				a.BOX_NO,	
+				a.PREFIX_PROD,	
+				a.PROD_CODE,	
+				a.PREFIX_QTY,	
+				a.RECEIV_QTY,	
+				a.COO,	
+				a.PACKAGE_QTY,	
+				a.BOARD_NO,	
+				a.QR_CODE,	
+				a.PREFIX_LOTNO,	
+				a.LOT_NO,	
+				a.PREFIX_DATECODE,	
+				a.DATE_CODE,	
+				a.PREFIX_SCAN,	
+				a.SCAN_CODE,	
+				a.SCAN_QTY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.RECEIVOPT_ID,
+				a.BIG_BOX_NO,
+				a.BIN_CODE
+		from 
+				TM_RECEIVOPT a
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.INSTOCK_NO,	
+				a.BOX_NO,	
+				a.PREFIX_PROD,	
+				a.PROD_CODE,	
+				a.PREFIX_QTY,	
+				a.RECEIV_QTY,	
+				a.COO,	
+				a.PACKAGE_QTY,	
+				a.BOARD_NO,	
+				a.QR_CODE,	
+				a.PREFIX_LOTNO,	
+				a.LOT_NO,	
+				a.PREFIX_DATECODE,	
+				a.DATE_CODE,	
+				a.PREFIX_SCAN,	
+				a.SCAN_CODE,	
+				a.SCAN_QTY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.RECEIVOPT_ID,
+				a.BIG_BOX_NO,
+				a.BIN_CODE
+		from 
+				TM_RECEIVOPT a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+
+	<select id="findDtlByInstockNo" parameterType="list" resultType="pd">
+		SELECT  b.INSTOCK_NO,a.STOCKDTLMGRIN_ID,a.STOCKMGRIN_ID,a.ROW_NO,a.CUSTOMER_ID,a.PRODUCT_ID,a.PRODUCT_TYPE,a.PACK_RULE,a.PACK_UNIT,a.OT_EA,a.OT_RATIO,a.PALLET_EA,
+		a.PALLET_RATIO,a.BOX_EA,a.BOX_RATIO,a.INPACK_EA,a.INPACK_RATIO,a.EA_EA,a.EA_RATIO,a.LONG_UT,a.WIDE_UT,a.HIGH_UT,a.UNIT_VOLUME,a.TOTAL_VOLUME,
+		a.TOTAL_WEIGHT,a.TOTAL_SUTTLE,a.TOTAL_PRICE,a.UNIT_PRICE,a.CURRENCY_TYPE,a.STORAGE_ID,a.LOCATOR_ID,a.CAR_TYPE,a.CAR_PLATE,a.SEAL_NO,a.TP_HAULIER,
+		a.FREEZE_CODE,a.MGR_SERIAL,a.MEMO,a.IMP_FLG,a.RECEIPT_STATE,a.DISTR_STATE,a.PUT_STATUS,a.CREATE_EMP,a.CREATE_TM,a.MODIFY_EMP,a.MODIFY_TM,a.DEL_FLG,
+		a.BOX_NO,a.EA_ACTUAL,a.RECEI_FLG,a.PUT_EA,a.ASSIGNED_EA,a.SCAN_CODE,a.PUT_STORAGE_ID,a.PUT_LOCATOR_ID
+		FROM tm_stockmgrin_dtl a ,tm_stockmgrin b
+		where a.STOCKMGRIN_ID = b.STOCKMGRIN_ID
+		and a.DEL_FLG = '0'
+		and b.DEL_FLG = '0'
+		and b.INSTOCK_NO IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findCancelDtllistPage" parameterType="page" resultType="pd">
+	SELECT
+	 A.PRODUCT_ID, A.CUSTOMER_ID,A.BIG_BOX_NO, A.BOX_NO,A.EA_NUM,
+	 A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY, A.COO, A.BIN_CODE,A.REMARK1, A.REMARK2, A.REMARK3,
+	 A.RECEIPT_TM, A.PUT_LOCATOR,
+	 B.STOCKDTLMGRIN_ID,C.INSTOCK_NO
+	FROM TM_BOX A,TM_STOCKMGRIN_DTL B,TM_STOCKMGRIN C
+	WHERE A.BOX_ID = B.STOCKDTLMGRIN_ID
+	  AND B.STOCKMGRIN_ID = C.STOCKMGRIN_ID
+	  AND B.RECEI_FLG = '1'
+	  AND B.DEL_FLG = '0'
+	  AND B.DISTR_STATE ='100'
+	  AND C.STOCKMGRIN_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</select>
+
+	<select id="findBoxIdByNo" parameterType="pd" resultType="pd">
+		SELECT BOX_ID,BOX_ID STOCKDTLMGRIN_ID  FROM TM_BOX A WHERE A.BOX_NO = #{BOX_NO} AND DEL_FLG = '0'
+	</select>
+
+	<select id="findInIdByInstockNo" parameterType="list" resultType="pd">
+		SELECT DISTINCT STOCKMGRIN_ID FROM  TM_STOCKMGRIN_DTL WHERE DEL_FLG = '0'
+		  AND STOCKDTLMGRIN_ID IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findBatchByStockAndProdId" parameterType="pd" resultType="pd">
+		SELECT 	C.P_ID,C.STOCKMGRIN_ID,C.STOCKDTLMGRIN_ID,C.ORDERBATCH_TYPE,
+		C.TIME_ONE,C.TIME_TWO,C.TIME_THR,C.TIME_FOU,C.TIME_FIV,C.TIME_SIX,C.TIME_SEV,C.TIME_EIG,C.TIME_NIG,C.TIME_TEN,
+		C.NUM_ONE,C.NUM_TWO,C.NUM_THR,C.NUM_FOU,C.NUM_FIV,C.NUM_SIX,C.NUM_SEV,C.NUM_EIG,C.NUM_NIG,C.NUM_TEN,
+		C.TXT_ONE,C.TXT_TWO,C.TXT_THR,C.TXT_FOU,C.TXT_FIV,C.TXT_SIX,C.TXT_SEV,C.TXT_EIG,C.TXT_NIG,C.TXT_TEN,
+		C.TXT_ELEVEN,C.TXT_TWELVE,C.TXT_THIRT,C.TXT_FOURT,C.TXT_FIFT,C.TXT_SIXT,C.TXT_SEVENT,C.TXT_EIGHT,C.TXT_NINET,C.TXT_TWENT,
+		C.TXT_21,C.TXT_22,C.TXT_23,C.TXT_24,C.TXT_25,C.TXT_26,C.TXT_27,C.TXT_28,C.TXT_29,C.TXT_30
+		FROM TM_STOCKMGRIN_PROPERTY C,TM_STOCKMGRIN_DTL B
+		WHERE C.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND C.STOCKDTLMGRIN_ID = B.STOCKDTLMGRIN_ID
+		AND B.STOCKMGRIN_ID = #{STOCKMGRIN_ID}
+		AND B.PRODUCT_ID = #{PRODUCT_ID}
+		AND B.RECEI_FLG = '0'
+	</select>
+
+</mapper>

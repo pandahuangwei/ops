@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StorageMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_STORAGE(
+		    STOCK_ID,
+			STORAGE_CODE,	
+			STORAGE_NAME,
+			STORAGE_TYPE,
+			STORAGE_PICK,	
+			STORAGE_PUT,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STORAGE_ID,
+			MEMO
+		) values (
+		    #{STOCK_ID},
+			#{STORAGE_CODE},	
+			#{STORAGE_NAME},
+			#{STORAGE_TYPE},
+			#{STORAGE_PICK},	
+			#{STORAGE_PUT},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{STORAGE_ID},
+			#{MEMO}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_STORAGE
+		where STORAGE_ID = #{STORAGE_ID}
+		  AND STORAGE_ID NOT  IN (SELECT STORAGE_CODE FROM TB_LOCATOR)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_STORAGE
+			set STOCK_ID = #{STOCK_ID},
+				STORAGE_CODE = #{STORAGE_CODE},
+				STORAGE_NAME = #{STORAGE_NAME},
+				STORAGE_TYPE = #{STORAGE_TYPE},
+				STORAGE_PICK = #{STORAGE_PICK},
+				STORAGE_PUT = #{STORAGE_PUT},
+				MEMO = #{MEMO}
+			where 
+				STORAGE_ID = #{STORAGE_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		    STOCK_ID,
+			STORAGE_CODE,	
+			STORAGE_NAME,
+			STORAGE_TYPE,
+			STORAGE_PICK,	
+			STORAGE_PUT,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STORAGE_ID,
+			MEMO
+		from 
+			TB_STORAGE
+		where 
+			STORAGE_ID = #{STORAGE_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select  a.STOCK_ID,
+				a.STORAGE_CODE,	
+				a.STORAGE_NAME,
+		        a.STORAGE_TYPE,
+				a.STORAGE_PICK,	
+				a.STORAGE_PUT,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STORAGE_ID,
+		        a.MEMO
+		FROM TB_STORAGE a LEFT JOIN  TB_STOCK b
+		  ON (a.STOCK_ID = b.STOCK_ID)
+		WHERE a.DEL_FLG = 0
+		<if test="pd != null and pd.STORAGE_CODE != null and pd.STORAGE_CODE != ''">
+			AND a.STORAGE_CODE LIKE CONCAT(CONCAT('%', #{pd.STORAGE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.STORAGE_NAME != null and pd.STORAGE_NAME != ''">
+			AND a.STORAGE_NAME LIKE CONCAT(CONCAT('%', #{pd.STORAGE_NAME}),'%')
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.STORAGE_CODE,	
+				a.STORAGE_NAME,
+				 a.STORAGE_TYPE,
+				a.STORAGE_PICK,	
+				a.STORAGE_PUT,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STORAGE_ID,
+				a.MEMO
+		from 
+				TB_STORAGE a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_STORAGE
+		where 
+			STORAGE_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND STORAGE_ID NOT  IN (SELECT STORAGE_CODE FROM TB_LOCATOR)
+	</delete>
+
+	<!-- 列表 -->
+	<select id="findAll" resultType="pd">
+		select
+		a.STORAGE_CODE,
+		a.STORAGE_NAME,
+		 a.STORAGE_TYPE,
+		a.STORAGE_PICK,
+		a.STORAGE_PUT,
+		a.STORAGE_ID,
+		a.MEMO
+		from
+		TB_STORAGE a
+		WHERE a.DEL_FLG = 0
+	</select>
+
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		STORAGE_CODE,
+		STORAGE_NAME,
+		STORAGE_TYPE,
+		STORAGE_PICK,
+		STORAGE_PUT,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STORAGE_ID
+		from
+		TB_STORAGE
+		where DEL_FLG = 0
+		  AND STORAGE_CODE = #{STORAGECODE}
+		  AND STOCK_ID = #{STOCK_ID}
+		<if test="STORAGEID != null and STORAGEID != ''">
+			AND STORAGE_ID != #{STORAGEID}
+		</if>
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		STORAGE_CODE,
+		STORAGE_NAME,
+		STORAGE_TYPE,
+		STORAGE_PICK,
+		STORAGE_PUT,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STORAGE_ID
+		from
+		TB_STORAGE
+		where DEL_FLG = 0
+		 AND STORAGE_NAME = #{STORAGENAME}
+		AND STOCK_ID = #{STOCK_ID}
+		<if test="STORAGEID != null and STORAGEID != ''">
+		 AND STORAGE_ID != #{STORAGEID}
+		</if>
+	</select>
+	
+</mapper>

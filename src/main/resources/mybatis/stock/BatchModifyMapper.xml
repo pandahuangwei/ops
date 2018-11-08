@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BatchModifyMapper">
+
+  <select  id="batchDatalistPage" parameterType="page" resultType="pd">
+		SELECT
+		  C2.P_ID,
+		  A.INSTOCK_NO,
+		  A.CUSTOMER_ID,
+		  C1.TXT_TWENT            BILL_NO,
+		  ''                      PUT_STOCK,
+		  E.PUT_STORAGE,
+		  E.PUT_LOCATOR,
+		  E.BIG_BOX_NO,
+		  E.BOX_NO,
+		  E.PRODUCT_ID,
+		  E.DATE_CODE,
+		  E.LOT_NO,
+		  E.EA_NUM,
+	      E.ASSIGNED_STOCK_STATE,
+		  E.ASSIGNED_STOCK_NUM,
+		  E.FREEZE_STATE,
+		  C2.TXT_FOU              REMARK1,
+		  C2.TXT_FIV              REMARK2,
+		  C2.TXT_SIX              REMARK3
+		FROM TM_STOCKMGRIN A,
+		  TM_STOCKMGRIN_DTL B,
+		  TM_STOCKMGRIN_PROPERTY C1,
+		  TM_STOCKMGRIN_PROPERTY C2,
+		  TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+			AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+			AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+			AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+			AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+			AND B.DEL_FLG = '0'
+			AND B.RECEI_FLG = '1'
+			AND C1.ORDERBATCH_TYPE = '60'
+			AND C2.ORDERBATCH_TYPE = '62'
+	  <if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+		  AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+	  </if>
+	  <if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+		  AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+	  </if>
+	  <if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+		  AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+	  </if>
+
+	  <if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+		  AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+	  </if>
+	  <if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+		  AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+	  </if>
+	  <if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+		  AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+	  </if>
+	  <if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+		  AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+	  </if>
+	  <if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+		  AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+	  </if>
+	  <if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+		  AND C2.TXT_FOU  =#{pd.TXT_FOU}
+	  </if>
+	  <if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+		  AND C2.TXT_FIV  =#{pd.TXT_FIV}
+	  </if>
+	  <if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+		  AND C2.TXT_SIX  =#{pd.TXT_SIX}
+	  </if>
+	  <if test="pd.ASSIGNED_STOCK_STATE_S != null">
+		  AND E.ASSIGNED_STOCK_STATE IN
+		  <foreach item="item" index="index" collection="pd.ASSIGNED_STOCK_STATE_S" open="(" separator="," close=")">
+			  '${item}'
+		  </foreach>
+	  </if>
+
+	  <if test="pd.PICK_STATE_S != null">
+		  AND E.PICK_STATE IN
+		  <foreach item="item" index="index" collection="pd.PICK_STATE_S" open="(" separator="," close=")">
+			  '${item}'
+		  </foreach>
+	  </if>
+
+	  <if test="pd.CARGO_STATE_S != null">
+		  AND E.CARGO_STATE IN
+		  <foreach item="item" index="index" collection="pd.CARGO_STATE_S" open="(" separator="," close=")">
+			  '${item}'
+		  </foreach>
+	  </if>
+	  <if test="pd.FREEZE_STATE_S != null">
+		  AND E.FREEZE_STATE IN
+		  <foreach item="item" index="index" collection="pd.FREEZE_STATE_S" open="(" separator="," close=")">
+			  '${item}'
+		  </foreach>
+	  </if>
+  </select>
+
+	<delete id="deleteData2HistRemark" parameterType="pd">
+		DELETE  FROM hist_remark_proc WHERE BATCH_ID =#{BATCH_ID}
+	</delete>
+
+	<delete id="deleteData2HistRemarkByEmp" parameterType="pd">
+		DELETE  FROM hist_remark_proc WHERE MODIFY_EMP =#{MODIFY_EMP}
+	</delete>
+
+	<insert id="insertData2HistRemark" parameterType="page">
+		 INSERT INTO HIST_REMARK
+		   (P_ID, CUSTOMER_ID, BOX_ID, STOCKMGRIN_ID, BOX_NO, BIG_BOX_NO, INSTOCK_NO, PRODUCT_ID, PUT_STORAGE, PUT_LOCATOR, LOT_NO,
+		    DATE_CODE, MODIFY_EMP, MODIFY_TM, REMARK1, REMARK2, REMARK3, BILL_NO, MODIFY_BATCH, REMARK1_M, REMARK2_M, REMARK3_M,
+		    OLD_REMARK1, OLD_REMARK2, OLD_REMARK3)
+		 SELECT P_ID, #{pd.CUSTOMER_ID}, BOX_ID, STOCKMGRIN_ID, BOX_NO, BIG_BOX_NO, INSTOCK_NO, PRODUCT_ID, PUT_STORAGE, PUT_LOCATOR, LOT_NO,
+		    DATE_CODE, #{pd.MODIFY_EMP}, #{pd.MODIFY_TM},
+			<choose>
+				<when test='pd != null and pd.TXT_FOU_USE == "1"'>
+					#{pd.TXT_FOU_NEW},
+				</when>
+				<otherwise>
+					REMARK1,
+				</otherwise>
+			</choose>
+			<choose>
+				<when test='pd != null and pd.TXT_FIV_USE == "1"'>
+					#{pd.TXT_FIV_NEW},
+				</when>
+				<otherwise>
+					REMARK2,
+				</otherwise>
+			</choose>
+			<choose>
+				<when test='pd != null and pd.TXT_SIX_USE == "1"'>
+					#{pd.TXT_SIX_NEW},
+				</when>
+				<otherwise>
+					REMARK3,
+				</otherwise>
+			</choose>
+		    BILL_NO, #{pd.MODIFY_BATCH},
+		    #{pd.REMARK1_M},#{pd.REMARK2_M},#{pd.REMARK3_M},
+		    REMARK1,REMARK2,REMARK3
+		    FROM hist_remark_proc
+		   WHERE BATCH_ID =#{pd.BATCH_ID}
+			<if test="pd != null and pd.FLAG != null and pd.FLAG != ''">
+				AND P_ID in
+				<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+					'${item}'
+				</foreach>
+			</if>
+	</insert>
+    
+	<select id="getPropertyIdList" parameterType="page" resultType="pd">
+		SELECT P_ID,BOX_ID FROM HIST_REMARK_PROC WHERE BATCH_ID =#{pd.BATCH_ID}
+		<if test="pd != null and pd.FLAG != null and pd.FLAG != ''">
+		AND P_ID in
+			<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<update id="updateRemark" parameterType="page">
+		UPDATE TM_STOCKMGRIN_PROPERTY
+			SET
+		      <if test="pd != null and pd.TXT_FOU_USE != null and pd.TXT_FOU_USE != ''">
+				  TXT_FOU = #{pd.TXT_FOU_NEW},
+		      </if>
+			  <if test="pd != null and pd.TXT_FIV_USE != null and pd.TXT_FIV_USE != ''">
+				  TXT_FIV = #{pd.TXT_FIV_NEW},
+		  	  </if>
+			  <if test="pd != null and pd.TXT_SIX_USE != null and pd.TXT_SIX_USE != ''">
+				  TXT_SIX = #{pd.TXT_SIX_NEW},
+			   </if>
+		   P_ID = P_ID
+		WHERE P_ID = #{pd.P_ID}
+	</update>
+
+	<update id="updateBoxRemark" parameterType="page">
+		UPDATE TM_BOX
+		SET
+		<if test="pd != null and pd.TXT_FOU_USE != null and pd.TXT_FOU_USE != ''">
+			REMARK1 = #{pd.TXT_FOU_NEW},
+		</if>
+		<if test="pd != null and pd.TXT_FIV_USE != null and pd.TXT_FIV_USE != ''">
+			REMARK2 = #{pd.TXT_FIV_NEW},
+		</if>
+		<if test="pd != null and pd.TXT_SIX_USE != null and pd.TXT_SIX_USE != ''">
+			REMARK3 = #{pd.TXT_SIX_NEW},
+		</if>
+		BOX_ID = BOX_ID
+		WHERE BOX_ID = #{pd.BOX_ID}
+	</update>
+
+	<select id="findHistRemarkProclistPage" parameterType="page" resultType="pd">
+		SELECT P_ID, BOX_ID, STOCKMGRIN_ID, BOX_NO, BIG_BOX_NO, INSTOCK_NO, PRODUCT_ID, PUT_STORAGE, PUT_LOCATOR, LOT_NO,
+		 DATE_CODE, REMARK1, REMARK2, REMARK3, BILL_NO, BATCH_ID, MODIFY_EMP
+		 FROM HIST_REMARK_PROC
+		 WHERE MODIFY_EMP = #{pd.MODIFY_EMP}
+	</select>
+
+	<!-- 先将数据存入过程表 -->
+	<insert  id="insertData2HistRemarkProc" parameterType="page">
+		INSERT INTO HIST_REMARK_PROC
+		(P_ID, BOX_ID, STOCKMGRIN_ID, BOX_NO, BIG_BOX_NO, INSTOCK_NO, PRODUCT_ID, PUT_STORAGE, PUT_LOCATOR, LOT_NO,
+		 DATE_CODE, REMARK1, REMARK2, REMARK3, BILL_NO, BATCH_ID, MODIFY_EMP )
+		SELECT
+		C2.P_ID,E.BOX_ID,A.STOCKMGRIN_ID,E.BOX_NO,E.BIG_BOX_NO,A.INSTOCK_NO,E.PRODUCT_ID,E.PUT_STORAGE,E.PUT_LOCATOR,E.LOT_NO,
+		E.DATE_CODE,C2.TXT_FOU,C2.TXT_FIV,C2.TXT_SIX,C1.TXT_TWENT,#{pd.BATCH_ID},#{pd.MODIFY_EMP}
+		FROM TM_STOCKMGRIN A,
+		TM_STOCKMGRIN_DTL B,
+		TM_STOCKMGRIN_PROPERTY C1,
+		TM_STOCKMGRIN_PROPERTY C2,
+		TM_BOX E
+		WHERE A.STOCKMGRIN_ID = B.STOCKMGRIN_ID
+		AND A.STOCKMGRIN_ID = C1.STOCKMGRIN_ID
+		AND B.STOCKMGRIN_ID = C2.STOCKMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = C2.STOCKDTLMGRIN_ID
+		AND B.STOCKDTLMGRIN_ID = E.BOX_ID
+		AND B.DEL_FLG = '0'
+		AND B.RECEI_FLG = '1'
+		AND C1.ORDERBATCH_TYPE = '60'
+		AND C2.ORDERBATCH_TYPE = '62'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND E.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  E.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  E.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  E.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  E.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.TXT_FOU != null and pd.TXT_FOU != ''">
+			AND C2.TXT_FOU  =#{pd.TXT_FOU}
+		</if>
+		<if test="pd != null and pd.TXT_FIV != null and pd.TXT_FIV != ''">
+			AND C2.TXT_FIV  =#{pd.TXT_FIV}
+		</if>
+		<if test="pd != null and pd.TXT_SIX != null and pd.TXT_SIX != ''">
+			AND C2.TXT_SIX  =#{pd.TXT_SIX}
+		</if>
+		<if test="pd.ASSIGNED_STOCK_STATE_S != null">
+			AND E.ASSIGNED_STOCK_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STOCK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.PICK_STATE_S != null">
+			AND E.PICK_STATE IN
+			<foreach item="item" index="index" collection="pd.PICK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.CARGO_STATE_S != null">
+			AND E.CARGO_STATE IN
+			<foreach item="item" index="index" collection="pd.CARGO_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<if test="pd.FREEZE_STATE_S != null">
+		AND E.FREEZE_STATE IN
+		<foreach item="item" index="index" collection="pd.FREEZE_STATE_S" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+		</if>
+	</insert>
+
+	<select  id="batchDataHistorylistPage" parameterType="page" resultType="pd">
+      SELECT P_ID,CUSTOMER_ID, BOX_ID, STOCKMGRIN_ID, BOX_NO, BIG_BOX_NO, INSTOCK_NO, PRODUCT_ID, PUT_STORAGE, PUT_LOCATOR, LOT_NO,
+             DATE_CODE, MODIFY_EMP, MODIFY_TM, REMARK1, REMARK2, REMARK3, BILL_NO, MODIFY_BATCH, REMARK1_M, REMARK2_M,
+              REMARK3_M,OLD_REMARK1, OLD_REMARK2, OLD_REMARK3
+        FROM hist_remark A
+		WHERE 1 = 1
+		<if test="pd != null and pd.MODIFY_BATCH != null and pd.MODIFY_BATCH != ''">
+			AND A.MODIFY_BATCH =#{pd.MODIFY_BATCH}
+		</if>
+		<if test="pd != null and pd.MODIFY_TM_BEGIN != null and pd.MODIFY_TM_BEGIN != ''">
+			<![CDATA[ AND A.MODIFY_TM >= #{pd.MODIFY_TM_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.MODIFY_TM_END != null and pd.MODIFY_TM_END != ''">
+			<![CDATA[ AND A.MODIFY_TM <= #{pd.MODIFY_TM_END} ]]>
+		</if>
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND A.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+		</if>
+
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND  A.PUT_LOCATOR LIKE CONCAT(CONCAT('%', #{pd.PUT_LOCATOR}),'%')
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND  A.DATE_CODE LIKE CONCAT(CONCAT('%', #{pd.DATE_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND  A.LOT_NO LIKE CONCAT(CONCAT('%', #{pd.LOT_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BIG_BOX_NO != null and pd.BIG_BOX_NO != ''">
+			AND  A.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BIG_BOX_NO}),'%')
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+			AND A.REMARK1  =#{pd.REMARK1}
+		</if>
+		<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+			AND A.REMARK2  =#{pd.REMARK2}
+		</if>
+		<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+			AND A.REMARK3  = #{pd.REMARK3}
+		</if>
+	</select>
+
+</mapper>

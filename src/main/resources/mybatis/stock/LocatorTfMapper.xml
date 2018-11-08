@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LocatorTfMapper">
+
+
+
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID STOCKDTLMGRIN_ID, B.INSTOCK_NO, B.BIG_BOX_NO, B.CUSTOMER_ID, B.RECEIPT_TM REAL_INSTOCK_DATE, B.PRODUCT_ID,
+		        0 OT_EA, 0 PALLET_EA, 0 BOX_EA, 0 INPACK_EA, B.EA_NUM EA_EA, B.FREEZE_STATE, B.PUT_LOCATOR,B.BOX_NO,B.PUT_LOCATOR_BF
+		FROM TM_BOX B
+		WHERE B.DEPOT_TYPE ='142'
+		AND B.DEL_FLG ='0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND B.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND B.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.STORAGE_ID != null and pd.STORAGE_ID != ''">
+			AND B.PUT_STORAGE =#{pd.STORAGE_ID}
+		</if>
+		<if test="pd != null and pd.LOCATOR_ID != null and pd.LOCATOR_ID != ''">
+			AND B.PUT_LOCATOR =#{pd.LOCATOR_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND B.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (B.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR B.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND B.RECEIPT_TM >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND B.RECEIPT_TM <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		ORDER BY B.INSTOCK_NO DESC
+	</select>
+
+
+	<select id="datalistPage-bak" parameterType="page" resultType="pd">
+		SELECT 	A.STOCKDTLMGRIN_ID, A.STOCKMGRIN_ID, A.ROW_NO, C.INSTOCK_NO, C.CUSTOMER_ID, C.REAL_INSTOCK_DATE, A.PRODUCT_ID,
+		A.OT_EA, A.PALLET_EA, A.BOX_EA, A.INPACK_EA, A.EA_EA, B.FREEZE_STATE, B.PUT_LOCATOR,B.BOX_NO,B.PUT_LOCATOR_BF
+		FROM TM_STOCKMGRIN_DTL A,TM_BOX B,TM_STOCKMGRIN C
+		WHERE A.STOCKDTLMGRIN_ID = B.BOX_ID
+		AND A.STOCKMGRIN_ID = C.STOCKMGRIN_ID
+		AND B.PUT_STATUS ='82'
+		AND B.ASSIGNED_STOCK_STATE='100'
+		AND A.DEL_FLG ='0'
+		AND A.RECEI_FLG = '1'
+		<if test="pd != null and pd.DTL_CUSTOMER_ID != null and pd.DTL_CUSTOMER_ID != ''">
+			AND C.CUSTOMER_ID =#{pd.DTL_CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		<if test="pd != null and pd.STORAGE_ID != null and pd.STORAGE_ID != ''">
+			AND B.PUT_STORAGE =#{pd.STORAGE_ID}
+		</if>
+		<if test="pd != null and pd.LOCATOR_ID != null and pd.LOCATOR_ID != ''">
+			AND B.PUT_LOCATOR =#{pd.LOCATOR_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND C.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (C.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR B.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			)
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_BEGIN != null and pd.REAL_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND C.REAL_INSTOCK_DATE >= #{pd.REAL_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.REAL_INSTOCK_DATE_END != null and pd.REAL_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND C.REAL_INSTOCK_DATE <= #{pd.REAL_INSTOCK_DATE_END} ]]>
+		</if>
+		ORDER BY C.INSTOCK_NO DESC
+	</select>
+
+	<!-- 修改箱的冻结状态 -->
+	<update id="editBoxLocator" parameterType="page">
+		UPDATE TM_BOX   A
+		SET A.PUT_STORAGE_BF = A.PUT_STORAGE,
+		A.PUT_LOCATOR_BF = A.PUT_LOCATOR,
+		A.TRANSFER_TM = #{pd.TRANSFER_TM},
+		A.PUT_STORAGE =#{pd.PUT_STORAGE},
+		A.PUT_LOCATOR = #{pd.PUT_LOCATOR},
+		A.MODIFY_EMP = #{pd.MODIFY_EMP},
+		A.MODIFY_TM = #{pd.TRANSFER_TM}
+		WHERE BOX_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+	<update id="editInLocator" parameterType="page">
+		UPDATE TM_STOCKMGRIN_DTL   A
+		SET
+		A.PUT_STORAGE_ID =#{pd.PUT_STORAGE},
+		A.PUT_LOCATOR_ID = #{pd.PUT_LOCATOR}
+		WHERE STOCKDTLMGRIN_ID IN
+		<foreach item="item" index="index" collection="pd.IDS" open="(" separator="," close=")">
+			'${item}'
+		</foreach>
+	</update>
+
+
+
+
+
+</mapper>

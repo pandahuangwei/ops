@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DataMgrMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_DATAMGR(
+			FUNCTION_NAME,	
+			TABLE_CN,	
+			TABLE_DESC,	
+			TOTAL_CNT,	
+			VALID_CNT,	
+			NOVALID_CNT,	
+			DATAMGR_ID
+		) values (
+			#{FUNCTION_NAME},	
+			#{TABLE_CN},	
+			#{TABLE_DESC},	
+			#{TOTAL_CNT},	
+			#{VALID_CNT},	
+			#{NOVALID_CNT},	
+			#{DATAMGR_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_DATAMGR
+		where 
+			DATAMGR_ID = #{DATAMGR_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_DATAMGR
+			set 
+				FUNCTION_NAME = #{FUNCTION_NAME},
+				TABLE_CN = #{TABLE_CN},
+				TABLE_DESC = #{TABLE_DESC},
+				TOTAL_CNT = #{TOTAL_CNT},
+				VALID_CNT = #{VALID_CNT},
+				NOVALID_CNT = #{NOVALID_CNT},
+			DATAMGR_ID = DATAMGR_ID
+			where 
+				DATAMGR_ID = #{DATAMGR_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			FUNCTION_NAME,	
+			TABLE_CN,	
+			TABLE_DESC,	
+			TOTAL_CNT,	
+			VALID_CNT,	
+			NOVALID_CNT,	
+			DATAMGR_ID
+		from 
+			TB_DATAMGR
+		where 
+			DATAMGR_ID = #{DATAMGR_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.FUNCTION_NAME,	
+				a.TABLE_CN,	
+				a.TABLE_DESC,	
+				a.TOTAL_CNT,	
+				a.VALID_CNT,	
+				a.NOVALID_CNT,	
+				a.DATAMGR_ID
+		from 
+				TB_DATAMGR a
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.FUNCTION_NAME,	
+				a.TABLE_CN,	
+				a.TABLE_DESC,	
+				a.TOTAL_CNT,	
+				a.VALID_CNT,	
+				a.NOVALID_CNT,	
+				a.DATAMGR_ID
+		from 
+				TB_DATAMGR a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_DATAMGR
+		where 
+			DATAMGR_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+
+	<select id="findTableList" parameterType="pd" resultType="pd">
+		select
+		a.FUNCTION_NAME,
+		a.TABLE_CN,
+		a.TABLE_DESC,
+		a.TOTAL_CNT,
+		a.VALID_CNT,
+		a.NOVALID_CNT,
+		a.DATAMGR_ID
+		from
+		TB_DATAMGR a
+	</select>
+
+
+	<select id="findCnt" parameterType="pd" resultType="pd">
+		SELECT SUM(A) VALID_CNT,SUM(B) NOVALID_CNT FROM (
+		SELECT COUNT(*) A,0 B FROM ${TABLE_CN} WHERE DEL_FLG = 0
+		UNION ALL
+		SELECT 0 A,COUNT(*) B FROM ${TABLE_CN} WHERE DEL_FLG = 1
+		) T
+	</select>
+
+	<update id="editCnt" parameterType="pd">
+		update  TB_DATAMGR
+		set
+		TOTAL_CNT = #{TOTAL_CNT},
+		VALID_CNT = #{VALID_CNT},
+		NOVALID_CNT = #{NOVALID_CNT}
+		where
+		DATAMGR_ID = #{DATAMGR_ID}
+	</update>
+
+	<delete id="deleteTable" parameterType="pd">
+		delete from ${TABLE_CN}
+	</delete>
+	
+</mapper>

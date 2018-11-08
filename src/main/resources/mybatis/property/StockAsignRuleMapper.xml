@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockAsignRuleMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_STOCKASIGNRULE(
+			CUSTOMER_ID,	
+			STOCKASIGN_CODE,	
+			STOCKASIGN_CN,	
+			MEMO,	
+			IN_STOCK_DAY,	
+			IN_STOCK_CYCLE,	
+			PRODUCE_DAY,	
+			PRODUCE_CYCLE,
+			PRODUCE_LEVEL,
+			CUSTOMER_ASIGN,	
+			CUSTOMER_ASIGN_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STOCKASIGNRULE_ID
+		) values (
+			#{CUSTOMER_ID},	
+			#{STOCKASIGN_CODE},	
+			#{STOCKASIGN_CN},	
+			#{MEMO},	
+			#{IN_STOCK_DAY},	
+			#{IN_STOCK_CYCLE},	
+			#{PRODUCE_DAY},	
+			#{PRODUCE_CYCLE},
+			#{PRODUCE_LEVEL},
+			#{CUSTOMER_ASIGN},	
+			#{CUSTOMER_ASIGN_USE},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{STOCKASIGNRULE_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_STOCKASIGNRULE
+		where STOCKASIGNRULE_ID = #{STOCKASIGNRULE_ID}
+		 AND  STOCKASIGNRULE_ID NOT IN (SELECT RULE_STORAGE_ASIGN  FROM  TB_PRODUCT )
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_STOCKASIGNRULE
+			set 
+				CUSTOMER_ID = #{CUSTOMER_ID},
+				STOCKASIGN_CODE = #{STOCKASIGN_CODE},
+				STOCKASIGN_CN = #{STOCKASIGN_CN},
+				MEMO = #{MEMO},
+				IN_STOCK_DAY = #{IN_STOCK_DAY},
+				IN_STOCK_CYCLE = #{IN_STOCK_CYCLE},
+				PRODUCE_DAY = #{PRODUCE_DAY},
+				PRODUCE_CYCLE = #{PRODUCE_CYCLE},
+				PRODUCE_LEVEL  = #{PRODUCE_LEVEL},
+				CUSTOMER_ASIGN = #{CUSTOMER_ASIGN},
+				CUSTOMER_ASIGN_USE = #{CUSTOMER_ASIGN_USE},
+			STOCKASIGNRULE_ID = STOCKASIGNRULE_ID
+			where 
+				STOCKASIGNRULE_ID = #{STOCKASIGNRULE_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			CUSTOMER_ID,	
+			STOCKASIGN_CODE,	
+			STOCKASIGN_CN,	
+			MEMO,	
+			IN_STOCK_DAY,	
+			IN_STOCK_CYCLE,	
+			PRODUCE_DAY,	
+			PRODUCE_CYCLE,	
+			CUSTOMER_ASIGN,	
+			CUSTOMER_ASIGN_USE,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STOCKASIGNRULE_ID
+		from 
+			TB_STOCKASIGNRULE
+		where 
+			STOCKASIGNRULE_ID = #{STOCKASIGNRULE_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STOCKASIGN_CODE,	
+				a.STOCKASIGN_CN,	
+				a.MEMO,	
+				a.IN_STOCK_DAY,	
+				a.IN_STOCK_CYCLE,	
+				a.PRODUCE_DAY,	
+				a.PRODUCE_CYCLE,	
+				a.CUSTOMER_ASIGN,	
+				a.CUSTOMER_ASIGN_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCKASIGNRULE_ID
+		from 
+				TB_STOCKASIGNRULE a
+		WHERE DEL_FLG = '0'
+		<if test="pd != null and pd.STOCKASIGN_CODE != null and pd.STOCKASIGN_CODE != ''">
+			AND STOCKASIGN_CODE LIKE CONCAT(CONCAT('%', #{pd.STOCKASIGN_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.STOCKASIGN_CN != null and pd.STOCKASIGN_CN != ''">
+			AND STOCKASIGN_CN LIKE CONCAT(CONCAT('%', #{pd.STOCKASIGN_CN}),'%')
+		</if>
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND CUSTOMER_ID = #{pd.CUSTOMER_ID}
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.CUSTOMER_ID,	
+				a.STOCKASIGN_CODE,	
+				a.STOCKASIGN_CN,	
+				a.MEMO,	
+				a.IN_STOCK_DAY,	
+				a.IN_STOCK_CYCLE,	
+				a.PRODUCE_DAY,	
+				a.PRODUCE_CYCLE,	
+				a.CUSTOMER_ASIGN,	
+				a.CUSTOMER_ASIGN_USE,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCKASIGNRULE_ID
+		from 
+				TB_STOCKASIGNRULE a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_STOCKASIGNRULE
+		where STOCKASIGNRULE_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	 	 AND  STOCKASIGNRULE_ID NOT IN (SELECT RULE_STORAGE_ASIGN  FROM  TB_PRODUCT )
+	</delete>
+
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		CUSTOMER_ID,
+		STOCKASIGN_CODE,
+		STOCKASIGN_CN,
+		MEMO,
+		IN_STOCK_DAY,
+		IN_STOCK_CYCLE,
+		PRODUCE_DAY,
+		PRODUCE_CYCLE,
+		CUSTOMER_ASIGN,
+		CUSTOMER_ASIGN_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		STOCKASIGNRULE_ID
+		from
+		TB_STOCKASIGNRULE
+		where DEL_FLG = '0'
+		and STOCKASIGN_CODE = #{STOCKASIGN_CODE}
+		<if test="STOCKASIGNRULE_ID != null and STOCKASIGNRULE_ID != ''">
+			and STOCKASIGNRULE_ID != #{STOCKASIGNRULE_ID}
+		</if>
+		<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+			and CUSTOMER_ID = #{CUSTOMER_ID}
+		</if>
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+	select
+		CUSTOMER_ID,
+		STOCKASIGN_CODE,
+		STOCKASIGN_CN,
+		MEMO,
+		IN_STOCK_DAY,
+		IN_STOCK_CYCLE,
+		PRODUCE_DAY,
+		PRODUCE_CYCLE,
+		CUSTOMER_ASIGN,
+		CUSTOMER_ASIGN_USE,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		STOCKASIGNRULE_ID
+	from
+	TB_STOCKASIGNRULE
+	where DEL_FLG = '0'
+	and STOCKASIGN_CN = #{STOCKASIGN_CN}
+	<if test="STOCKASIGNRULE_ID != null and STOCKASIGNRULE_ID != ''">
+		and STOCKASIGNRULE_ID != #{STOCKASIGNRULE_ID}
+	</if>
+	<if test="CUSTOMER_ID != null and CUSTOMER_ID != ''">
+		and CUSTOMER_ID = #{CUSTOMER_ID}
+	</if>
+	</select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BaseInfoMapper">
+
+
+	<!-- 所有的产品信息 -->
+	<select id="findAllProduct" parameterType="pd" resultType="pd">
+		SELECT PRODUCT_ID, CUSTOMER_ID, STOCK_ID, PRODUCT_CODE, PRODUCT_CN, PRODUCT_EN,
+		LONG_UNIT, WIDE_UNIT, HIGH_UNIT, UNIT_PRICE, TOTAL_WEIGHT_UNIT, TOTAL_WEIGHT, TOTAL_SUTTLE_UNIT, TOTAL_SUTTLE, VOLUME_UNIT, VOLUME_UN,
+		PRODUCT_TYPE, STORAGE_ID, LOCATOR_ID, FREEZE_REJECT_CODE, MEMO, DANGER_FLG, MANAGER_FLG, COMBI_FLG, ACTIVE_FLG,
+		RULE_PACK, RULE_PICK, RULE_STORAGE, RULE_STORAGE_ASIGN, RULE_STOCK_ASIGN, USE_VALIDITY, PERIOD_TYPE, INBOUND_DAY, OUTBOUND_DAY
+		FROM TB_PRODUCT
+		WHERE DEL_FLG ='0'
+	</select>
+
+
+	<!-- 所有的产品信息 -->
+	<select id="findScanProduct" parameterType="pd" resultType="pd">
+		SELECT A.CUSTOMER_ID,A.SCAN_PN, A.ACTUAL_PN, B.PRODUCT_CODE
+		  FROM TB_PN_MAP  A,TB_PRODUCT B
+		WHERE A.ACTUAL_PN = B.PRODUCT_ID
+		  AND A.DEL_FLG = '0'
+		  AND B.DEL_FLG = '0'
+
+	</select>
+
+	<select id="findStockAssign" parameterType="pd" resultType="pd">
+		SELECT 	STOCKASIGNRULE_ID, CUSTOMER_ID, STOCKASIGN_CODE, STOCKASIGN_CN, MEMO, IN_STOCK_DAY, IN_STOCK_CYCLE, PRODUCE_DAY, PRODUCE_CYCLE,
+		        PRODUCE_LEVEL,CUSTOMER_ASIGN, CUSTOMER_ASIGN_USE
+		 FROM TB_STOCKASIGNRULE
+		 WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findStorageList" parameterType="pd" resultType="pd">
+		SELECT 	STORAGE_ID,STORAGE_CODE,STORAGE_NAME,STORAGE_TYPE
+	     FROM tb_storage
+	    WHERE DEL_FLG='0'
+	</select>
+
+	<select id="findStockList" parameterType="pd" resultType="pd">
+		 SELECT STOCK_ID,STOCK_CODE,STOCK_NAME  FROM tb_stock WHERE DEL_FLG='0'
+	</select>
+
+	<select id="findLocatorList" parameterType="pd" resultType="pd">
+		SELECT 	LOCATOR_ID, LOCATOR_CODE, STORAGE_CODE, ROW_UNIT, FLOOR_UNIT, QUEUE_UNIT, LOCATOR_STATE, LOCATOR_USE, LOCATOR_TYPE, LOCATOR_UNIT, TURNOVER_CYCLE, MEMO,
+		        VOLUME_LIMIT, WEIGHT_LIMIT, QUANTITY_LIMIT, PALLET_LIMIT, LONG_UNIT, WIDE_UNIT, HIGH_UNIT, PLIES_UNIT, PRODUCT_MIX, BATCH_MIX, LOCATOR_PRIORITY_LEVEL
+	   FROM TB_LOCATOR
+		WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findAllPackList" parameterType="pd" resultType="pd">
+		 SELECT PACKRULE_ID, PACK_CN, PACK_DSC, STANDARD_PACK, EA_NUM, EA_DSC, EA_DOCK, EA_REPL
+		  FROM TB_PACKRULE
+		WHERE DEL_FLG = '0'
+	</select>
+
+
+	<select id="findAllPickList" parameterType="pd" resultType="pd">
+		SELECT 	PICKRULE_ID, CUSTOMER_ID, PICK_RULE_CODE, PICK_RULE_CN, MEMO, PROD_COMB_USE, OUT_PROD_DAY, OUT_PROD_USE
+		  FROM TB_PICKRULE
+		WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findAllStockasignruleList" parameterType="pd" resultType="pd">
+		SELECT STOCKASIGNRULE_ID, CUSTOMER_ID, STOCKASIGN_CODE, STOCKASIGN_CN, MEMO, IN_STOCK_DAY, IN_STOCK_CYCLE, PRODUCE_DAY,
+		       PRODUCE_CYCLE,PRODUCE_LEVEL, CUSTOMER_ASIGN, CUSTOMER_ASIGN_USE
+		 FROM TB_STOCKASIGNRULE
+		WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findAllStorageasignruleList" parameterType="pd" resultType="pd">
+		 SELECT STORAGEASIGNRULE_ID, CUSTOMER_ID, STORAGEASING_CODE, STORAGEASING_CN, MEMO, SEAT_STATE, PROD_LIMIT, PROD_LIMIT_USE, VOLUME_LIMIT, VOLUME_LIMIT_USE, LONG_LIMIT,
+		        LONG_LIMIT_USE, WIDE_LIMIT, WIDE_LIMIT_USE, HIGH_LIMIT, HIGH_LIMIT_USE LOCATOR_PRIORITY_LEVEL
+		 FROM TB_STORAGEASIGNRULE
+		WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findAllStockturnList" parameterType="pd" resultType="pd">
+		SELECT 	STOCKTURN_ID,STOCKTURN_CODE,STOCKTURN_CN,
+	            TIME_DISTANCE,CUSTOMER_ID,PRIORITY_LEVEL,BATCH_PROPERTY
+	      FROM TB_STOCKTURN
+		WHERE DEL_FLG = '0'
+	</select>
+
+	<select id="findAllProperty" parameterType="pd" resultType="pd">
+		SELECT a.CUSTOMER_ID,a.ORDERBATCH_TYPE,a.PROPERTY_KEY,a.PROPERTY_SORT,a.SRC_SORT
+		FROM tb_orderproperty a
+		WHERE  a.PROPERTY_USE = '1'
+		ORDER BY a.SRC_SORT ASC
+	</select>
+
+	<select id="findAllBoxRule" parameterType="pd" resultType="pd">
+	   SELECT CUSTOMER_ID,MID_CODE FROM TB_BOX_RULE
+	</select>
+
+	<select id="findPropertyByCustAndType" parameterType="pd" resultType="pd">
+		SELECT
+		a.CUSTOMER_ID,
+		a.ORDERBATCH_TYPE,
+		a.PROPERTY_KEY,
+		a.PROPERTY_SORT,
+		a.SRC_SORT
+		FROM tb_orderproperty a
+		WHERE  a.PROPERTY_USE = '1'
+		ORDER BY a.CUSTOMER_ID,a.ORDERBATCH_TYPE,a.SRC_SORT ASC
+	</select>
+
+	<select id="findStockStockageLocatorList" parameterType="pd" resultType="pd">
+		SELECT c.STOCK_ID, STOCK_CODE, a.LOCATOR_CODE, a.LOCATOR_ID, b.STORAGE_ID, b.STORAGE_CODE
+		FROM TB_LOCATOR a, TB_STORAGE b, TB_STOCK c
+		WHERE a.STORAGE_CODE = b.STORAGE_ID
+		 AND b.STOCK_ID = c.STOCK_ID
+		 AND a.DEL_FLG = 0
+		 AND b.DEL_FLG = 0
+		 AND c.DEL_FLG = 0
+	</select>
+
+	<select id="findBoxList" parameterType="pd" resultType="pd">
+	SELECT A.BOX_ID,A.BOX_NO,A.BIG_BOX_NO,A.OLD_BOX_ID, DATE_CODE, COO, BIN_CODE, LOT_NO LOT_CODE FROM TM_BOX A WHERE A.DEL_FLG='0'
+	</select>
+
+
+	<select id="findCustomer2Dist" parameterType="pd" resultType="pd">
+		SELECT 	CUSTOMER_ID, RECEIVOPT_2D, PN, DATE_CODE, LOT_CODE, BIN, COO, QTY, REMARK1, REMARK2, REMARK3, INV_NO,SEPERATOR FROM tb_customer_2d
+	</select>
+
+	<select id="findAllUser" parameterType="pd" resultType="pd">
+		 SELECT USER_ID, USERNAME, PASSWORD, NAME, RIGHTS, ROLE_ID, LAST_LOGIN, IP, STATUS, BZ, SKIN, EMAIL, NUMBER, PHONE, del_flag, OUT_CUSTOMER, CUSTOMER_ID
+           FROM ts_user
+          WHERE del_flag ='0'
+	</select>
+
+</mapper>

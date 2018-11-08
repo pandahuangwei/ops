@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoxMapper">
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+	SELECT BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO,
+		 CARGO_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR,
+		 PUT_STORAGE, PUT_LOCATOR, RECEIV_QTY,EA_NUM, RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS, ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM,
+		 PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM, SUPPLIER_PROD,RECEIPT_TM,
+	      ASSIGNED_TM, PUT_TM,ASSIGNED_STOCK_TM, PICK_TM, CARGO_TM, DEPOT_TM, FREEZE_TM,
+	      TRANSFER_TM, PUT_LOCATOR_BF,CUSTOMER_ID_BF,PRODRIGHT_TM,
+	      LOT_NO, DATE_CODE, SEPARATE_QTY, COO, BIN_CODE,
+	      EA_NUM_BF, EA_NUM_AF, AUDIT_STATE, AUDIT_APPLY_EMP, AUDIT_APPLY_TM, AUDIT_PASS_EMP, AUDIT_PASS_TM, AUDIT_TYPE,
+	      REMARK1, REMARK2, REMARK3
+	 FROM TM_BOX
+	WHERE BOX_ID = #{BOX_ID}
+	</select>
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT A.BOX_ID, A.BOX_NO, A.BOARD_NO, A.PRODUCT_ID, A.CUSTOMER_ID, A.BIG_BOX_STATUS, A.BIG_BOX_NO, A.INSTOCK_NO, A.OUTSTOCK_NO,
+			  A.CARGO_NO, A.LONG_UNIT, A.WIDE_UNIT, A.HIGH_UNIT, A.VOLUME_UNIT, A.TOTAL_SUTTLE, A.TOTAL_WEIGHT, A.ASIGN_STORAGE, A.ASIGN_LOCATOR,
+			  A.PUT_STORAGE, A.PUT_LOCATOR,A.RECEIV_QTY, A.EA_NUM, A.RECEIPT_STATE, A.ASSIGNED_STATE, A.PUT_STATUS, A.ASSIGNED_STOCK_STATE, A.ASSIGNED_STOCK_NUM,
+			  A.PICK_STATE, A.CARGO_STATE, A.DEPOT_TYPE, A.FREEZE_STATE, A.BOX_STATE, A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.SUPPLIER_PROD,
+		      A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY, A.COO, A.BIN_CODE,REMARK1, REMARK2, REMARK3
+        FROM TM_BOX A,(SELECT PRODUCT_ID,PRODUCT_CODE FROM TB_PRODUCT)B
+        WHERE A.PRODUCT_ID = B.PRODUCT_ID
+		  AND A.DEL_FLG ='0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (A.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			 OR  A.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%'))
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+
+		<if test="pd != null and pd.ASIGN_STORAGE != null and pd.ASIGN_STORAGE != ''">
+			AND A.ASIGN_STORAGE =#{pd.ASIGN_STORAGE}
+		</if>
+
+		<if test="pd != null and pd.ASIGN_LOCATOR != null and pd.ASIGN_LOCATOR != ''">
+			AND A.ASIGN_LOCATOR =#{pd.ASIGN_LOCATOR}
+		</if>
+
+		<if test="pd != null and pd.PUT_STORAGE != null and pd.PUT_STORAGE != ''">
+			AND A.PUT_STORAGE =#{pd.PUT_STORAGE}
+		</if>
+
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND A.PUT_LOCATOR =#{pd.PUT_LOCATOR}
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND A.LOT_NO =#{pd.LOT_NO}
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND A.DATE_CODE =#{pd.DATE_CODE}
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND A.COO =#{pd.COO}
+		</if>
+		<if test="pd != null and pd.BIN_CODE != null and pd.BIN_CODE != ''">
+			AND A.BIN_CODE =#{pd.BIN_CODE}
+		</if>
+		<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+			AND A.REMARK1 =#{pd.REMARK1}
+		</if>
+		<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+			AND A.REMARK2 =#{pd.REMARK2}
+		</if>
+		<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+			AND A.REMARK3 =#{pd.REMARK3}
+		</if>
+		<if test="pd.RECEIPT_STATE_S != null">
+			AND A.RECEIPT_STATE IN
+			<foreach item="item" index="index" collection="pd.RECEIPT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.ASSIGNED_STATE_S != null">
+			AND A.ASSIGNED_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.PUT_STATE_S != null">
+			AND A.PUT_STATUS IN
+			<foreach item="item" index="index" collection="pd.PUT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.ASSIGNED_STOCK_STATE_S != null">
+			AND A.ASSIGNED_STOCK_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STOCK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.PICK_STATE_S != null">
+			AND A.PICK_STATE IN
+			<foreach item="item" index="index" collection="pd.PICK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.CARGO_STATE_S != null">
+			AND A.CARGO_STATE IN
+			<foreach item="item" index="index" collection="pd.CARGO_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.DEPOT_STATE_S != null">
+			AND A.DEPOT_STATE IN
+			<foreach item="item" index="index" collection="pd.DEPOT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<if test="pd.FREEZE_STATE_S != null">
+			AND A.FREEZE_STATE IN
+			<foreach item="item" index="index" collection="pd.FREEZE_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.CREATE_TM_BEGIN != null and pd.CREATE_TM_BEGIN != ''">
+			<![CDATA[ AND A.CREATE_TM >= #{pd.CREATE_TM_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.CREATE_TM_END != null and pd.CREATE_TM_END != ''">
+			<![CDATA[ AND A.CREATE_TM <= #{pd.CREATE_TM_END} ]]>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="BOX_NO" '>
+			ORDER BY A.BOX_NO
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="BIG_BOX_NO"'>
+			ORDER BY A.BIG_BOX_NO
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="INSTOCK_NO"'>
+			ORDER BY A.INSTOCK_NO
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="PRODUCT_CODE" '>
+			ORDER BY B.PRODUCT_CODE
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="RECEIPT_TM" '>
+			ORDER BY A.RECEIPT_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="ASSIGNED_TM" '>
+			ORDER BY A.ASSIGNED_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="PUT_TM" '>
+			ORDER BY A.PUT_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="ASSIGNED_STOCK_TM" '>
+			ORDER BY A.ASSIGNED_STOCK_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="CARGO_TM" '>
+			ORDER BY A.CARGO_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="PICK_TM" '>
+			ORDER BY A.PICK_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+		<if test='pd.SORT_CLOUM != null and pd.SORT_CLOUM=="DEPOT_TM" '>
+			ORDER BY A.DEPOT_TM
+			<if test='pd.SORT_BY != null and pd.SORT_BY=="DESC"'>
+				DESC
+			</if>
+		</if>
+
+	<!--	<if test="pd.SORT_CLOUM != null">
+			ORDER BY  #{pd.SORT_CLOUM}
+			<if test="pd.SORT_BY != null">
+				#{pd.SORT_BY}
+			</if>
+		</if>-->
+
+
+
+	</select>
+
+
+	<select id="datalistForExcel" parameterType="page" resultType="pd">
+		SELECT A.BOX_ID, A.BOX_NO, A.BOARD_NO, A.PRODUCT_ID, A.CUSTOMER_ID, A.BIG_BOX_STATUS, A.BIG_BOX_NO, A.INSTOCK_NO, A.OUTSTOCK_NO,
+		A.CARGO_NO, A.LONG_UNIT, A.WIDE_UNIT, A.HIGH_UNIT, A.VOLUME_UNIT, A.TOTAL_SUTTLE, A.TOTAL_WEIGHT, A.ASIGN_STORAGE, A.ASIGN_LOCATOR,
+		A.PUT_STORAGE, A.PUT_LOCATOR, A.EA_NUM, A.RECEIPT_STATE, A.ASSIGNED_STATE, A.PUT_STATUS, A.ASSIGNED_STOCK_STATE, A.ASSIGNED_STOCK_NUM,
+		A.PICK_STATE, A.CARGO_STATE, A.DEPOT_TYPE, A.FREEZE_STATE, A.BOX_STATE, A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.SUPPLIER_PROD,
+		A.LOT_NO, A.DATE_CODE, A.SEPARATE_QTY, A.COO, A.BIN_CODE,REMARK1, REMARK2, REMARK3
+		FROM TM_BOX A
+		WHERE  A.DEL_FLG ='0'
+		<if test="pd != null and pd.CUSTOMER_ID != null and pd.CUSTOMER_ID != ''">
+			AND A.CUSTOMER_ID =#{pd.CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.BOX_NO != null and pd.BOX_NO != ''">
+			AND (A.BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%')
+			OR  A.BIG_BOX_NO LIKE CONCAT(CONCAT('%', #{pd.BOX_NO}),'%'))
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND A.PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+
+		<if test="pd != null and pd.ASIGN_STORAGE != null and pd.ASIGN_STORAGE != ''">
+			AND A.ASIGN_STORAGE =#{pd.ASIGN_STORAGE}
+		</if>
+
+		<if test="pd != null and pd.ASIGN_LOCATOR != null and pd.ASIGN_LOCATOR != ''">
+			AND A.ASIGN_LOCATOR =#{pd.ASIGN_LOCATOR}
+		</if>
+
+		<if test="pd != null and pd.PUT_STORAGE != null and pd.PUT_STORAGE != ''">
+			AND A.PUT_STORAGE =#{pd.PUT_STORAGE}
+		</if>
+
+		<if test="pd != null and pd.PUT_LOCATOR != null and pd.PUT_LOCATOR != ''">
+			AND A.PUT_LOCATOR =#{pd.PUT_LOCATOR}
+		</if>
+		<if test="pd != null and pd.LOT_NO != null and pd.LOT_NO != ''">
+			AND A.LOT_NO =#{pd.LOT_NO}
+		</if>
+		<if test="pd != null and pd.DATE_CODE != null and pd.DATE_CODE != ''">
+			AND A.DATE_CODE =#{pd.DATE_CODE}
+		</if>
+		<if test="pd != null and pd.COO != null and pd.COO != ''">
+			AND A.COO =#{pd.COO}
+		</if>
+		<if test="pd != null and pd.BIN_CODE != null and pd.BIN_CODE != ''">
+			AND A.BIN_CODE =#{pd.BIN_CODE}
+		</if>
+		<if test="pd != null and pd.REMARK1 != null and pd.REMARK1 != ''">
+			AND A.REMARK1 =#{pd.REMARK1}
+		</if>
+		<if test="pd != null and pd.REMARK2 != null and pd.REMARK2 != ''">
+			AND A.REMARK2 =#{pd.REMARK2}
+		</if>
+		<if test="pd != null and pd.REMARK3 != null and pd.REMARK3 != ''">
+			AND A.REMARK3 =#{pd.REMARK3}
+		</if>
+		<if test="pd.RECEIPT_STATE_S != null">
+			AND A.RECEIPT_STATE IN
+			<foreach item="item" index="index" collection="pd.RECEIPT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.ASSIGNED_STATE_S != null">
+			AND A.ASSIGNED_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.PUT_STATE_S != null">
+			AND A.PUT_STATUS IN
+			<foreach item="item" index="index" collection="pd.PUT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.ASSIGNED_STOCK_STATE_S != null">
+			AND A.ASSIGNED_STOCK_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STOCK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.PICK_STATE_S != null">
+			AND A.PICK_STATE IN
+			<foreach item="item" index="index" collection="pd.PICK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.CARGO_STATE_S != null">
+			AND A.CARGO_STATE IN
+			<foreach item="item" index="index" collection="pd.CARGO_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<if test="pd.DEPOT_STATE_S != null">
+			AND A.DEPOT_STATE IN
+			<foreach item="item" index="index" collection="pd.DEPOT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<if test="pd.FREEZE_STATE_S != null">
+			AND A.FREEZE_STATE IN
+			<foreach item="item" index="index" collection="pd.FREEZE_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.CREATE_TM_BEGIN != null and pd.CREATE_TM_BEGIN != ''">
+			<![CDATA[ AND A.CREATE_TM >= #{pd.CREATE_TM_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.CREATE_TM_END != null and pd.CREATE_TM_END != ''">
+			<![CDATA[ AND A.CREATE_TM <= #{pd.CREATE_TM_END} ]]>
+		</if>
+	</select>
+
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		INSERT INTO TM_BOX( BOX_ID, BOX_NO, BOARD_NO, PRODUCT_ID, CUSTOMER_ID, BIG_BOX_STATUS, BIG_BOX_NO, INSTOCK_NO, OUTSTOCK_NO, CARGO_NO, LONG_UNIT, WIDE_UNIT,
+		 HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT, ASIGN_STORAGE, ASIGN_LOCATOR, PUT_STORAGE, PUT_LOCATOR, EA_NUM, RECEIPT_STATE, ASSIGNED_STATE, PUT_STATUS,
+		 ASSIGNED_STOCK_STATE, ASSIGNED_STOCK_NUM, PICK_STATE, CARGO_STATE, DEPOT_TYPE, FREEZE_STATE, BOX_STATE, MEMO, CREATE_EMP, CREATE_TM,MODIFY_EMP,MODIFY_TM, DEL_FLG,SUPPLIER_PROD,AUDIT_EMP,AUDIT_TM,AUDIT_FLG,
+		  LOT_NO,DATE_CODE,SEPARATE_QTY,COO,BIN_CODE)
+		VALUES ( #{BOX_ID}, #{BOX_NO}, #{BOARD_NO}, #{PRODUCT_ID}, #{CUSTOMER_ID}, #{BIG_BOX_STATUS}, #{BIG_BOX_NO}, #{INSTOCK_NO}, #{OUTSTOCK_NO}, #{CARGO_NO}, #{LONG_UNIT}, #{WIDE_UNIT},
+		 #{HIGH_UNIT}, #{VOLUME_UNIT}, #{TOTAL_SUTTLE}, #{TOTAL_WEIGHT}, #{ASIGN_STORAGE}, #{ASIGN_LOCATOR}, #{PUT_STORAGE}, #{PUT_LOCATOR}, #{EA_NUM}, #{RECEIPT_STATE}, #{ASSIGNED_STATE}, #{PUT_STATUS},
+		 #{ASSIGNED_STOCK_STATE}, #{ASSIGNED_STOCK_NUM}, #{PICK_STATE}, #{CARGO_STATE}, #{DEPOT_TYPE}, #{FREEZE_STATE}, #{BOX_STATE}, #{MEMO}, #{CREATE_EMP}, #{CREATE_TM},#{MODIFY_EMP}, #{MODIFY_TM},#{DEL_FLG}, #{SUPPLIER_PROD}, #{AUDIT_EMP}, #{AUDIT_TM}, #{AUDIT_FLG},
+		 #{LOT_NO}, #{DATE_CODE}, #{SEPARATE_QTY}, #{COO}, #{BIN_CODE})
+	</insert>
+
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TM_BOX
+		set
+		AUDIT_EMP = #{AUDIT_EMP},
+		AUDIT_TM = #{AUDIT_TM},
+		AUDIT_FLG = #{AUDIT_FLG},
+		RECEIPT_STATE  = #{RECEIPT_STATE},
+		MODIFY_TM  = #{MODIFY_TM},
+		DEL_FLG = #{DEL_FLG}
+		where
+		BOX_ID = #{BOX_ID}
+	</update>
+
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TM_BOX
+		where
+		BOX_ID = #{BOX_ID}
+	</delete>
+
+
+	<!-- 修改 -->
+	<update id="edit1" parameterType="pd">
+		update  TM_BOX
+		set
+		BOX_ID = #{BOX_ID},
+		BOX_NO = #{BOX_NO},
+		BOARD_NO = #{BOARD_NO},
+		PRODUCT_ID = #{PRODUCT_ID},
+		CUSTOMER_ID = #{CUSTOMER_ID},
+		BIG_BOX_STATUS = #{BIG_BOX_STATUS},
+		BIG_BOX_NO = #{BIG_BOX_NO},
+		INSTOCK_NO = #{INSTOCK_NO},
+		OUTSTOCK_NO = #{OUTSTOCK_NO},
+		CARGO_NO = #{CARGO_NO},
+		LONG_UNIT = #{LONG_UNIT},
+		WIDE_UNIT = #{WIDE_UNIT},
+		HIGH_UNIT = #{HIGH_UNIT},
+		VOLUME_UNIT = #{VOLUME_UNIT},
+		TOTAL_SUTTLE = #{TOTAL_SUTTLE},
+		TOTAL_WEIGHT = #{TOTAL_WEIGHT},
+		ASIGN_STORAGE = #{ASIGN_STORAGE},
+		ASIGN_LOCATOR = #{ASIGN_LOCATOR},
+		PUT_STORAGE = #{PUT_STORAGE},
+		PUT_LOCATOR = #{PUT_LOCATOR},
+		EA_NUM = #{EA_NUM},
+		RECEIPT_STATE = #{RECEIPT_STATE},
+		ASSIGNED_STATE = #{ASSIGNED_STATE},
+		PUT_STATUS = #{PUT_STATUS},
+		ASSIGNED_STOCK_STATE = #{ASSIGNED_STOCK_STATE},
+		ASSIGNED_STOCK_NUM = #{ASSIGNED_STOCK_NUM},
+		PICK_STATE = #{PICK_STATE},
+		CARGO_STATE = #{CARGO_STATE},
+		DEPOT_TYPE = #{DEPOT_TYPE},
+		FREEZE_STATE = #{FREEZE_STATE},
+		BOX_STATE = #{BOX_STATE},
+		MEMO = #{MEMO},
+		CREATE_EMP = #{CREATE_EMP},
+		CREATE_TM = #{CREATE_TM},
+		SUPPLIER_PROD = #{SUPPLIER_PROD},
+		BOX_ID = BOX_ID
+		where
+		BOX_ID = #{BOX_ID}
+	</update>
+
+
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.BOX_ID,	
+				a.BOX_NO,	
+				a.BOARD_NO,	
+				a.PRODUCT_ID,	
+				a.CUSTOMER_ID,	
+				a.BIG_BOX_STATUS,	
+				a.BIG_BOX_NO,	
+				a.INSTOCK_NO,	
+				a.OUTSTOCK_NO,	
+				a.CARGO_NO,	
+				a.LONG_UNIT,	
+				a.WIDE_UNIT,	
+				a.HIGH_UNIT,	
+				a.VOLUME_UNIT,	
+				a.TOTAL_SUTTLE,	
+				a.TOTAL_WEIGHT,	
+				a.ASIGN_STORAGE,	
+				a.ASIGN_LOCATOR,	
+				a.PUT_STORAGE,	
+				a.PUT_LOCATOR,	
+				a.EA_NUM,	
+				a.RECEIPT_STATE,	
+				a.ASSIGNED_STATE,	
+				a.PUT_STATUS,	
+				a.ASSIGNED_STOCK_STATE,	
+				a.ASSIGNED_STOCK_NUM,	
+				a.PICK_STATE,	
+				a.CARGO_STATE,	
+				a.DEPOT_TYPE,	
+				a.FREEZE_STATE,	
+				a.BOX_STATE,	
+				a.MEMO,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.SUPPLIER_PROD,	
+				a.BOX_ID
+		from 
+				TM_BOX a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TM_BOX
+		where 
+			BOX_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+</mapper>

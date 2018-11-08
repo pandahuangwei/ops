@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PutLocatorOptMapper">
+
+
+	<!-- 通过箱号获取数据进行扫描码放 -->
+	<select id="findBoxForScanPut" parameterType="pd" resultType="pd">
+		SELECT A.BOX_ID,A.PRODUCT_ID, A.INSTOCK_NO, A.BOX_NO, A.BIG_BOX_NO, A.ASIGN_STORAGE, A.ASIGN_LOCATOR, A.PUT_LOCATOR
+		 FROM  TM_BOX A
+		WHERE  A.DEL_FLG = '0'
+		 AND  (A.BOX_NO = #{BOX_NO} OR A.BIG_BOX_NO = #{BOX_NO})
+	</select>
+
+
+	<!-- 通过箱号获取数据进行码放 -->
+	<select id="findBoxForPut" parameterType="pd" resultType="pd">
+		SELECT A.BOX_ID,A.INSTOCK_NO, A.BOX_NO, A.ASIGN_STORAGE, A.ASIGN_LOCATOR, A.PUT_LOCATOR,A.PRODUCT_ID
+		 FROM  TM_BOX A
+		 WHERE  A.DEL_FLG = '0'
+		   AND  (A.BOX_NO = #{BOX_NO} OR A.BIG_BOX_NO =#{BOX_NO} )
+	</select>
+
+
+	<!-- 列表 -->
+	<select id="findManualPutlistPage" parameterType="page" resultType="pd">
+		SELECT 	C.BOX_ID,C.BIG_BOX_NO,C.BOX_NO,C.BOARD_NO,C.PRODUCT_ID,C.CUSTOMER_ID,C.INSTOCK_NO,C.ASIGN_STORAGE,C.ASIGN_LOCATOR,C.PUT_STORAGE,C.PUT_LOCATOR,C.EA_NUM,C.RECEIPT_STATE,
+		C.ASSIGNED_STATE,C.PUT_STATUS
+		FROM TM_BOX C
+		WHERE C.RECEIPT_STATE='77'
+		AND C.ASSIGNED_STATE ='102'
+		AND C.PUT_STATUS ='80'
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findCancellistPage" parameterType="page" resultType="pd">
+		SELECT 	C.BOX_ID,C.BOX_NO,C.BOARD_NO,C.PRODUCT_ID,C.CUSTOMER_ID,C.INSTOCK_NO,C.ASIGN_STORAGE,C.ASIGN_LOCATOR,C.PUT_STORAGE,C.PUT_LOCATOR,C.EA_NUM,C.RECEIPT_STATE,
+		C.ASSIGNED_STATE,C.PUT_STATUS
+		FROM TM_BOX C
+		WHERE C.RECEIPT_STATE='77'
+		AND C.ASSIGNED_STATE ='102'
+		AND C.PUT_STATUS IN ('81','82')
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+
+</mapper>

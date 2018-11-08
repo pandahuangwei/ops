@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoxwvMapper">
+
+	<!-- 通过ID获取数据 -->
+	<select id="findByBoxNo" parameterType="pd" resultType="pd">
+		 SELECT BOX_ID, BOX_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT
+		   FROM TM_BOX
+		  WHERE DEL_FLG = '0'
+		    AND BOX_NO = #{BOX_NO}
+	</select>
+
+	<select id="findByBigBoxNo" parameterType="pd" resultType="pd">
+		SELECT BOX_ID, BOX_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT
+		FROM TM_BOX
+		WHERE DEL_FLG = '0'
+		  AND BIG_BOX_NO = #{BOX_NO}
+	</select>
+
+	<!-- 修改 -->
+	<update id="saveBox" parameterType="pd">
+		UPDATE TM_BOX
+		SET
+			LONG_UNIT= #{LONG_UNIT},
+			WIDE_UNIT= #{WIDE_UNIT},
+			HIGH_UNIT= #{HIGH_UNIT},
+			VOLUME_UNIT= #{VOLUME_UNIT},
+			TOTAL_WEIGHT= #{TOTAL_WEIGHT},
+			BIG_BOX_STATUS = #{BIG_BOX_STATUS}
+		WHERE BOX_ID = #{BOX_ID}
+	</update>
+
+
+
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_BOXWV(
+			BOX_NO,	
+			LONG_UNIT,	
+			WIDE_UNIT,	
+			HIGH_UNIT,	
+			VOLUME_UNIT,	
+			TOTAL_WEIGHT,	
+			WV_FLG,	
+			BOXWV_ID
+		) values (
+			#{BOX_NO},	
+			#{LONG_UNIT},	
+			#{WIDE_UNIT},	
+			#{HIGH_UNIT},	
+			#{VOLUME_UNIT},	
+			#{TOTAL_WEIGHT},	
+			#{WV_FLG},	
+			#{BOXWV_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_BOXWV
+		where 
+			BOXWV_ID = #{BOXWV_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_BOXWV
+			set 
+				BOX_NO = #{BOX_NO},
+				LONG_UNIT = #{LONG_UNIT},
+				WIDE_UNIT = #{WIDE_UNIT},
+				HIGH_UNIT = #{HIGH_UNIT},
+				VOLUME_UNIT = #{VOLUME_UNIT},
+				TOTAL_WEIGHT = #{TOTAL_WEIGHT},
+				WV_FLG = #{WV_FLG},
+			BOXWV_ID = BOXWV_ID
+			where 
+				BOXWV_ID = #{BOXWV_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			BOX_NO,	
+			LONG_UNIT,	
+			WIDE_UNIT,	
+			HIGH_UNIT,	
+			VOLUME_UNIT,	
+			TOTAL_WEIGHT,	
+			WV_FLG,	
+			BOXWV_ID
+		from 
+			TB_BOXWV
+		where 
+			BOXWV_ID = #{BOXWV_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT 	BOX_ID, BIG_BOX_NO, BOX_NO, BOARD_NO, PRODUCT_ID, INSTOCK_NO, LONG_UNIT, WIDE_UNIT, HIGH_UNIT, VOLUME_UNIT, TOTAL_SUTTLE, TOTAL_WEIGHT
+		 FROM TM_BOX
+	    WHERE  BIG_BOX_STATUS = #{pd.BIG_BOX_STATUS}
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.BOX_NO,	
+				a.LONG_UNIT,	
+				a.WIDE_UNIT,	
+				a.HIGH_UNIT,	
+				a.VOLUME_UNIT,	
+				a.TOTAL_WEIGHT,	
+				a.WV_FLG,	
+				a.BOXWV_ID
+		from 
+				TB_BOXWV a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_BOXWV
+		where 
+			BOXWV_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+</mapper>

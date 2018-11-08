@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_STOCK(
+			STOCK_CODE,	
+			STOCK_NAME,	
+			STOCK_DSC,	
+			CITY_ID,	
+			STOCK_ADDR,	
+			MEMO,	
+			HEAD_EMP,	
+			HEAD_MOBILE,	
+			HEAD_FAX,	
+			HEAD_MAIL,	
+			USE_FLG,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			STOCK_ID
+		) values (
+			#{STOCK_CODE},	
+			#{STOCK_NAME},	
+			#{STOCK_DSC},	
+			#{CITY_ID},	
+			#{STOCK_ADDR},	
+			#{MEMO},	
+			#{HEAD_EMP},	
+			#{HEAD_MOBILE},	
+			#{HEAD_FAX},	
+			#{HEAD_MAIL},	
+			#{USE_FLG},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},	
+			#{STOCK_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TB_STOCK
+		where STOCK_ID = #{STOCK_ID}
+		  AND  STOCK_ID NOT IN (SELECT  STOCK_ID FROM TB_PRODUCT)
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_STOCK
+			set 
+				STOCK_CODE = #{STOCK_CODE},
+				STOCK_NAME = #{STOCK_NAME},
+				STOCK_DSC = #{STOCK_DSC},
+				CITY_ID = #{CITY_ID},
+				STOCK_ADDR = #{STOCK_ADDR},
+				MEMO = #{MEMO},
+				HEAD_EMP = #{HEAD_EMP},
+				HEAD_MOBILE = #{HEAD_MOBILE},
+				HEAD_FAX = #{HEAD_FAX},
+				HEAD_MAIL = #{HEAD_MAIL},
+				USE_FLG = #{USE_FLG},
+			STOCK_ID = STOCK_ID
+			where 
+				STOCK_ID = #{STOCK_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		SELECT
+			A.STOCK_CODE,
+			A.STOCK_NAME,
+			A.STOCK_DSC,
+			D.PROVINCE_ID,
+			D.COUNTRY_ID,
+			A.CITY_ID,
+			A.STOCK_ADDR,
+			A.MEMO,
+			A.HEAD_EMP,
+			A.HEAD_MOBILE,
+			A.HEAD_FAX,
+			A.HEAD_MAIL,
+			A.USE_FLG,
+			A.CREATE_EMP,
+			A.CREATE_TM,
+			A.MODIFY_EMP,
+			A.MODIFY_TM,
+			A.STOCK_ID
+		FROM
+			TB_STOCK A LEFT JOIN
+     (SELECT B.CITY_ID, B.PROVINCE_ID,C.COUNTRY_ID FROM TB_CITY B,TB_PROVINCE C WHERE B.PROVINCE_ID = C.PROVINCE_ID) D ON A.CITY_ID = D.CITY_ID
+		WHERE 1 = 1
+		 AND A.STOCK_ID = #{STOCK_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.STOCK_CODE,	
+				a.STOCK_NAME,	
+				a.STOCK_DSC,	
+				a.CITY_ID,	
+				a.STOCK_ADDR,	
+				a.MEMO,	
+				a.HEAD_EMP,	
+				a.HEAD_MOBILE,	
+				a.HEAD_FAX,	
+				a.HEAD_MAIL,	
+				a.USE_FLG,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCK_ID
+		from 
+				TB_STOCK a,TB_CITY b
+		WHERE a.DEL_FLG = 0
+		  AND a.CITY_ID = b.CITY_ID
+		<if test="pd != null and pd.STOCK_CODE != null and pd.STOCK_CODE != ''">
+			AND a.STOCK_CODE LIKE CONCAT(CONCAT('%', #{pd.STOCK_CODE}),'%')
+		</if>
+		<if test="pd != null and pd.STOCK_NAME != null and pd.STOCK_NAME != ''">
+			AND a.STOCK_NAME LIKE CONCAT(CONCAT('%', #{pd.STOCK_NAME}),'%')
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.STOCK_CODE,	
+				a.STOCK_NAME,	
+				a.STOCK_DSC,	
+				a.CITY_ID,	
+				a.STOCK_ADDR,	
+				a.MEMO,	
+				a.HEAD_EMP,	
+				a.HEAD_MOBILE,	
+				a.HEAD_FAX,	
+				a.HEAD_MAIL,	
+				a.USE_FLG,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.STOCK_ID
+		from 
+				TB_STOCK a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TB_STOCK
+		where STOCK_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+		AND  STOCK_ID NOT IN (SELECT  STOCK_ID FROM TB_PRODUCT)
+	</delete>
+
+	<select id="findByCode" parameterType="pd" resultType="pd">
+		select
+		STOCK_CODE,
+		STOCK_NAME,
+		STOCK_DSC,
+		CITY_ID,
+		STOCK_ADDR,
+		MEMO,
+		HEAD_EMP,
+		HEAD_MOBILE,
+		HEAD_FAX,
+		HEAD_MAIL,
+		USE_FLG,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STOCK_ID
+		from
+		TB_STOCK
+		where DEL_FLG = 0
+		  AND STOCK_CODE = #{STOCKCODE}
+		<if test="STOCKID != null and STOCKID != ''">
+			and STOCK_ID != #{STOCKID}
+		</if>
+	</select>
+
+	<select id="findByCn" parameterType="pd" resultType="pd">
+		select
+		STOCK_CODE,
+		STOCK_NAME,
+		STOCK_DSC,
+		CITY_ID,
+		STOCK_ADDR,
+		MEMO,
+		HEAD_EMP,
+		HEAD_MOBILE,
+		HEAD_FAX,
+		HEAD_MAIL,
+		USE_FLG,
+		CREATE_EMP,
+		CREATE_TM,
+		MODIFY_EMP,
+		MODIFY_TM,
+		DEL_FLG,
+		STOCK_ID
+		from
+		TB_STOCK
+		where DEL_FLG = 0
+		AND STOCK_NAME = #{STOCKCN}
+		<if test="STOCKID != null and STOCKID != ''">
+			and STOCK_ID != #{STOCKID}
+		</if>
+	</select>
+</mapper>

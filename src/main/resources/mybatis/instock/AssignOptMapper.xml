@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AssignOptMapper">
+
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT
+		A.INSTOCK_NO, A.CUSTOMER_ID, A.INSTOCK_TYPE, A.PRE_INSTOCK_DATE, A.REAL_INSTOCK_DATE, A.INSTOCK_STATE, A.PUT_STATE,
+		A.TOTAL_WEIGHT, A.TOTAL_SUTTLE, A.TOTAL_VOLUME, A.TOTAL_PRICE, A.TOTAL_EA, A.PRIORITY_LEVEL, A.ORDER_NO, A.COST_STATE,
+		A.MEMO, A.CREATE_EMP, A.CREATE_TM, A.MODIFY_EMP, A.MODIFY_TM, A.DEL_FLG, A.STOCKMGRIN_ID
+		FROM TM_STOCKMGRIN A LEFT JOIN
+		(SELECT * FROM TM_STOCKMGRIN_DTL
+		WHERE DEL_FLG = '0'
+		  AND RECEI_FLG ='0'
+		<if test="pd != null and pd.DTL_CUSTOMER_ID != null and pd.DTL_CUSTOMER_ID != ''">
+			AND CUSTOMER_ID =#{pd.DTL_CUSTOMER_ID}
+		</if>
+		<if test="pd != null and pd.PRODUCT_ID != null and pd.PRODUCT_ID != ''">
+			AND PRODUCT_ID =#{pd.PRODUCT_ID}
+		</if>
+		) B
+		ON A.STOCKMGRIN_ID = b.STOCKMGRIN_ID
+		WHERE A.DEL_FLG = '0'
+		<if test="pd != null and pd.INSTOCK_NO != null and pd.INSTOCK_NO != ''">
+			AND A.INSTOCK_NO LIKE CONCAT(CONCAT('%', #{pd.INSTOCK_NO}),'%')
+		</if>
+		<if test="pd != null and pd.ORDER_NO != null and pd.ORDER_NO != ''">
+			AND A.ORDER_NO LIKE CONCAT(CONCAT('%', #{pd.ORDER_NO}),'%')
+		</if>
+		<if test="pd != null and pd.COST_STATE != null and pd.COST_STATE != ''">
+			AND A.COST_STATE = #{pd.COST_STATE}
+		</if>
+		<!--  小于号转义 &lt;   大于号: &gt;  -->
+		<if test="pd != null and pd.PRE_INSTOCK_DATE_BEGIN != null and pd.PRE_INSTOCK_DATE_BEGIN != ''">
+			<![CDATA[ AND A.PRE_INSTOCK_DATE >= #{pd.PRE_INSTOCK_DATE_BEGIN} ]]>
+		</if>
+
+		<if test="pd != null and pd.PRE_INSTOCK_DATE_END != null and pd.PRE_INSTOCK_DATE_END != ''">
+			<![CDATA[ AND A.PRE_INSTOCK_DATE <= #{pd.PRE_INSTOCK_DATE_END} ]]>
+		</if>
+
+		<!-- 入库类型-->
+		<if test="pd.INSTOCK_TYPE_S != null">
+			AND A.INSTOCK_TYPE IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_TYPE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 入库状态-->
+		<if test="pd.INSTOCK_STATE_S != null">
+			AND A.INSTOCK_STATE IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		<!-- 码放状态-->
+		<if test="pd.PUT_STATE_S != null">
+			AND A.PUT_STATE IN
+			<foreach item="item" index="index" collection="pd.PUT_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		<!-- 分配状态-->
+		<if test="pd.ASSIGNED_STATE_S != null">
+			AND A.ASSIGNED_STATE IN
+			<foreach item="item" index="index" collection="pd.ASSIGNED_STATE_S" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+
+		ORDER BY A.INSTOCK_NO DESC
+	</select>
+
+	<select id="findAssignHead" parameterType="page" resultType="pd">
+     SELECT C.STOCKMGRIN_ID,  C.INSTOCK_NO, C.CUSTOMER_ID, C.INSTOCK_TYPE, C.INSTOCK_STATE,
+		  C.PUT_STATE,C.ASSIGNED_STATE,
+		    SUM(A.EA_ACTUAL) EA_ACTUAL, SUM(A.ASSIGNED_EA) ASSIGNED_EA, SUM(A.PUT_EA) PUT_EA
+       FROM TM_STOCKMGRIN_DTL A,TM_STOCKMGRIN C
+		WHERE A.STOCKMGRIN_ID = C.STOCKMGRIN_ID
+		  AND A.DEL_FLG='0'
+		  AND A.RECEI_FLG ='0'
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		GROUP BY C.STOCKMGRIN_ID, C.INSTOCK_NO, C.CUSTOMER_ID, C.INSTOCK_TYPE, C.INSTOCK_STATE,C.PUT_STATE,C.ASSIGNED_STATE
+	</select>
+
+	<!-- 查找需要分配的数据，必须是已经收货的 -->
+	<select id="findDtllistPage" parameterType="page" resultType="pd">
+		SELECT 	C.BOX_ID,C.BIG_BOX_NO,C.BOX_NO,C.BOARD_NO,C.PRODUCT_ID,C.CUSTOMER_ID,C.INSTOCK_NO,C.LONG_UNIT,C.WIDE_UNIT,C.HIGH_UNIT,
+		C.VOLUME_UNIT,C.TOTAL_SUTTLE,C.TOTAL_WEIGHT,C.ASIGN_STORAGE,C.ASIGN_LOCATOR,C.PUT_LOCATOR,C.EA_NUM,C.RECEIPT_STATE,
+		C.ASSIGNED_STATE,C.PUT_STATUS,C.CREATE_TM
+		FROM TM_BOX C
+		WHERE DEL_FLG = '0'
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		ORDER BY CREATE_TM
+	</select>
+
+	<!-- 查找需要分配的数据，必须是已经收货的 -->
+	<select id="findAssignlistPage" parameterType="page" resultType="pd">
+	SELECT 	C.BOX_ID,C.BIG_BOX_NO,C.BOX_NO,C.BOARD_NO,C.PRODUCT_ID,C.CUSTOMER_ID,C.INSTOCK_NO,C.LONG_UNIT,C.WIDE_UNIT,C.HIGH_UNIT,
+	       C.VOLUME_UNIT,C.TOTAL_SUTTLE,C.TOTAL_WEIGHT,C.ASIGN_STORAGE,C.ASIGN_LOCATOR,C.PUT_LOCATOR,C.EA_NUM,C.RECEIPT_STATE,
+	       C.ASSIGNED_STATE,C.PUT_STATUS,C.CREATE_TM
+	 FROM TM_BOX C
+	WHERE C.RECEIPT_STATE='77'
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+		ORDER BY CREATE_TM
+	</select>
+
+
+
+	<!-- 查找需要取消分配的数据，必须是已经收货的且已经分配的 -->
+	<select id="findAssignCacellistPage" parameterType="page" resultType="pd">
+		SELECT 	C.BOX_ID,C.BOX_NO,C.BOARD_NO,C.PRODUCT_ID,C.CUSTOMER_ID,C.INSTOCK_NO,C.LONG_UNIT,C.WIDE_UNIT,C.HIGH_UNIT,
+		C.VOLUME_UNIT,C.TOTAL_SUTTLE,C.TOTAL_WEIGHT,C.ASIGN_STORAGE,C.ASIGN_LOCATOR,C.PUT_LOCATOR,C.EA_NUM,C.RECEIPT_STATE,
+		C.ASSIGNED_STATE,C.PUT_STATUS
+		FROM TM_BOX C
+		WHERE C.RECEIPT_STATE='77'
+		  AND C.ASSIGNED_STATE ='102'
+		<if test="pd.INSTOCK_NO != null">
+			AND C.INSTOCK_NO IN
+			<foreach item="item" index="index" collection="pd.INSTOCK_NO" open="(" separator="," close=")">
+				'${item}'
+			</foreach>
+		</if>
+	</select>
+
+
+
+	<select id="findStockLocator" parameterType="pd" resultType="pd">
+		SELECT  A.LOCATOR_ID,B.STORAGE_ID,C.C_VALUE LOCATOR_LEVEL FROM TB_LOCATOR A,TB_STORAGE B,TB_SELECT C
+		WHERE A.STORAGE_CODE = B.STORAGE_ID
+		AND A.LOCATOR_PRIORITY_LEVEL = C.SELECT_ID
+		AND B.STORAGE_TYPE='172'
+		ORDER BY C_VALUE
+	</select>
+
+	<select id="findStorageAssigneRule" parameterType="pd" resultType="pd">
+		SELECT 	STORAGEASIGNRULE_ID, CUSTOMER_ID, STORAGEASING_CODE, STORAGEASING_CN, PROD_LIMIT, PROD_LIMIT_USE, VOLUME_LIMIT, VOLUME_LIMIT_USE,
+	            LONG_LIMIT, LONG_LIMIT_USE, WIDE_LIMIT, WIDE_LIMIT_USE, HIGH_LIMIT, HIGH_LIMIT_USE, LOCATOR_PRIORITY_LEVEL
+	      FROM TB_STORAGEASIGNRULE
+	      WHERE DEL_FLG = '0'
+	        AND CUSTOMER_ID =#{CUSTOMER_ID}
+	</select>
+
+
+
+
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TM_RECEIVOPT(
+			INSTOCK_NO,	
+			BOX_NO,	
+			PREFIX_PROD,	
+			PROD_CODE,	
+			PREFIX_QTY,	
+			RECEIV_QTY,	
+			COO,	
+			PACKAGE_QTY,	
+			BOARD_NO,	
+			QR_CODE,	
+			PREFIX_LOTNO,	
+			LOT_NO,	
+			PREFIX_DATECODE,	
+			DATE_CODE,	
+			PREFIX_SCAN,	
+			SCAN_CODE,	
+			SCAN_QTY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			RECEIVOPT_ID,
+			GROUP_KEY
+		) values (
+			#{INSTOCK_NO},	
+			#{BOX_NO},	
+			#{PREFIX_PROD},	
+			#{PROD_CODE},	
+			#{PREFIX_QTY},	
+			#{RECEIV_QTY},	
+			#{COO},	
+			#{PACKAGE_QTY},	
+			#{BOARD_NO},	
+			#{QR_CODE},	
+			#{PREFIX_LOTNO},	
+			#{LOT_NO},	
+			#{PREFIX_DATECODE},	
+			#{DATE_CODE},	
+			#{PREFIX_SCAN},	
+			#{SCAN_CODE},	
+			#{SCAN_QTY},	
+			#{CREATE_EMP},	
+			#{CREATE_TM},	
+			#{MODIFY_EMP},	
+			#{MODIFY_TM},	
+			#{DEL_FLG},
+			#{RECEIVOPT_ID},
+			#{GROUP_KEY}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TM_RECEIVOPT
+			set 
+				INSTOCK_NO = #{INSTOCK_NO},
+				BOX_NO = #{BOX_NO},
+				PREFIX_PROD = #{PREFIX_PROD},
+				PROD_CODE = #{PROD_CODE},
+				PREFIX_QTY = #{PREFIX_QTY},
+				RECEIV_QTY = #{RECEIV_QTY},
+				COO = #{COO},
+				PACKAGE_QTY = #{PACKAGE_QTY},
+				BOARD_NO = #{BOARD_NO},
+				QR_CODE = #{QR_CODE},
+				PREFIX_LOTNO = #{PREFIX_LOTNO},
+				LOT_NO = #{LOT_NO},
+				PREFIX_DATECODE = #{PREFIX_DATECODE},
+				DATE_CODE = #{DATE_CODE},
+				PREFIX_SCAN = #{PREFIX_SCAN},
+				SCAN_CODE = #{SCAN_CODE},
+				SCAN_QTY = #{SCAN_QTY},
+			RECEIVOPT_ID = RECEIVOPT_ID
+			where 
+				RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			INSTOCK_NO,	
+			BOX_NO,	
+			PREFIX_PROD,	
+			PROD_CODE,	
+			PREFIX_QTY,	
+			RECEIV_QTY,	
+			COO,	
+			PACKAGE_QTY,	
+			BOARD_NO,	
+			QR_CODE,	
+			PREFIX_LOTNO,	
+			LOT_NO,	
+			PREFIX_DATECODE,	
+			DATE_CODE,	
+			PREFIX_SCAN,	
+			SCAN_CODE,	
+			SCAN_QTY,	
+			CREATE_EMP,	
+			CREATE_TM,	
+			MODIFY_EMP,	
+			MODIFY_TM,	
+			DEL_FLG,	
+			RECEIVOPT_ID
+		from 
+			TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID = #{RECEIVOPT_ID}
+	</select>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findCurReceivlistPage" parameterType="page" resultType="pd">
+		SELECT 	RECEIVOPT_ID, INSTOCK_NO, RECEIV_TYPE, BOX_NO, PREFIX_PROD, PROD_CODE, PREFIX_QTY, RECEIV_QTY, COO, PACKAGE_QTY,
+				BOARD_NO, QR_CODE, QR_CODE_USE, PREFIX_LOTNO, LOT_NO, PREFIX_DATECODE, DATE_CODE,
+				PREFIX_SCAN, SCAN_CODE, SCAN_QTY, GROUP_KEY, CNT_SCAN, BOX_SCAN
+          FROM TM_RECEIVOPT
+		  WHERE DEL_FLG = '0'
+		    AND GROUP_KEY = #{pd.GROUP_KEY}
+	</select>
+
+
+	<!-- 批量删除 -->
+	<delete id="deleteReceivDtl" parameterType="pd">
+		UPDATE TM_RECEIVOPT
+		SET   DEL_FLG = '1',
+			  MODIFY_EMP = #{MODIFY_EMP},
+			  MODIFY_TM  = #{MODIFY_TM}
+		WHERE
+		RECEIVOPT_ID = #{RECEIVOPT_ID}
+
+	</delete>
+
+	
+	<!-- 列表 -->
+	<select id="datalistPage1" parameterType="page" resultType="pd">
+		select
+				a.INSTOCK_NO,	
+				a.BOX_NO,	
+				a.PREFIX_PROD,	
+				a.PROD_CODE,	
+				a.PREFIX_QTY,	
+				a.RECEIV_QTY,	
+				a.COO,	
+				a.PACKAGE_QTY,	
+				a.BOARD_NO,	
+				a.QR_CODE,	
+				a.PREFIX_LOTNO,	
+				a.LOT_NO,	
+				a.PREFIX_DATECODE,	
+				a.DATE_CODE,	
+				a.PREFIX_SCAN,	
+				a.SCAN_CODE,	
+				a.SCAN_QTY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.RECEIVOPT_ID
+		from 
+				TM_RECEIVOPT a
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.INSTOCK_NO,	
+				a.BOX_NO,	
+				a.PREFIX_PROD,	
+				a.PROD_CODE,	
+				a.PREFIX_QTY,	
+				a.RECEIV_QTY,	
+				a.COO,	
+				a.PACKAGE_QTY,	
+				a.BOARD_NO,	
+				a.QR_CODE,	
+				a.PREFIX_LOTNO,	
+				a.LOT_NO,	
+				a.PREFIX_DATECODE,	
+				a.DATE_CODE,	
+				a.PREFIX_SCAN,	
+				a.SCAN_CODE,	
+				a.SCAN_QTY,	
+				a.CREATE_EMP,	
+				a.CREATE_TM,	
+				a.MODIFY_EMP,	
+				a.MODIFY_TM,	
+				a.DEL_FLG,	
+				a.RECEIVOPT_ID
+		from 
+				TM_RECEIVOPT a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from TM_RECEIVOPT
+		where 
+			RECEIVOPT_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+
+	
+</mapper>
