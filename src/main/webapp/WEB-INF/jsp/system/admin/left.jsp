@@ -6,26 +6,19 @@
 		<div id="sidebar" class="menu-min">
 
 				<div id="sidebar-shortcuts">
-
+					<!-- 隐藏     -->
+					<c:if test="${1 == 2 }">
 					<div id="sidebar-shortcuts-large">
-
 						<button class="btn btn-small btn-success" id="menuchange" onclick="changeMenu();" title="切换菜单"><i class="icon-pencil"></i></button>
-
 						<button class="btn btn-small btn-info" title="UI实例"  id="uiexam" onclick="window.open('<%=basePathl%>static/UI_new/index.html');"><i class="icon-eye-open"></i></button>
-
 						<button class="btn btn-small btn-warning" title="数据字典" id="adminzidian" onclick="zidian();"><i class="icon-book"></i></button>
-						
 						<button class="btn btn-small btn-danger" title="菜单管理" id="adminmenu" onclick="menu();"><i class="icon-folder-open"></i></button>
-						
 					</div>
-
+					</c:if>
 					<div id="sidebar-shortcuts-mini">
 						<span class="btn btn-success"></span>
-
 						<span class="btn btn-info"></span>
-
 						<span class="btn btn-warning"></span>
-
 						<span class="btn btn-danger"></span>
 					</div>
 
@@ -37,8 +30,6 @@
 					<li class="active" id="fhindex">
 					  <a href="main/index"><i class="icon-dashboard"></i><span>后台首页</span></a>
 					</li>
-
-
 
 			<c:forEach items="${menuList}" var="menu">
 				<c:if test="${menu.hasMenu}">

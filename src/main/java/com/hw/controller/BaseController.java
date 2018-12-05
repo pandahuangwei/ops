@@ -104,4 +104,8 @@ public class BaseController {
             pd.put("CUSTOMER_ID",customerId);
         }
     }
+
+    protected boolean isSearch(String searchFlag) {
+        return StringUtil.isBlank(searchFlag)||Const.SEARCH_FLAG_NO.equals(searchFlag)||Const.SEARCH_FLAG_YSE.equals(searchFlag);
+    }
 }

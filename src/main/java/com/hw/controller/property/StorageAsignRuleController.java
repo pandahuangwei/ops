@@ -137,7 +137,7 @@ public class StorageAsignRuleController extends BaseController {
 			setSelect(mv);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = storageasignruleService.list(page);    //列出StorageAsignRule列表
 			}
 			mv.setViewName("property/storageasignrule_list");

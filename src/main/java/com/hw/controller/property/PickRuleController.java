@@ -120,7 +120,7 @@ public class PickRuleController extends BaseController {
 			setSelect(mv);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = pickruleService.list(page);	//列出PickRule列表
 			}
 			mv.setViewName("property/pickrule_list");

@@ -142,7 +142,7 @@ public class OrderPropertyController extends BaseController {
 			page.setShowCount(Const.BATCH_SHOW_SIZE);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = orderpropertyService.list(page);	//列出OrderProperty列表
 			}
 

@@ -62,7 +62,7 @@ public class BreakBoxRpController extends BaseController {
             List<String> showItemNameList = BaseInfoCache.getInstance().getInboundNameColum(pd.getString("CUSTOMER_ID"));
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                 varList = breakboxRpService.list(page);
             }
 

@@ -126,7 +126,7 @@ public class StockTurnController extends BaseController {
 			page.setPd(pd);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = stockturnService.list(page);    //列出StockTurn列表
 			}
 			mv.setViewName("property/stockturn_list");

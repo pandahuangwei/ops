@@ -115,7 +115,7 @@ public class StockAsignRuleController extends BaseController {
 			setSelect(mv);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = stockasignruleService.list(page);	//列出StockAsignRule列表
 			}
 			mv.setViewName("property/stockasignrule_list");

@@ -219,4 +219,6 @@ public class Const {
 
     public static final int SAVE_SIZE = 100;
 
+    public static final String SEARCH_FLAG_NO = "0";
+    public static final String SEARCH_FLAG_YSE = "1";
 }

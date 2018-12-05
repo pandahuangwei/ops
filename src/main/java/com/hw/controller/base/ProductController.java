@@ -123,7 +123,7 @@ public class ProductController extends BaseController {
 			setSelect(mv,null);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = productService.list(page);	//列出Product列表
 			}
 

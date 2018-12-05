@@ -157,7 +157,7 @@ public class LocatorController extends BaseController {
 			page.setPd(pd);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = locatorService.list(page);	//列出Locator列表
 			}
 

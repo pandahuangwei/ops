@@ -117,7 +117,7 @@ public class BoxRuleController extends BaseController {
             setSelect(mv);
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                 varList = boxruleService.list(page);	//列出BOXRULE列表
             }
 

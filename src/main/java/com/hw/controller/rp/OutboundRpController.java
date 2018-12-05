@@ -58,7 +58,7 @@ public class OutboundRpController extends BaseController {
 
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                 varList = outboundRpService.list(page);
             }
 
@@ -126,7 +126,7 @@ public class OutboundRpController extends BaseController {
             List<String> showItemNameList = BaseInfoCache.getInstance().getOutboundNameColum(pd.getString("CUSTOMER_ID"));
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                 varList = outboundRpService.list(page);
             }
 

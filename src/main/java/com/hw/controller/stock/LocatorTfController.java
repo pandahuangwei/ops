@@ -53,7 +53,7 @@ public class LocatorTfController extends BaseController {
 			setSelect(mv);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = locatorTfService.list(page);
 			}
 			mv.setViewName("stock/locatortf_list");

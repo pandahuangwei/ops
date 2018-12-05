@@ -3,8 +3,8 @@ $(function(){if('main'== locat[3]){locat =  locat[0]+'//'+locat[2];}else{locat =
 
 
 //菜单状态切换
-var fmid = "fhindex";
-var mid = "fhindex";
+var fmid = "hwindex";
+var mid = "hwindex";
 function siMenu(id,fid,MENU_NAME,MENU_URL){
 	if(id != mid){
 		$("#"+mid).removeClass();
@@ -36,12 +36,83 @@ $(function(){
 
 var USER_ID;
 
-var user = "FH";	//用于即时通讯（ 当前登录用户）
+var user = "HW";	//用于即时通讯（ 当前登录用户）
+$(function(){
+    $.ajax({
+        type: "POST",
+        url: locat+'/head/getUname.do?tm='+new Date().getTime(),
+        data: encodeURI(""),
+        dataType:'json',
+        //beforeSend: validateData,
+        cache: false,
+        success: function(data){
+            //alert(data.list.length);
+            $.each(data.list, function(i, list){
+                //登陆者资料
+                $("#user_info").html('<small>Welcome</small> '+list.NAME+'');
+                user = list.USERNAME;
+                USER_ID = list.USER_ID;//用户ID
+                hf(list.SKIN);//皮肤
 
+                if(list.USERNAME != 'administrator'){
+
+                    $("#menuchange").hide();	//隐藏菜单切换
+                    $("#uiexam").hide();	   //隐藏UI实例
+
+                    $("#adminmenu").hide();	//隐藏菜单设置
+                    $("#adminzidian").hide();	//隐藏数据字典
+                    $("#systemset").hide();	//隐藏系统设置
+                    $("#productCode").hide();	//隐藏代码生成
+
+                    $("#procmsg").hide();	     //隐藏开发进度
+                    $("#mailmsg").hide();	    //隐藏站内邮件信息
+                    $("#talkmsg").hide();	   //隐藏聊天信息
+                }
+                online();//连接在线管理
+            });
+        }
+    });
+});
 
 //在线管理
 var websocket;
 function online(){
+    if (window.WebSocket) {
+
+        websocket = new WebSocket(encodeURI('ws://'+oladress));
+
+        websocket.onopen = function() {
+            //连接成功
+            websocket.send('[join]'+user);
+        };
+        websocket.onerror = function() {
+            //连接失败
+        };
+        websocket.onclose = function() {
+            //连接断开
+        };
+        //消息接收
+        websocket.onmessage = function(message) {
+            if (message == null || message=='') {
+                return;
+            }
+            var message = JSON.parse(message.data);
+            alert(message);
+            if (message.type == 'count') {
+                userCount = message.msg;
+            }else if(message.type == 'goOut'){
+                $("body").html("");
+                goOut("此用户在其它终端已经早于您登录,您暂时无法登录");
+            }else if(message.type == 'thegoout'){
+                $("body").html("");
+                goOut("您被系统管理员强制下线");
+            }else if(message.type == 'changeMenu'){
+                window.location.href=locat+'/main/yes';
+            }else if(message.type == 'userlist'){
+                userlist = message.list;
+            }
+        };
+    }
 }
 
 //在线总数

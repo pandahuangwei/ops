@@ -242,7 +242,7 @@ public class ReceivOptController extends BaseController {
 			page.setPd(pd);
 			List<PageData> varList=new ArrayList<>();
 			String searchFlag = pd.getString("SEARCH_FLAG");
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = stockmgrinService.list(page);	//列出StockMgrIn列表
 			}
 

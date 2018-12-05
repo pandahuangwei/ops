@@ -116,7 +116,7 @@ public class PackRuleController extends BaseController {
 			page.setPd(pd);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = packruleService.list(page);    //列出PackRule列表
 			}
 			mv.setViewName("property/packrule_list");

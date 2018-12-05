@@ -130,7 +130,7 @@ public class CustomerController extends BaseController {
 			mv.addObject("cityAllList", cityAllList);
 			String searchFlag = pd.getString("SEARCH_FLAG");
 			List<PageData> varList=new ArrayList<>();
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				varList = customerService.list(page);	//列出Customer列表
 			}
 

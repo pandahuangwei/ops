@@ -114,7 +114,7 @@ public class ImgmsgController extends BaseController {
             page.setPd(pd);
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                 varList = imgmsgService.list(page);	//列出Imgmsg列表
             }
             mv.setViewName("weixin/imgmsg/imgmsg_list");

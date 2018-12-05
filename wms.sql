@@ -2,7 +2,8 @@
 SQLyog 企业版 - MySQL GUI v8.14 
 MySQL - 8.0.12 : Database - wms
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -897,6 +898,15 @@ CREATE TABLE `tb_select` (
 
 insert  into `tb_select`(`SELECT_ID`,`GROUP_KEY`,`GROUP_NAME`,`C_CODE`,`C_VALUE`,`C_DESC`,`MODIFY_EMP`,`MODIFY_TM`,`DEL_FLG`,`C_SORT`) values ('1','LOCATOR_STATE','库位属性','1','正常',NULL,NULL,NULL,'0',1),('10','LOCATOR_USE','库位使用','6','理货站和组装工作区',NULL,NULL,NULL,'0',6),('100','ASSIGNED_STATE','分配状态','1','未分配',NULL,NULL,NULL,'0',1),('101','ASSIGNED_STATE','分配状态','2','部分分配',NULL,NULL,NULL,'0',2),('102','ASSIGNED_STATE','分配状态','3','全部分配',NULL,NULL,NULL,'0',3),('103','LOCATOR_PRIORITY_LEVEL','库位优先级','4','4',NULL,NULL,NULL,'0',4),('104','LOCATOR_PRIORITY_LEVEL','库位优先级','5','5',NULL,NULL,NULL,'0',5),('11','LOCATOR_TYPE','库位类型','1','货架',NULL,NULL,NULL,'0',1),('110','CURRENCY_TYPE','币种','RMB','RMB人民币',NULL,NULL,NULL,'0',1),('111','CURRENCY_TYPE','币种','HKD','HKD港币',NULL,NULL,NULL,'0',2),('112','CURRENCY_TYPE','币种','USD','USD美元',NULL,NULL,NULL,'0',3),('113','CURRENCY_TYPE','币种','EUR','EUR欧元',NULL,NULL,NULL,'0',4),('12','LOCATOR_TYPE','库位类型','2','地面平仓',NULL,NULL,NULL,'0',2),('120','RULE_STORAGE','库位指定规则','1','人工指定库位',NULL,NULL,NULL,'0',1),('121','RULE_STORAGE','库位指定规则','2','收获时计算库位',NULL,NULL,NULL,'0',2),('122','RULE_STORAGE','库位指定规则','3','码放时计算库位',NULL,NULL,NULL,'0',3),('125','RULE_BULK','体积重量计算方式','1','录入整票单证重量',NULL,NULL,NULL,'0',1),('126','RULE_BULK','体积重量计算方式','2','按产品手工录入',NULL,NULL,NULL,'0',2),('127','RULE_BULK','体积重量计算方式','3','按产品自动计算',NULL,NULL,NULL,'0',3),('13','LOCATOR_TYPE','库位类型','3','重力式货架',NULL,NULL,NULL,'0',3),('130','BOOlEAN_FLG','是否','2','2','','admin','2016-11-04 09:46:57','1',2),('131','BOOlEAN_FLG','是否','2','243','','admin','2016-11-04 09:47:13','0',3),('132','BOOlEAN_FLG','是否','1','11','','admin','2016-11-06 17:58:39','0',1),('133','LOADED_TYPE','装车状态','1','未装车','','admin','2016-11-04 01:47:07','0',1),('134','LOADED_TYPE','装车状态','2','部分装车','','admin','2016-11-04 01:47:07','0',2),('135','LOADED_TYPE','装车状态','3','全部装车','','admin','2016-11-04 01:47:07','0',3),('136','OUTSTOCK_WAY','发货方式','1','按拣货发货','','admin','2016-11-04 01:47:07','0',1),('137','OUTSTOCK_WAY','发货方式','2','按出货单发货','','admin','2016-11-04 01:47:07','0',2),('138','OUTSTOCK_WAY','发货方式','3','按配载单发货','','admin','2016-11-04 01:47:07','0',3),('139','PICK_STATE','拣货状态','1','未拣货','','admin','2016-11-04 01:47:07','0',1),('14','LOCATOR_TYPE','库位类型','4','窄巷道货架',NULL,NULL,NULL,'0',4),('140','PICK_STATE','拣货状态','2','部分拣货','','admin','2016-11-04 01:47:07','0',2),('141','PICK_STATE','拣货状态','3','全部拣货','','admin','2016-11-04 01:47:07','0',3),('142','DEPOT_TYPE','发货状态','1','未发货','','admin','2016-11-04 01:47:07','0',1),('143','DEPOT_TYPE','发货状态','2','部分发货','','admin','2016-11-04 01:47:07','0',2),('144','DEPOT_TYPE','发货状态','3','全部发货','','admin','2016-11-04 01:47:07','0',3),('145','OUTSTOCK_TYPE','出库类型','1','一般','','admin','2016-11-04 01:47:07','0',1),('146','OUTSTOCK_TYPE','出库类型','2','退货','','admin','2016-11-04 01:47:07','0',2),('147','CAR_TYPE','车型','small','小型车',NULL,NULL,NULL,'0',1),('148','CAR_TYPE','车型','middle','中型车',NULL,NULL,NULL,'0',2),('149','CAR_TYPE','车型','large','大型车',NULL,NULL,NULL,'0',3),('15','LOCATOR_UNIT','库位处理','1','其他',NULL,NULL,NULL,'0',1),('150','PACK_UNIT','包装单位','1','EA','',NULL,NULL,'0',1),('151','PACK_UNIT','包装单位','2','IP','',NULL,NULL,'0',2),('152','TP_HAULIER','承运人','1','AAAA',NULL,NULL,NULL,'0',1),('153','BATCH_PROPERTY','批次属性','1','入库日期','','','','0',1),('154','BATCH_PROPERTY','批次属性','2','Case Number','','','','0',2),('155','BATCH_PROPERTY','批次属性','3','入库单号','','','','0',3),('156','SORT_BY','排序','ASC','从小到大','','','','0',1),('157','SORT_BY','排序','DESC','从大到小','','','','0',2),('158','FREEZE_STATE','冻结状态','1','未冻结',NULL,NULL,NULL,'0',1),('159','FREEZE_STATE','冻结状态','2','部分冻结',NULL,NULL,NULL,'0',2),('16','LOCATOR_UNIT','库位处理','2','箱',NULL,NULL,NULL,'0',2),('160','FREEZE_STATE','冻结状态','3','全部冻结',NULL,NULL,NULL,'0',3),('161','CARGO_STATE','配载状态','1','未配载',NULL,NULL,NULL,'0',1),('162','CARGO_STATE','配载状态','2','部分配载',NULL,NULL,NULL,'0',2),('163','CARGO_STATE','配载状态','3','全部配载',NULL,NULL,NULL,'0',3),('164','PACK_UNIT','包装单位','3','CS','','admin','2016-11-30 23:29:21','0',3),('165','PACK_UNIT','包装单位','4','PL','','admin','2016-11-30 23:29:32','0',4),('166','PACK_UNIT','包装单位','5','OT','','admin','2016-11-30 23:29:45','0',5),('17','LOCATOR_UNIT','库位处理','3','托盘',NULL,NULL,NULL,'0',3),('18','TURNOVER_CYCLE','周转周期','1','快速周转',NULL,NULL,NULL,'0',1),('19','TURNOVER_CYCLE','周转周期','2','中速周转',NULL,NULL,NULL,'0',2),('2','LOCATOR_STATE','库位属性','2','占用',NULL,NULL,NULL,'0',2),('20','TURNOVER_CYCLE','周转周期','3','慢速中转',NULL,NULL,NULL,'0',3),('23','TOTAL_WEIGHT_UNIT','毛重单位','0','',NULL,NULL,NULL,'0',0),('24','TOTAL_WEIGHT_UNIT','毛重单位','1','其他',NULL,NULL,NULL,'0',1),('25','TOTAL_WEIGHT_UNIT','毛重单位','2','托盘',NULL,NULL,NULL,'0',2),('26','TOTAL_WEIGHT_UNIT','毛重单位','3','箱',NULL,NULL,NULL,'0',3),('27','TOTAL_WEIGHT_UNIT','毛重单位','4','内包装',NULL,NULL,NULL,'0',4),('28','TOTAL_WEIGHT_UNIT','毛重单位','5','EA',NULL,NULL,NULL,'0',5),('29','TOTAL_SUTTLE_UNIT','净重单位','0','',NULL,NULL,NULL,'0',0),('3','LOCATOR_STATE','库位属性','3','封存',NULL,NULL,NULL,'0',3),('30','TOTAL_SUTTLE_UNIT','净重单位','1','其他',NULL,NULL,NULL,'0',1),('31','TOTAL_SUTTLE_UNIT','净重单位','2','托盘',NULL,NULL,NULL,'0',2),('32','TOTAL_SUTTLE_UNIT','净重单位','3','箱',NULL,NULL,NULL,'0',3),('33','TOTAL_SUTTLE_UNIT','净重单位','4','内包装',NULL,NULL,NULL,'0',4),('34','TOTAL_SUTTLE_UNIT','净重单位','5','EA',NULL,NULL,NULL,'0',5),('35','VOLUME_UNIT','体积单位','0','',NULL,NULL,NULL,'0',0),('36','VOLUME_UNIT','体积单位','1','其他',NULL,NULL,NULL,'0',1),('37','VOLUME_UNIT','体积单位','2','托盘',NULL,NULL,NULL,'0',2),('38','VOLUME_UNIT','体积单位','3','箱',NULL,NULL,NULL,'0',3),('39','VOLUME_UNIT','体积单位','4','内包装',NULL,NULL,NULL,'0',4),('4','LOCATOR_STATE','库位属性','4','损坏',NULL,NULL,NULL,'0',4),('40','VOLUME_UNIT','体积单位','5','EA',NULL,NULL,NULL,'0',5),('41','FREEZE_REJECT_CODE','冻结/拒收代码','0','',NULL,NULL,NULL,'0',0),('42','FREEZE_REJECT_CODE','冻结/拒收代码','1','正常',NULL,NULL,NULL,'0',1),('43','FREEZE_REJECT_CODE','冻结/拒收代码','2','货物损坏',NULL,NULL,NULL,'0',2),('44','FREEZE_REJECT_CODE','冻结/拒收代码','3','过期产品',NULL,NULL,NULL,'0',3),('45','FREEZE_REJECT_CODE','冻结/拒收代码','4','库位非活动状态',NULL,NULL,NULL,'0',4),('46','FREEZE_REJECT_CODE','冻结/拒收代码','5','其他',NULL,NULL,NULL,'0',5),('47','FREEZE_REJECT_CODE','冻结/拒收代码','6','质检-上架',NULL,NULL,NULL,'0',6),('48','FREEZE_REJECT_CODE','冻结/拒收代码','7','上架-质检',NULL,NULL,NULL,'0',7),('49','PERIOD_TYPE','周期类型','1','生产日期',NULL,NULL,NULL,'0',1),('5','LOCATOR_USE','库位使用','1','存储库位',NULL,NULL,NULL,'0',1),('50','PERIOD_TYPE','周期类型','2','失效日期',NULL,NULL,NULL,'0',2),('51','PERIOD_TYPE','周期类型','0','',NULL,NULL,NULL,'0',0),('6','LOCATOR_USE','库位使用','2','过渡库位',NULL,NULL,NULL,'0',2),('60','ORDERBATCH_TYPE','订单/批次属性','1','入库单订单属性',NULL,NULL,NULL,'0',1),('61','ORDERBATCH_TYPE','订单/批次属性','2','出库单订单属性',NULL,NULL,NULL,'0',2),('62','ORDERBATCH_TYPE','订单/批次属性','3','入库单批次属性',NULL,NULL,NULL,'0',3),('63','ORDERBATCH_TYPE','订单/批次属性','4','出库单批次属性',NULL,NULL,NULL,'0',4),('7','LOCATOR_USE','库位使用','3','箱拣货库位',NULL,NULL,NULL,'0',3),('70','INSTOCK_TYPE','入库类型','1','一般',NULL,NULL,NULL,'0',1),('71','INSTOCK_TYPE','入库类型','2','退货',NULL,NULL,NULL,'0',2),('75','INSTOCK_STATE','收货状态','1','未收货',NULL,NULL,NULL,'0',1),('76','INSTOCK_STATE','收货状态','2','部分收货',NULL,NULL,NULL,'0',2),('77','INSTOCK_STATE','收货状态','3','全部收货',NULL,NULL,NULL,'0',3),('8','LOCATOR_USE','库位使用','4','件拣货库位',NULL,NULL,NULL,'0',4),('80','PUT_STATE','码放状态','1','未码放',NULL,NULL,NULL,'0',1),('81','PUT_STATE','码放状态','2','部分码放',NULL,NULL,NULL,'0',2),('82','PUT_STATE','码放状态','3','全部码放',NULL,NULL,NULL,'0',3),('9','LOCATOR_USE','库位使用','5','箱/件拣货库位',NULL,NULL,NULL,'0',5),('90','PRIORITY_LEVEL','优先级','1','1',NULL,NULL,NULL,'0',1),('91','PRIORITY_LEVEL','优先级','2','2',NULL,NULL,NULL,'0',2),('92','PRIORITY_LEVEL','优先级','3','3',NULL,NULL,NULL,'0',3),('93','PRIORITY_LEVEL','优先级','4','4',NULL,NULL,NULL,'0',4),('94','PRIORITY_LEVEL','优先级','5','5',NULL,NULL,NULL,'0',5),('95','PRODUCT_TYPE','货物类型','1','电子产品','',NULL,NULL,'0',1),('96','PRODUCT_TYPE','货物类型','2','快消产品','',NULL,NULL,'0',2),('97','LOCATOR_PRIORITY_LEVEL','库位优先级','1','1',NULL,NULL,NULL,'0',1),('98','LOCATOR_PRIORITY_LEVEL','库位优先级','2','2',NULL,NULL,NULL,'0',2),('99','LOCATOR_PRIORITY_LEVEL','库位优先级','3','3',NULL,NULL,NULL,'0',3);
 
+DROP TABLE IF EXISTS `tb_box_rule`;
+CREATE TABLE `tb_box_rule` (
+   `CUSTOMER_ID` varchar(32) DEFAULT NULL,
+   `MID_CODE` varchar(255) DEFAULT NULL,
+   `MEMO` varchar(255) DEFAULT NULL,
+   `CREATE_EMP` varchar(255) DEFAULT NULL,
+   `CREATE_TM` varchar(255) DEFAULT NULL,
+   `BOXRULE_ID` varchar(32) DEFAULT NULL
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*Table structure for table `tb_stock` */
 
 DROP TABLE IF EXISTS `tb_stock`;
@@ -1681,6 +1691,16 @@ CREATE TABLE `tm_stockmgrin_property` (
   `TXT_EIGHT` varchar(64) DEFAULT NULL,
   `TXT_NINET` varchar(64) DEFAULT NULL,
   `TXT_TWENT` varchar(64) DEFAULT NULL,
+  `TXT_21` VARCHAR(64) DEFAULT NULL,
+   `TXT_22` VARCHAR(64) DEFAULT NULL,
+   `TXT_23` VARCHAR(64) DEFAULT NULL,
+   `TXT_24` VARCHAR(64) DEFAULT NULL,
+   `TXT_25` VARCHAR(64) DEFAULT NULL,
+   `TXT_26` VARCHAR(64) DEFAULT NULL,
+   `TXT_27` VARCHAR(64) DEFAULT NULL,
+   `TXT_28` VARCHAR(64) DEFAULT NULL,
+   `TXT_29` VARCHAR(64) DEFAULT NULL,
+   `TXT_30` VARCHAR(64) DEFAULT NULL,
   PRIMARY KEY (`P_ID`),
   FULLTEXT KEY `NewIndex1` (`STOCKDTLMGRIN_ID`,`ORDERBATCH_TYPE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1849,6 +1869,16 @@ CREATE TABLE `tm_stockmgrout_property` (
   `TXT_EIGHT` varchar(128) DEFAULT NULL,
   `TXT_NINET` varchar(128) DEFAULT NULL,
   `TXT_TWENT` varchar(128) DEFAULT NULL,
+  `TXT_21` VARCHAR(64) DEFAULT NULL,
+   `TXT_22` VARCHAR(64) DEFAULT NULL,
+   `TXT_23` VARCHAR(64) DEFAULT NULL,
+   `TXT_24` VARCHAR(64) DEFAULT NULL,
+   `TXT_25` VARCHAR(64) DEFAULT NULL,
+   `TXT_26` VARCHAR(64) DEFAULT NULL,
+   `TXT_27` VARCHAR(64) DEFAULT NULL,
+   `TXT_28` VARCHAR(64) DEFAULT NULL,
+   `TXT_29` VARCHAR(64) DEFAULT NULL,
+   `TXT_30` VARCHAR(64) DEFAULT NULL,
   PRIMARY KEY (`P_ID`),
   FULLTEXT KEY `NewIndex1` (`STOCKDTLMGROUT_ID`,`ORDERBATCH_TYPE`),
   FULLTEXT KEY `NewIndex2` (`STOCKMGROUT_ID`)

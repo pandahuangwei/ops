@@ -108,7 +108,7 @@ public class DataMgrController extends BaseController {
 			flg = StringUtil.isEmpty(flg)?"0":flg;
 			List<PageData>	varList = new ArrayList<>();
 			String searchFlag = pd.getString("SEARCH_FLAG");
-			if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+			if(isSearch(searchFlag)) {
 				if (flg.equals("0")) {
 					varList = datamgrService.list(page);    //列出DataMgr列表
 				} else {

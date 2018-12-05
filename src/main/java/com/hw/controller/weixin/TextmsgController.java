@@ -120,7 +120,7 @@ public class TextmsgController extends BaseController {
             page.setPd(pd);
             String searchFlag = pd.getString("SEARCH_FLAG");
             List<PageData> varList=new ArrayList<>();
-            if(StringUtil.isNotEmpty(searchFlag)&&searchFlag.equals("1")) {
+            if(isSearch(searchFlag)) {
                  varList = textmsgService.list(page);	//列出Textmsg列表
             }
             mv.setViewName("weixin/textmsg/textmsg_list");
